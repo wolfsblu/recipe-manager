@@ -9,20 +9,55 @@ import (
 )
 
 func (h *RecipeHandler) NewError(_ context.Context, err error) (r *api.ErrorStatusCode) {
-	var serviceError *domain.RecipeServiceError
+	var domainErr *domain.Error
 	var securityError *ogenerrors.SecurityError
 
 	if errors.As(err, &securityError) {
-		serviceError = domain.ErrSecurity
-	} else if !errors.As(err, &serviceError) {
-		serviceError = domain.ErrUnhandled
+		domainErr = domain.ErrAuthentication
+	} else if !errors.As(err, &domainErr) {
+		domainErr = domain.ErrUnhandled
 	}
 
 	return &api.ErrorStatusCode{
-		StatusCode: serviceError.HttpStatusCode,
+		StatusCode: mapToStatusCode(domainErr),
 		Response: api.Error{
-			Code:    serviceError.Code,
+			Code:    domainErr.Code,
 			Message: err.Error(),
 		},
+	}
+}
+
+func mapToStatusCode(err *domain.Error) int {
+	switch {
+	case errors.Is(err, domain.ErrUserExists):
+		return 400
+	case errors.Is(err, domain.ErrAuthentication):
+		fallthrough
+	case errors.Is(err, domain.ErrPasswordResetTokenNotFound):
+		fallthrough
+	case errors.Is(err, domain.ErrInvalidCredentials):
+		return 403
+	case errors.Is(err, domain.ErrRecipeNotFound):
+		fallthrough
+	case errors.Is(err, domain.ErrUserNotFound):
+		return 404
+	case errors.Is(err, domain.ErrCommittingTransaction):
+		fallthrough
+	case errors.Is(err, domain.ErrCreatingUser):
+		fallthrough
+	case errors.Is(err, domain.ErrCreatingPasswordResetToken):
+		fallthrough
+	case errors.Is(err, domain.ErrCreatingRegistrationToken):
+		fallthrough
+	case errors.Is(err, domain.ErrDeletingPasswordResetToken):
+		fallthrough
+	case errors.Is(err, domain.ErrStartingTransaction):
+		fallthrough
+	case errors.Is(err, domain.ErrUnhandled):
+		fallthrough
+	case errors.Is(err, domain.ErrUpdatingPassword):
+		fallthrough
+	default:
+		return 500
 	}
 }

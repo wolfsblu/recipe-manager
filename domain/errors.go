@@ -4,27 +4,32 @@ import (
 	"fmt"
 )
 
-type RecipeServiceError struct {
-	HttpStatusCode int
-	Code           int
-	Message        string
-	Children       []error
+type Error struct {
+	Code    int
+	Message string
 }
 
 var (
-	ErrUnhandled          = &RecipeServiceError{HttpStatusCode: 500, Code: 1, Message: "internal server error"}
-	ErrNotFound           = &RecipeServiceError{HttpStatusCode: 404, Code: 2, Message: "the requested resource was not found"}
-	ErrSecurity           = &RecipeServiceError{HttpStatusCode: 403, Code: 3, Message: "authentication required"}
-	ErrInvalidCredentials = &RecipeServiceError{HttpStatusCode: 403, Code: 4, Message: "invalid credentials"}
-	ErrRegistration       = &RecipeServiceError{HttpStatusCode: 422, Code: 5, Message: "failed to register user"}
-	ErrPersistence        = &RecipeServiceError{HttpStatusCode: 500, Code: 6, Message: "failed to persist data"}
-	ErrRetrieval          = &RecipeServiceError{HttpStatusCode: 500, Code: 7, Message: "failed to retrieve data"}
+	ErrUnhandled                  = &Error{Code: 100, Message: "internal server error"}
+	ErrStartingTransaction        = &Error{Code: 101, Message: "failed to establish transaction"}
+	ErrCommittingTransaction      = &Error{Code: 102, Message: "failed to commit transaction"}
+	ErrCreatingUser               = &Error{Code: 200, Message: "failed to create user"}
+	ErrCreatingPasswordResetToken = &Error{Code: 201, Message: "failed to create password reset token"}
+	ErrCreatingRegistrationToken  = &Error{Code: 202, Message: "failed to create user registration token"}
+	ErrUserExists                 = &Error{Code: 203, Message: "user already exists"}
+	ErrInvalidCredentials         = &Error{Code: 300, Message: "invalid credentials"}
+	ErrUpdatingPassword           = &Error{Code: 301, Message: "failed to update password"}
+	ErrAuthentication             = &Error{Code: 302, Message: "failed to authenticate user"}
+	ErrDeletingPasswordResetToken = &Error{Code: 302, Message: "failed to remove password reset token"}
+	ErrUserNotFound               = &Error{Code: 400, Message: "user was not found"}
+	ErrPasswordResetTokenNotFound = &Error{Code: 401, Message: "password reset token was not found"}
+	ErrRecipeNotFound             = &Error{Code: 402, Message: "recipe was not found"}
 )
 
-func (e *RecipeServiceError) Error() string {
+func (e *Error) Error() string {
 	return e.Message
 }
 
-func WrapError(err error, message string, root *RecipeServiceError) error {
-	return fmt.Errorf("%w: %s: %w", root, message, err)
+func WrapError(parent *Error, child error) error {
+	return fmt.Errorf("%w: %w", parent, child)
 }

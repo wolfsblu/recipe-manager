@@ -8,7 +8,7 @@ import (
 func (s *Store) Begin(ctx context.Context) error {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return domain.WrapError(err, "failed to establish transaction", domain.ErrPersistence)
+		return domain.WrapError(domain.ErrStartingTransaction, err)
 	}
 	s.tx = tx
 	s.qtx = s.q.WithTx(tx)
@@ -18,7 +18,7 @@ func (s *Store) Begin(ctx context.Context) error {
 func (s *Store) Commit() error {
 	err := s.tx.Commit()
 	if err != nil {
-		return domain.WrapError(err, "failed to commit transaction", domain.ErrPersistence)
+		return domain.WrapError(domain.ErrCommittingTransaction, err)
 	}
 	return nil
 }

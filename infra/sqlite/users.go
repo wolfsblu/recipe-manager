@@ -2,8 +2,6 @@ package sqlite
 
 import (
 	"context"
-	"database/sql"
-	"github.com/go-faster/errors"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/domain/security"
 )
@@ -14,7 +12,7 @@ func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User)
 		Token:  security.GenerateToken(security.DefaultTokenLength),
 	})
 	if err != nil {
-		return token, domain.WrapError(err, "failed to create password reset token", domain.ErrPersistence)
+		return token, domain.WrapError(domain.ErrCreatingPasswordResetToken, err)
 	}
 
 	token = result.AsDomainModel()
@@ -28,7 +26,7 @@ func (s *Store) CreateUser(ctx context.Context, credentials domain.Credentials) 
 		PasswordHash: credentials.PasswordHash,
 	})
 	if err != nil {
-		return user, domain.WrapError(err, "failed to create user", domain.ErrPersistence)
+		return user, domain.WrapError(domain.ErrCreatingUser, err)
 	}
 	return result.AsDomainModel(), nil
 }
@@ -39,7 +37,7 @@ func (s *Store) CreateUserRegistration(ctx context.Context, user *domain.User) (
 		Token:  security.GenerateToken(security.DefaultTokenLength),
 	})
 	if err != nil {
-		return registration, domain.WrapError(err, "failed to create user registration", domain.ErrPersistence)
+		return registration, domain.WrapError(domain.ErrCreatingRegistrationToken, err)
 	}
 
 	registration = result.AsDomainModel()
@@ -50,7 +48,7 @@ func (s *Store) CreateUserRegistration(ctx context.Context, user *domain.User) (
 func (s *Store) GetPasswordResetTokenByUser(ctx context.Context, user *domain.User) (token domain.PasswordResetToken, _ error) {
 	result, err := s.query().GetPasswordResetTokenByUser(ctx, user.ID)
 	if err != nil {
-		return token, domain.WrapError(err, "failed to retrieve password reset token", domain.ErrRetrieval)
+		return token, domain.WrapError(domain.ErrPasswordResetTokenNotFound, err)
 	}
 	token = result.AsDomainModel()
 	token.User = user
@@ -59,20 +57,16 @@ func (s *Store) GetPasswordResetTokenByUser(ctx context.Context, user *domain.Us
 
 func (s *Store) GetUserByEmail(ctx context.Context, email string) (user domain.User, _ error) {
 	result, err := s.query().GetUserByEmail(ctx, email)
-	if errors.Is(err, sql.ErrNoRows) {
-		return user, domain.ErrNotFound
-	} else if err != nil {
-		return user, domain.WrapError(err, "failed to retrieve user by email", domain.ErrRetrieval)
+	if err != nil {
+		return user, domain.WrapError(domain.ErrUserNotFound, err)
 	}
 	return result.AsDomainModel(), nil
 }
 
 func (s *Store) GetUserById(ctx context.Context, id int64) (user domain.User, _ error) {
 	result, err := s.query().GetUser(ctx, id)
-	if errors.Is(err, sql.ErrNoRows) {
-		return user, domain.ErrNotFound
-	} else if err != nil {
-		return user, domain.WrapError(err, "failed to retrieve user by id", domain.ErrRetrieval)
+	if err != nil {
+		return user, domain.WrapError(domain.ErrUserNotFound, err)
 	}
 	return result.AsDomainModel(), nil
 }
@@ -86,16 +80,16 @@ func (s *Store) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPa
 
 	token, err := s.query().GetPasswordResetToken(ctx, searchToken)
 	if err != nil {
-		return domain.WrapError(err, "failed to retrieve password reset token", domain.ErrRetrieval)
+		return domain.WrapError(domain.ErrPasswordResetTokenNotFound, err)
 	}
 	if err = s.query().UpdatePasswordByUserId(ctx, UpdatePasswordByUserIdParams{
 		PasswordHash: hashedPassword,
 		ID:           token.User.ID,
 	}); err != nil {
-		return domain.WrapError(err, "failed to update password", domain.ErrPersistence)
+		return domain.WrapError(domain.ErrUpdatingPassword, err)
 	}
 	if err = s.query().DeletePasswordResetTokenByUserId(ctx, token.User.ID); err != nil {
-		return domain.WrapError(err, "failed to delete password reset token", domain.ErrPersistence)
+		return domain.WrapError(domain.ErrDeletingPasswordResetToken, err)
 	}
 	return s.Commit()
 }

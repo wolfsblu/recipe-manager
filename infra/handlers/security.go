@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
 )
@@ -26,11 +25,11 @@ func NewSecurityHandler(service *domain.RecipeService) *SecurityHandler {
 func (h *SecurityHandler) HandleCookieAuth(ctx context.Context, _ string, t api.CookieAuth) (context.Context, error) {
 	userId, err := getUserFromSessionCookie(t.APIKey)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", &domain.ErrSecurity, err)
+		return nil, domain.WrapError(domain.ErrAuthentication, err)
 	}
 	user, err := h.Recipes.GetUserById(ctx, userId)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %w", &domain.ErrSecurity, err)
+		return nil, domain.WrapError(domain.ErrAuthentication, err)
 	}
 	return context.WithValue(ctx, ctxKeyUser, &user), nil
 }

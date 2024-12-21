@@ -2,8 +2,6 @@ package domain
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"github.com/wolfsblu/go-chef/domain/security"
 	"time"
 )
@@ -43,26 +41,24 @@ func (s *RecipeService) GetUserByEmail(ctx context.Context, email string) (User,
 }
 
 func (s *RecipeService) RegisterUser(ctx context.Context, credentials Credentials) error {
+	user, err := s.store.GetUserByEmail(ctx, credentials.Email)
+	if err == nil {
+		return ErrUserExists
+	}
 	if err := s.store.Begin(ctx); err != nil {
 		return err
 	}
 	defer s.store.Rollback()
-	user, err := s.store.GetUserByEmail(ctx, credentials.Email)
-	if err == nil {
-		return nil
-	} else if !errors.Is(err, ErrNotFound) {
-		return fmt.Errorf("%w: %w", ErrRegistration, err)
-	}
 	user, err = s.store.CreateUser(ctx, credentials)
 	if err != nil {
-		return fmt.Errorf("%w: %w", ErrRegistration, err)
+		return err
 	}
 	registration, err := s.store.CreateUserRegistration(ctx, &user)
 	if err != nil {
-		return fmt.Errorf("%w: %w", ErrRegistration, err)
+		return err
 	}
 	if err = s.store.Commit(); err != nil {
-		return fmt.Errorf("%w: %w", ErrRegistration, err)
+		return err
 	}
 	go func() {
 		_ = s.sender.SendUserRegistration(registration)
@@ -92,9 +88,9 @@ func (s *RecipeService) ResetPasswordByEmail(ctx context.Context, email string) 
 func (s *RecipeService) VerifyPassword(user User, password string) error {
 	ok, err := security.ComparePasswordAndHash(password, user.PasswordHash)
 	if err != nil {
-		return fmt.Errorf("%w: %w", &ErrSecurity, err)
+		return WrapError(ErrInvalidCredentials, err)
 	} else if !ok {
-		return fmt.Errorf("hallo welt: %w", &ErrInvalidCredentials)
+		return ErrInvalidCredentials
 	}
 	return nil
 }

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/domain/security"
@@ -31,7 +30,7 @@ func (h *RecipeHandler) Login(ctx context.Context, req *api.Credentials) (r *api
 	}
 	cookie, err := createSessionCookie(user.ID)
 	if err != nil {
-		return nil, domain.ErrSecurity
+		return nil, domain.WrapError(domain.ErrAuthentication, err)
 	}
 
 	return &api.AuthenticatedUserHeaders{
@@ -59,13 +58,12 @@ func (h *RecipeHandler) Logout(_ context.Context) (*api.LogoutOK, error) {
 func (h *RecipeHandler) Register(ctx context.Context, c *api.Credentials) error {
 	hash, err := security.CreateHash(c.Password, security.DefaultHashParams)
 	if err != nil {
-		return domain.ErrSecurity
+		return domain.WrapError(domain.ErrCreatingUser, err)
 	}
-	err = h.Recipes.RegisterUser(ctx, domain.Credentials{
+	return h.Recipes.RegisterUser(ctx, domain.Credentials{
 		Email:        c.Email,
 		PasswordHash: hash,
 	})
-	return errors.Unwrap(err)
 }
 
 func (h *RecipeHandler) ResetPassword(ctx context.Context, req *api.ResetPasswordReq) error {
