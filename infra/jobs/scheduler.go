@@ -16,9 +16,13 @@ func StartScheduler(service *domain.RecipeService) {
 		for {
 			select {
 			case <-getC(cleanupPasswordResets):
-				_ = service.RemoveOldPasswordResets(ctx)
+				go func() {
+					_ = service.RemoveOldPasswordResets(ctx)
+				}()
 			case <-getC(cleanupRegistrations):
-				_ = service.RemoveOldRegistrations(ctx)
+				go func() {
+					_ = service.RemoveOldRegistrations(ctx)
+				}()
 			case <-quit:
 				cancel()
 				stopTickers()
