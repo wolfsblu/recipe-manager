@@ -18,6 +18,26 @@ const (
 	JsonIndentationWidth  = 2
 )
 
+var errorStatusCodeMap = map[*domain.Error]int{
+	domain.ErrAuthentication:             http.StatusForbidden,
+	domain.ErrCommittingTransaction:      http.StatusInternalServerError,
+	domain.ErrCreatingPasswordResetToken: http.StatusInternalServerError,
+	domain.ErrCreatingRegistrationToken:  http.StatusInternalServerError,
+	domain.ErrCreatingUser:               http.StatusInternalServerError,
+	domain.ErrDeletingPasswordResetToken: http.StatusInternalServerError,
+	domain.ErrDeletingRegistration:       http.StatusInternalServerError,
+	domain.ErrInvalidCredentials:         http.StatusForbidden,
+	domain.ErrPasswordResetTokenNotFound: http.StatusForbidden,
+	domain.ErrRecipeNotFound:             http.StatusNotFound,
+	domain.ErrRegistrationNotFound:       http.StatusNotFound,
+	domain.ErrStartingTransaction:        http.StatusInternalServerError,
+	domain.ErrUnhandled:                  http.StatusInternalServerError,
+	domain.ErrUpdatingPassword:           http.StatusInternalServerError,
+	domain.ErrUpdatingUser:               http.StatusInternalServerError,
+	domain.ErrUserExists:                 http.StatusBadRequest,
+	domain.ErrUserNotFound:               http.StatusNotFound,
+}
+
 func (h *RecipeHandler) NewError(_ context.Context, err error) (r *api.ErrorStatusCode) {
 	var domainErr *domain.Error
 	var securityError *ogenerrors.SecurityError
@@ -64,40 +84,8 @@ func (h *RecipeHandler) CustomErrorHandler(_ context.Context, w http.ResponseWri
 }
 
 func mapDomainErrorToStatusCode(err *domain.Error) int {
-	switch {
-	case errors.Is(err, domain.ErrUserExists):
-		return 400
-	case errors.Is(err, domain.ErrAuthentication):
-		fallthrough
-	case errors.Is(err, domain.ErrPasswordResetTokenNotFound):
-		fallthrough
-	case errors.Is(err, domain.ErrInvalidCredentials):
-		return 403
-	case errors.Is(err, domain.ErrRecipeNotFound):
-		fallthrough
-	case errors.Is(err, domain.ErrRegistrationNotFound):
-		fallthrough
-	case errors.Is(err, domain.ErrUserNotFound):
-		return 404
-	case errors.Is(err, domain.ErrCommittingTransaction):
-		fallthrough
-	case errors.Is(err, domain.ErrCreatingUser):
-		fallthrough
-	case errors.Is(err, domain.ErrCreatingPasswordResetToken):
-		fallthrough
-	case errors.Is(err, domain.ErrCreatingRegistrationToken):
-		fallthrough
-	case errors.Is(err, domain.ErrDeletingPasswordResetToken):
-		fallthrough
-	case errors.Is(err, domain.ErrDeletingRegistration):
-		fallthrough
-	case errors.Is(err, domain.ErrStartingTransaction):
-		fallthrough
-	case errors.Is(err, domain.ErrUpdatingUser):
-		fallthrough
-	case errors.Is(err, domain.ErrUnhandled):
-		fallthrough
-	default:
-		return 500
+	if val, ok := errorStatusCodeMap[err]; ok {
+		return val
 	}
+	return http.StatusInternalServerError
 }
