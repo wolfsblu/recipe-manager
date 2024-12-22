@@ -24,4 +24,5 @@ export default {
     "reset-password.labels.confirmPassword": "Confirm Password",
     "reset-password.subtitle": "If you have forgotten your password you may specify a new one below.",
     "reset-password.title": "Reset Password",
+    "user registration was not found": "There was an error confirming your account, please try clicking the link from your confirmation email again.",
 } satisfies Language

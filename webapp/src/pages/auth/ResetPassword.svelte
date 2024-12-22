@@ -3,7 +3,7 @@
     import Layout from "../../Layout.svelte";
     import SubmitIcon from "../../lib/icons/Submit.svelte";
     import Navbar from "../../lib/components/navigation/Navbar.svelte";
-    import t from "../../lib/i18n/i18n.svelte.js"
+    import {t} from "../../lib/i18n/i18n.svelte.js"
     import {createRouter} from "../../lib/router.svelte.js";
     import {createUser} from "../../lib/auth/user.svelte.js";
     import food from "../../assets/images/auth/forgot.jpg"
@@ -33,7 +33,7 @@
               title={t("reset-password.title")}
               subtitle={t("reset-password.subtitle")}
         >
-            <div class="gap-3 grid grid-cols-1 md:grid-cols-2">
+            <div class="gap-3 grid grid-cols-1">
                 <Input label={t("reset-password.labels.password")} type="password"
                        bind:value={password} required={true}/>
                 <Input label={t("reset-password.labels.confirmPassword")} type="password"

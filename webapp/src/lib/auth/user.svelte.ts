@@ -1,4 +1,5 @@
 import {
+    confirmAccount as apiConfirmAccount,
     fetchProfile as apiFetchProfile,
     login as apiLogin,
     register as apiRegister,
@@ -8,6 +9,13 @@ import {
 let profile: User | null = $state(null)
 
 export const createUser = () => {
+    const confirmAccount = async (token: string) => {
+        const response = await apiConfirmAccount(token)
+        if (response.error) {
+            throw response.error
+        }
+    }
+
     const login = async (credentials: Credentials) => {
         const response = await apiLogin(credentials)
         if (response.error) {
@@ -44,6 +52,7 @@ export const createUser = () => {
         get profile() {
             return profile
         },
+        confirmAccount,
         fetchProfile,
         login,
         register,

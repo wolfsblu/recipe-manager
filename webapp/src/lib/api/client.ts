@@ -6,6 +6,12 @@ const client = createClient<paths>({
     credentials: "include",
 })
 
+export const confirmAccount = async (token: string) => {
+    return client.POST("/user/confirm", {
+        body: {token}
+    })
+}
+
 export const fetchProfile = async () => {
     return client.GET("/user/profile")
 }

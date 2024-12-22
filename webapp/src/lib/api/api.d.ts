@@ -3,8 +3,7 @@ interface Credentials {
     password: string
 }
 
-interface Error {
-    code: number
+interface APIError {
     message: string
 }
 

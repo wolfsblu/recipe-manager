@@ -3,7 +3,7 @@
     import Layout from "../../Layout.svelte";
     import SubmitIcon from "../../lib/icons/Submit.svelte";
     import Navbar from "../../lib/components/navigation/Navbar.svelte";
-    import t from "../../lib/i18n/i18n.svelte.js"
+    import {t} from "../../lib/i18n/i18n.svelte.js"
     import {createRouter} from "../../lib/router.svelte.js";
     import {createUser} from "../../lib/auth/user.svelte.js";
     import food from "../../assets/images/auth/register.jpg"

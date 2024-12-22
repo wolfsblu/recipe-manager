@@ -40,7 +40,7 @@ export const localeSwitcher = {
     }
 }
 
-const translate = (locale: string, key: keyof Translation, vars?: Record<string, any>) => {
+const translate = (locale: string, key: string, vars?: Record<string, any>) => {
     if (!key) throw new Error("no key provided to $t()");
     if (!locale) throw new Error(`no translation for key "${key}"`);
 
@@ -58,6 +58,10 @@ const translate = (locale: string, key: keyof Translation, vars?: Record<string,
     return text;
 }
 
-export default (key: keyof Translation, vars?: any) => {
+export const te = (key: string) => {
+    return translate(currentLocale, key)
+}
+
+export const t = (key: keyof Translation, vars?: any) => {
     return translate(currentLocale, key, vars)
 }

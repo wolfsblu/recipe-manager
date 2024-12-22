@@ -1,7 +1,9 @@
 package smtp
 
 import (
+	"fmt"
 	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/go-chef/infra/env"
 	"gopkg.in/gomail.v2"
 )
 
@@ -18,7 +20,7 @@ type Mailer struct {
 
 func (s *Mailer) SendPasswordReset(token domain.PasswordResetToken) error {
 	tpl, err := buildTemplate("password-reset.html", PasswordResetTemplate{
-		ResetLink: "https://google.com",
+		ResetLink: fmt.Sprintf("%s/reset-password", env.MustGet("HOST")),
 	})
 	if err != nil {
 		return err
@@ -30,7 +32,7 @@ func (s *Mailer) SendPasswordReset(token domain.PasswordResetToken) error {
 }
 func (s *Mailer) SendUserRegistration(registration domain.UserRegistration) error {
 	tpl, err := buildTemplate("user-registration.html", UserRegistrationTemplate{
-		ConfirmLink: "https://google.com",
+		ConfirmLink: fmt.Sprintf("%s/confirm-email", env.MustGet("HOST")),
 	})
 	if err != nil {
 		return err

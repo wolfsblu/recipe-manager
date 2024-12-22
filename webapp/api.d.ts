@@ -173,7 +173,6 @@ export interface components {
         };
         /** @description Represents an error */
         Error: {
-            code: number;
             message: string;
         };
         /**

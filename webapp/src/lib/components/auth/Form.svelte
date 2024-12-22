@@ -3,7 +3,7 @@
     import Button from "../forms/Button.svelte";
 
     interface Props {
-        children: Snippet
+        children?: Snippet
         imageSrc: string
         submitIcon: Component
         submitLabel: string
@@ -26,7 +26,9 @@
             <p class="mb-3 text-sm">
                 {@html subtitle}
             </p>
-            {@render children()}
+            {#if children}
+                {@render children()}
+            {/if}
         </div>
 
         <div class="p-6 pt-0">
