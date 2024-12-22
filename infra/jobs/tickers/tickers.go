@@ -13,8 +13,8 @@ var (
 
 func Initialize() {
 	tickerMap = map[Type]*time.Ticker{
-		CleanupPasswordResets: time.NewTicker(1 * time.Minute),
-		CleanupRegistrations:  time.NewTicker(1 * time.Minute),
+		CleanupPasswordResets: time.NewTicker(24 * time.Hour),
+		CleanupRegistrations:  time.NewTicker(24 * time.Hour),
 	}
 }
 
