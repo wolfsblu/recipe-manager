@@ -23,18 +23,19 @@ func (h *RecipeHandler) Login(ctx context.Context, req *api.Credentials) (r *api
 	user, err := h.Recipes.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, err
-	} else if !user.Confirmed {
-		return nil, domain.ErrUnconfirmedUser
 	}
+
 	err = h.Recipes.VerifyPassword(user, req.Password)
 	if err != nil {
 		return nil, err
+	} else if !user.Confirmed {
+		return nil, domain.ErrUnconfirmedUser
 	}
+
 	cookie, err := createSessionCookie(user.ID)
 	if err != nil {
 		return nil, domain.WrapError(domain.ErrAuthentication, err)
 	}
-
 	return &api.AuthenticatedUserHeaders{
 		SetCookie: api.OptString{
 			Set:   true,
