@@ -37,14 +37,14 @@ CREATE TABLE users
 CREATE TABLE user_registrations
 (
     user_id    INTEGER PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
-    token      TEXT      NOT NULL,
+    token      TEXT      NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE password_resets
 (
     user_id    INTEGER PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
-    token      TEXT      NOT NULL,
+    token      TEXT      NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

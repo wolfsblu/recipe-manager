@@ -5,13 +5,17 @@ CREATE TABLE `units` (`id` integer NULL, `code` text NULL, `name` text NOT NULL,
 -- Create "ingredients" table
 CREATE TABLE `ingredients` (`id` integer NULL, `recipe_id` integer NOT NULL, `unit_id` integer NOT NULL, `name` text NOT NULL, `amount` real NOT NULL, PRIMARY KEY (`id`), CONSTRAINT `0` FOREIGN KEY (`unit_id`) REFERENCES `units` (`id`) ON UPDATE NO ACTION ON DELETE RESTRICT, CONSTRAINT `1` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE);
 -- Create "users" table
-CREATE TABLE `users` (`id` integer NULL, `email` text NOT NULL, `password_hash` text NOT NULL, `is_confirmed` BIT NOT NULL DEFAULT '0', `created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP), PRIMARY KEY (`id`));
+CREATE TABLE `users` (`id` integer NULL, `email` text NOT NULL, `password_hash` text NOT NULL, `is_confirmed` boolean NOT NULL DEFAULT 0, `created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP), PRIMARY KEY (`id`));
 -- Create index "users_email" to table: "users"
 CREATE UNIQUE INDEX `users_email` ON `users` (`email`);
 -- Create "user_registrations" table
 CREATE TABLE `user_registrations` (`user_id` integer NULL, `token` text NOT NULL, `created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP), PRIMARY KEY (`user_id`), CONSTRAINT `0` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE);
+-- Create index "user_registrations_token" to table: "user_registrations"
+CREATE UNIQUE INDEX `user_registrations_token` ON `user_registrations` (`token`);
 -- Create "password_resets" table
 CREATE TABLE `password_resets` (`user_id` integer NULL, `token` text NOT NULL, `created_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP), PRIMARY KEY (`user_id`), CONSTRAINT `0` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE);
+-- Create index "password_resets_token" to table: "password_resets"
+CREATE UNIQUE INDEX `password_resets_token` ON `password_resets` (`token`);
 -- Create "user_awards" table
 CREATE TABLE `user_awards` (`user_id` integer NOT NULL, `recipe_id` integer NOT NULL, `award_id` integer NOT NULL, `awarded_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP), CONSTRAINT `0` FOREIGN KEY (`award_id`) REFERENCES `awards` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, CONSTRAINT `1` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, CONSTRAINT `2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE);
 -- Create "user_reputation" table
