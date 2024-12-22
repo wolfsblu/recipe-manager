@@ -3,7 +3,8 @@ import {
     fetchProfile as apiFetchProfile,
     login as apiLogin,
     register as apiRegister,
-    resetPassword as apiResetPassword
+    resetPassword as apiResetPassword,
+    updatePassword as apiUpdatePassword,
 } from "../api/client";
 
 let profile: User | null = $state(null)
@@ -47,6 +48,12 @@ export const createUser = () => {
             throw response.error
         }
     }
+    const updatePassword = async (password: string, token: string) => {
+        const response = await apiUpdatePassword(password, token)
+        if (response.error) {
+            throw response.error
+        }
+    }
 
     return {
         get profile() {
@@ -57,5 +64,6 @@ export const createUser = () => {
         login,
         register,
         resetPassword,
+        updatePassword,
     }
 }

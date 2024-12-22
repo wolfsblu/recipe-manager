@@ -93,6 +93,8 @@ func (s *RecipeService) ResetPasswordByEmail(ctx context.Context, email string) 
 	user, err := s.store.GetUserByEmail(ctx, email)
 	if err != nil {
 		return err
+	} else if !user.Confirmed {
+		return ErrUnconfirmedUser
 	}
 	token, err := s.store.GetPasswordResetTokenByUser(ctx, &user)
 	if err == nil { // When there already is a reset token we want to do nothing and exit early

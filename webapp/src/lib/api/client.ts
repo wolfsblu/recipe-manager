@@ -52,3 +52,9 @@ export const resetPassword = (email: string) => {
         body: {email}
     })
 }
+
+export const updatePassword = (password: string, token: string) => {
+    return client.POST("/user/password", {
+        body: {password, token}
+    })
+}

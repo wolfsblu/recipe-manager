@@ -12,14 +12,19 @@
     const router = createRouter()
     const user = createUser()
 
+    let error: APIError | null = $state(null)
     let password = $state("")
 
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault()
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get("token") ?? ""
         try {
+            await user.updatePassword(password, token)
             router.redirectToNext()
-        } catch (e) {
-            // TODO: Show error toast
+        } catch (e: unknown) {
+            error = e as APIError
         }
     }
 </script>
