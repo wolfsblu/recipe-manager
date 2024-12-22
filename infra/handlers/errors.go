@@ -31,6 +31,7 @@ var errorStatusCodeMap = map[*domain.Error]int{
 	domain.ErrRecipeNotFound:             http.StatusNotFound,
 	domain.ErrRegistrationNotFound:       http.StatusNotFound,
 	domain.ErrStartingTransaction:        http.StatusInternalServerError,
+	domain.ErrUnconfirmedUser:            http.StatusForbidden,
 	domain.ErrUnhandled:                  http.StatusInternalServerError,
 	domain.ErrUpdatingPassword:           http.StatusInternalServerError,
 	domain.ErrUpdatingUser:               http.StatusInternalServerError,

@@ -18,6 +18,7 @@ var (
 	ErrRecipeNotFound             = &Error{Message: "recipe was not found"}
 	ErrRegistrationNotFound       = &Error{Message: "user registration was not found"}
 	ErrStartingTransaction        = &Error{Message: "failed to establish transaction"}
+	ErrUnconfirmedUser            = &Error{Message: "the requested user is not confirmed"}
 	ErrUnhandled                  = &Error{Message: "internal server error"}
 	ErrUpdatingPassword           = &Error{Message: "failed to update password"}
 	ErrUpdatingUser               = &Error{Message: "failed to update user"}

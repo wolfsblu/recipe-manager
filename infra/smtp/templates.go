@@ -3,7 +3,10 @@ package smtp
 import (
 	"bytes"
 	"fmt"
+	"github.com/wolfsblu/go-chef/infra/env"
 	"html/template"
+	"net/url"
+	"strings"
 )
 
 type PasswordResetTemplate struct {
@@ -26,4 +29,24 @@ func buildTemplate(path string, data any) (string, error) {
 		return "", err
 	}
 	return tpl.String(), nil
+}
+
+func buildUrl(path string) string {
+	path = strings.TrimPrefix(path, "/")
+	return fmt.Sprintf("%s/%s", getBaseUrl(), path)
+}
+
+func buildUrlWithQuery(path string, query map[string]string) string {
+	result, _ := url.Parse(buildUrl(path))
+	q := result.Query()
+	for k, v := range query {
+		q.Add(k, v)
+	}
+	result.RawQuery = q.Encode()
+	return result.String()
+}
+
+func getBaseUrl() string {
+	result := strings.TrimSuffix(env.MustGet("BASE_URL"), "/")
+	return fmt.Sprintf("%s", result)
 }

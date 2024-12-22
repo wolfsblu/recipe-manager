@@ -2,7 +2,7 @@
     import Layout from "../Layout.svelte";
     import Navbar from "../lib/components/navigation/Navbar.svelte";
     import {fetchRecipes} from "../lib/api/client";
-    import t, {localeSwitcher} from "../lib/i18n/i18n.svelte";
+    import {localeSwitcher} from "../lib/i18n/i18n.svelte";
 
     let recipeResult = fetchRecipes()
 </script>
