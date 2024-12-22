@@ -25,4 +25,4 @@ CREATE TABLE `recipe_votes` (`recipe_id` integer NOT NULL, `user_id` integer NOT
 -- Create "actions" table
 CREATE TABLE `actions` (`id` integer NULL, `name` text NOT NULL, `points` integer NOT NULL DEFAULT 0, PRIMARY KEY (`id`));
 -- Create "awards" table
-CREATE TABLE `awards` (`id` integer NULL, `name` text NOT NULL, PRIMARY KEY (`id`));
+CREATE TABLE `awards` (`id` integer NULL, `name` text NOT NULL, `description` text NOT NULL, PRIMARY KEY (`id`));

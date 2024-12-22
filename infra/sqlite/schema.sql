@@ -81,6 +81,7 @@ CREATE TABLE actions
 
 CREATE TABLE awards
 (
-    id   INTEGER PRIMARY KEY,
-    name TEXT NOT NULL
+    id          INTEGER PRIMARY KEY,
+    name        TEXT NOT NULL,
+    description TEXT NOT NULL
 );
