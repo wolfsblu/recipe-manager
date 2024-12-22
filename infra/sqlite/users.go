@@ -45,6 +45,14 @@ func (s *Store) CreateUserRegistration(ctx context.Context, user *domain.User) (
 	return registration, nil
 }
 
+func (s *Store) DeleteRegistrationByUser(ctx context.Context, user *domain.User) error {
+	err := s.query().DeleteRegistrationByUserId(ctx, user.ID)
+	if err != nil {
+		return domain.WrapError(domain.ErrDeletingRegistration, err)
+	}
+	return nil
+}
+
 func (s *Store) GetPasswordResetTokenByUser(ctx context.Context, user *domain.User) (token domain.PasswordResetToken, _ error) {
 	result, err := s.query().GetPasswordResetTokenByUser(ctx, user.ID)
 	if err != nil {
@@ -53,6 +61,17 @@ func (s *Store) GetPasswordResetTokenByUser(ctx context.Context, user *domain.Us
 	token = result.AsDomainModel()
 	token.User = user
 	return token, nil
+}
+
+func (s *Store) GetRegistrationByToken(ctx context.Context, token string) (registration domain.UserRegistration, _ error) {
+	result, err := s.query().GetUserRegistration(ctx, token)
+	if err != nil {
+		return registration, domain.WrapError(domain.ErrRegistrationNotFound, err)
+	}
+	user := result.User.AsDomainModel()
+	registration = result.UserRegistration.AsDomainModel()
+	registration.User = &user
+	return registration, nil
 }
 
 func (s *Store) GetUserByEmail(ctx context.Context, email string) (user domain.User, _ error) {
@@ -92,4 +111,16 @@ func (s *Store) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPa
 		return domain.WrapError(domain.ErrDeletingPasswordResetToken, err)
 	}
 	return s.Commit()
+}
+
+func (s *Store) UpdateUser(ctx context.Context, user *domain.User) error {
+	err := s.query().UpdateUser(ctx, UpdateUserParams{
+		Email:       user.Email,
+		IsConfirmed: user.Confirmed,
+		ID:          user.ID,
+	})
+	if err != nil {
+		return domain.WrapError(domain.ErrUpdatingUser, err)
+	}
+	return nil
 }

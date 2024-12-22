@@ -1,35 +1,41 @@
 package domain
 
-import (
-	"fmt"
-)
-
 type Error struct {
-	Code    int
+	Inner   error
 	Message string
 }
 
 var (
-	ErrUnhandled                  = &Error{Code: 100, Message: "internal server error"}
-	ErrStartingTransaction        = &Error{Code: 101, Message: "failed to establish transaction"}
-	ErrCommittingTransaction      = &Error{Code: 102, Message: "failed to commit transaction"}
-	ErrCreatingUser               = &Error{Code: 200, Message: "failed to create user"}
-	ErrCreatingPasswordResetToken = &Error{Code: 201, Message: "failed to create password reset token"}
-	ErrCreatingRegistrationToken  = &Error{Code: 202, Message: "failed to create user registration token"}
-	ErrUserExists                 = &Error{Code: 203, Message: "user already exists"}
-	ErrInvalidCredentials         = &Error{Code: 300, Message: "invalid credentials"}
-	ErrUpdatingPassword           = &Error{Code: 301, Message: "failed to update password"}
-	ErrAuthentication             = &Error{Code: 302, Message: "failed to authenticate user"}
-	ErrDeletingPasswordResetToken = &Error{Code: 302, Message: "failed to remove password reset token"}
-	ErrUserNotFound               = &Error{Code: 400, Message: "user was not found"}
-	ErrPasswordResetTokenNotFound = &Error{Code: 401, Message: "password reset token was not found"}
-	ErrRecipeNotFound             = &Error{Code: 402, Message: "recipe was not found"}
+	ErrAuthentication             = &Error{Message: "failed to authenticate user"}
+	ErrCommittingTransaction      = &Error{Message: "failed to commit transaction"}
+	ErrCreatingPasswordResetToken = &Error{Message: "failed to create password reset token"}
+	ErrCreatingRegistrationToken  = &Error{Message: "failed to create user registration token"}
+	ErrCreatingUser               = &Error{Message: "failed to create user"}
+	ErrDeletingPasswordResetToken = &Error{Message: "failed to remove password reset token"}
+	ErrDeletingRegistration       = &Error{Message: "failed to complete user registration"}
+	ErrInvalidCredentials         = &Error{Message: "invalid credentials"}
+	ErrPasswordResetTokenNotFound = &Error{Message: "password reset token was not found"}
+	ErrRecipeNotFound             = &Error{Message: "recipe was not found"}
+	ErrRegistrationNotFound       = &Error{Message: "user registration was not found"}
+	ErrStartingTransaction        = &Error{Message: "failed to establish transaction"}
+	ErrUnhandled                  = &Error{Message: "internal server error"}
+	ErrUpdatingPassword           = &Error{Message: "failed to update password"}
+	ErrUpdatingUser               = &Error{Message: "failed to update user"}
+	ErrUserExists                 = &Error{Message: "user already exists"}
+	ErrUserNotFound               = &Error{Message: "user was not found"}
 )
 
 func (e *Error) Error() string {
 	return e.Message
 }
 
+func (e *Error) Unwrap() error {
+	return e.Inner
+}
+
 func WrapError(parent *Error, child error) error {
-	return fmt.Errorf("%w: %w", parent, child)
+	return &Error{
+		Inner:   child,
+		Message: parent.Error(),
+	}
 }

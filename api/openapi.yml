@@ -242,14 +242,9 @@ components:
       type: object
       description: Represents an error
       properties:
-        code:
-          type: integer
-          examples:
-            - 1
         message:
           type: string
       required:
-        - code
         - message
     RecipeStatus:
       type: string

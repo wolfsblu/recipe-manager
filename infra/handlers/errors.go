@@ -21,8 +21,7 @@ func (h *RecipeHandler) NewError(_ context.Context, err error) (r *api.ErrorStat
 	return &api.ErrorStatusCode{
 		StatusCode: mapToStatusCode(domainErr),
 		Response: api.Error{
-			Code:    domainErr.Code,
-			Message: err.Error(),
+			Message: domainErr.Message,
 		},
 	}
 }
@@ -39,6 +38,8 @@ func mapToStatusCode(err *domain.Error) int {
 		return 403
 	case errors.Is(err, domain.ErrRecipeNotFound):
 		fallthrough
+	case errors.Is(err, domain.ErrRegistrationNotFound):
+		fallthrough
 	case errors.Is(err, domain.ErrUserNotFound):
 		return 404
 	case errors.Is(err, domain.ErrCommittingTransaction):
@@ -51,11 +52,13 @@ func mapToStatusCode(err *domain.Error) int {
 		fallthrough
 	case errors.Is(err, domain.ErrDeletingPasswordResetToken):
 		fallthrough
+	case errors.Is(err, domain.ErrDeletingRegistration):
+		fallthrough
 	case errors.Is(err, domain.ErrStartingTransaction):
 		fallthrough
-	case errors.Is(err, domain.ErrUnhandled):
+	case errors.Is(err, domain.ErrUpdatingUser):
 		fallthrough
-	case errors.Is(err, domain.ErrUpdatingPassword):
+	case errors.Is(err, domain.ErrUnhandled):
 		fallthrough
 	default:
 		return 500

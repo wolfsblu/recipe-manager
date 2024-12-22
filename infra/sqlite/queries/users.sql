@@ -18,6 +18,11 @@ DELETE
 FROM password_resets
 WHERE user_id = ?;
 
+-- name: DeleteRegistrationByUserId :exec
+DELETE
+FROM user_registrations
+WHERE user_id = ?;
+
 -- name: GetPasswordResetToken :one
 SELECT sqlc.embed(password_resets), sqlc.embed(users)
 FROM password_resets
@@ -43,7 +48,20 @@ FROM users
 WHERE email = ?
 LIMIT 1;
 
+-- name: GetUserRegistration :one
+SELECT sqlc.embed(user_registrations), sqlc.embed(users)
+FROM user_registrations
+         INNER JOIN users ON users.id = user_registrations.user_id
+WHERE token = ?
+LIMIT 1;
+
 -- name: UpdatePasswordByUserId :exec
 UPDATE users
 SET password_hash = ?
+WHERE id = ?;
+
+-- name: UpdateUser :exec
+UPDATE users
+SET email        = ?,
+    is_confirmed = ?
 WHERE id = ?;

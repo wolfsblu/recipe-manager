@@ -12,7 +12,8 @@ type Credentials struct {
 }
 
 type User struct {
-	ID int64
+	ID        int64
+	Confirmed bool
 	Credentials
 }
 
@@ -26,6 +27,28 @@ type UserRegistration struct {
 	User      *User
 	Token     string
 	CreatedAt time.Time
+}
+
+func (s *RecipeService) ConfirmUserByToken(ctx context.Context, token string) error {
+	registration, err := s.store.GetRegistrationByToken(ctx, token)
+	if err != nil {
+		return err
+	}
+
+	user := registration.User
+	user.Confirmed = true
+
+	if err := s.store.Begin(ctx); err != nil {
+		return err
+	}
+	defer s.store.Rollback()
+	if err = s.store.UpdateUser(ctx, user); err != nil {
+		return err
+	}
+	if err = s.store.DeleteRegistrationByUser(ctx, user); err != nil {
+		return err
+	}
+	return s.store.Commit()
 }
 
 func (s *RecipeService) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPassword string) error {

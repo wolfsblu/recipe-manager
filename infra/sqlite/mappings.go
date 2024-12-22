@@ -24,7 +24,8 @@ func (r *Recipe) AsDomainModel() domain.Recipe {
 
 func (r *User) AsDomainModel() domain.User {
 	return domain.User{
-		ID: r.ID,
+		ID:        r.ID,
+		Confirmed: r.IsConfirmed,
 		Credentials: domain.Credentials{
 			Email:        r.Email,
 			PasswordHash: r.PasswordHash,
