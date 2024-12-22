@@ -41,8 +41,6 @@
             <div class="gap-3 grid grid-cols-1">
                 <Input label={t("reset-password.labels.password")} type="password"
                        bind:value={password} required={true}/>
-                <Input label={t("reset-password.labels.confirmPassword")} type="password"
-                       bind:value={password} required={true}/>
             </div>
         </Form>
     </div>
