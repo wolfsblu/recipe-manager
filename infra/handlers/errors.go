@@ -39,7 +39,7 @@ var errorStatusCodeMap = map[*domain.Error]int{
 }
 
 func (h *RecipeHandler) NewError(_ context.Context, err error) (r *api.ErrorStatusCode) {
-	var domainErr *domain.Error
+	var domainErr = domain.ErrUnhandled
 	var securityError *ogenerrors.SecurityError
 
 	if errors.As(err, &securityError) {
