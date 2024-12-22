@@ -26,9 +26,10 @@ func main() {
 	}
 
 	recipeService := domain.NewRecipeService(notifier, store)
-	rh := handlers.NewRecipeHandler(recipeService)
-	sh := handlers.NewSecurityHandler(recipeService)
-	apiServer, err := api.NewServer(rh, sh)
+	recipeHandler := handlers.NewRecipeHandler(recipeService)
+	securityHandler := handlers.NewSecurityHandler(recipeService)
+	errorHandler := recipeHandler.CustomErrorHandler
+	apiServer, err := api.NewServer(recipeHandler, securityHandler, api.WithErrorHandler(errorHandler))
 	if err != nil {
 		log.Fatalln("failed to start api server:", err)
 	}
