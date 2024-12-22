@@ -33,9 +33,9 @@ func (e *Error) Unwrap() error {
 	return e.Inner
 }
 
-func WrapError(parent *Error, child error) error {
+func WrapError(err *Error, inner error) error {
 	return &Error{
-		Inner:   child,
-		Message: parent.Error(),
+		Inner:   inner,
+		Message: err.Error(),
 	}
 }
