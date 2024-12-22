@@ -11,6 +11,8 @@ RUN --mount=type=cache,target=/webapp/.npm \
 
 FROM docker.io/golang:alpine as backend
 
+RUN apk --no-cache add ca-certificates
+
 WORKDIR /app
 
 COPY . .
@@ -21,6 +23,7 @@ RUN --mount=type=cache,target=/go/pkg/mod go generate && go build
 FROM scratch
 
 COPY --from=backend /app/go-chef /bin/go-chef
+COPY --from=backend /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 # Atlas requires a tmp directory
 COPY --from=backend --chmod=1777 /tmp /tmp
 # Needed to apply migrations
