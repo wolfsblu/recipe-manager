@@ -89,11 +89,11 @@ func (s *RecipeService) RegisterUser(ctx context.Context, credentials Credential
 	return nil
 }
 
-func (s *RecipeService) RemoveObsoletePasswordResets(ctx context.Context) error {
+func (s *RecipeService) RemoveOldPasswordResets(ctx context.Context) error {
 	return nil
 }
 
-func (s *RecipeService) RemoveObsoleteRegistrations(ctx context.Context) error {
+func (s *RecipeService) RemoveOldRegistrations(ctx context.Context) error {
 	return nil
 }
 

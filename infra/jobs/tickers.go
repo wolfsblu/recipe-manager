@@ -11,18 +11,18 @@ var (
 	cleanupRegistrations  = tickerType("cleanupRegistrations")
 )
 
-func getC(t tickerType) <-chan time.Time {
-	if ticker, ok := tickerMap[t]; ok {
-		return ticker.C
-	}
-	return make(chan time.Time)
-}
-
 func initializeTickers() {
 	tickerMap = map[tickerType]*time.Ticker{
 		cleanupPasswordResets: time.NewTicker(24 * time.Hour),
 		cleanupRegistrations:  time.NewTicker(24 * time.Hour),
 	}
+}
+
+func getC(t tickerType) <-chan time.Time {
+	if ticker, ok := tickerMap[t]; ok {
+		return ticker.C
+	}
+	return make(chan time.Time)
 }
 
 func stopTickers() {
