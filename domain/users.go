@@ -89,6 +89,14 @@ func (s *RecipeService) RegisterUser(ctx context.Context, credentials Credential
 	return nil
 }
 
+func (s *RecipeService) RemoveObsoletePasswordResets(ctx context.Context) error {
+	return nil
+}
+
+func (s *RecipeService) RemoveObsoleteRegistrations(ctx context.Context) error {
+	return nil
+}
+
 func (s *RecipeService) ResetPasswordByEmail(ctx context.Context, email string) error {
 	user, err := s.store.GetUserByEmail(ctx, email)
 	if err != nil {

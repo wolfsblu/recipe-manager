@@ -5,6 +5,7 @@ import (
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/env"
 	"github.com/wolfsblu/go-chef/infra/handlers"
+	"github.com/wolfsblu/go-chef/infra/jobs"
 	"github.com/wolfsblu/go-chef/infra/routing"
 	"github.com/wolfsblu/go-chef/infra/smtp"
 	"github.com/wolfsblu/go-chef/infra/sqlite"
@@ -33,6 +34,9 @@ func main() {
 	if err != nil {
 		log.Fatalln("failed to start api server:", err)
 	}
+
+	jobs.StartScheduler(recipeService)
+	defer jobs.QuitScheduler()
 
 	host := env.MustGet("HOST")
 	mux := routing.NewServeMux(apiServer)
