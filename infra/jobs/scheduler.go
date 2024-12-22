@@ -3,26 +3,25 @@ package jobs
 import (
 	"context"
 	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/infra/jobs/tickers"
 )
 
 var quit chan struct{}
 
 func StartScheduler(service *domain.RecipeService) {
 	quit = make(chan struct{})
-	tickers.Initialize()
+	initializeTickers()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
 		for {
 			select {
-			case <-tickers.GetC(tickers.CleanupPasswordResets):
+			case <-getC(cleanupPasswordResets):
 				_ = service.RemoveObsoletePasswordResets(ctx)
-			case <-tickers.GetC(tickers.CleanupRegistrations):
+			case <-getC(cleanupRegistrations):
 				_ = service.RemoveObsoleteRegistrations(ctx)
 			case <-quit:
 				cancel()
-				tickers.Stop()
+				stopTickers()
 				return
 			}
 		}
