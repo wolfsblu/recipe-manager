@@ -24,7 +24,8 @@ func NewSqliteStore() (*Store, error) {
 }
 
 func connect(path string) (*sql.DB, error) {
-	con, err := sql.Open("sqlite", path)
+	constr := fmt.Sprintf("%s?_pragma=foreign_keys(1)", path)
+	con, err := sql.Open("sqlite", constr)
 	if err != nil {
 		return nil, err
 	}
