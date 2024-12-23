@@ -30,7 +30,7 @@ WHERE user_id = ?;
 
 -- name: DeleteRegistrationsBefore :exec
 DELETE
-FROM user_registrations
+FROM users
 WHERE created_at < ?;
 
 -- name: GetPasswordResetToken :one
