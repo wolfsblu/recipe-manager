@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/domain/security"
+	"time"
 )
 
 func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User) (token domain.PasswordResetToken, _ error) {
@@ -45,12 +46,20 @@ func (s *Store) CreateUserRegistration(ctx context.Context, user *domain.User) (
 	return registration, nil
 }
 
+func (s *Store) DeletePasswordResetsBefore(ctx context.Context, before time.Time) error {
+	return s.query().DeletePasswordResetsBefore(ctx, before)
+}
+
 func (s *Store) DeleteRegistrationByUser(ctx context.Context, user *domain.User) error {
 	err := s.query().DeleteRegistrationByUserId(ctx, user.ID)
 	if err != nil {
 		return domain.WrapError(domain.ErrDeletingRegistration, err)
 	}
 	return nil
+}
+
+func (s *Store) DeleteRegistrationsBefore(ctx context.Context, before time.Time) error {
+	return s.query().DeleteRegistrationsBefore(ctx, before)
 }
 
 func (s *Store) GetPasswordResetTokenByUser(ctx context.Context, user *domain.User) (token domain.PasswordResetToken, _ error) {

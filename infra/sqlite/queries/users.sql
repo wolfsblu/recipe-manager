@@ -13,6 +13,11 @@ INSERT INTO user_registrations (user_id, token)
 VALUES (?, ?)
 RETURNING *;
 
+-- name: DeletePasswordResetsBefore :exec
+DELETE
+FROM password_resets
+WHERE created_at < ?;
+
 -- name: DeletePasswordResetTokenByUserId :exec
 DELETE
 FROM password_resets
@@ -22,6 +27,11 @@ WHERE user_id = ?;
 DELETE
 FROM user_registrations
 WHERE user_id = ?;
+
+-- name: DeleteRegistrationsBefore :exec
+DELETE
+FROM user_registrations
+WHERE created_at < ?;
 
 -- name: GetPasswordResetToken :one
 SELECT sqlc.embed(password_resets), sqlc.embed(users)

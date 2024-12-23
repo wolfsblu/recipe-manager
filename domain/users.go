@@ -51,6 +51,16 @@ func (s *RecipeService) ConfirmUserByToken(ctx context.Context, token string) er
 	return s.store.Commit()
 }
 
+func (s *RecipeService) DeletePasswordResetsOlderThan(ctx context.Context, olderThan time.Duration) error {
+	before := time.Now().Add(-olderThan)
+	return s.store.DeleteRegistrationsBefore(ctx, before)
+}
+
+func (s *RecipeService) DeleteRegistrationsOlderThan(ctx context.Context, olderThan time.Duration) error {
+	before := time.Now().Add(-olderThan)
+	return s.store.DeletePasswordResetsBefore(ctx, before)
+}
+
 func (s *RecipeService) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPassword string) error {
 	return s.store.UpdatePasswordByToken(ctx, searchToken, hashedPassword)
 }
@@ -86,14 +96,6 @@ func (s *RecipeService) RegisterUser(ctx context.Context, credentials Credential
 	go func() {
 		_ = s.sender.SendUserRegistration(registration)
 	}()
-	return nil
-}
-
-func (s *RecipeService) RemoveOldPasswordResets(ctx context.Context) error {
-	return nil
-}
-
-func (s *RecipeService) RemoveOldRegistrations(ctx context.Context) error {
 	return nil
 }
 
