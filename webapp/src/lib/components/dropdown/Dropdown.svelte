@@ -11,16 +11,18 @@
 
     let dropdownNode: Node;
     window.addEventListener("click", (e: MouseEvent) => {
-        if (!dropdownNode) {
-            return;
-        }
         const target = e.target as HTMLElement
-        isOpen = dropdownNode.contains(target);
+        isOpen = dropdownNode && dropdownNode.contains(target);
     })
+    const onClick = (e: MouseEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        isOpen = !isOpen;
+    }
 </script>
 
 <div class="relative inline-block text-left" bind:this={dropdownNode}>
-    <button>
+    <button onclick={onClick}>
         {@render button()}
     </button>
 
