@@ -4,13 +4,14 @@
     interface Props {
         icon: Component
         text?: string
-        href: string
+        href?: string
     }
 
     const {icon: Icon, text, href}: Props = $props()
+    const tag = href ? "a" : "div"
 </script>
 
-<a class="
+<svelte:element this={tag} class="
         active:bg-orange-50
         active:shadow-inner
         active:text-orange-700
@@ -26,11 +27,11 @@
         shadow-md
         text-orange-700
     "
-   {href}>
+                {href}>
     <span class="group-active:text-orange-700 group-hover:text-orange-800 text-orange-700 relative h-7 w-7">
         <Icon/>
     </span>
     {#if text}
         <span class="hidden sm:inline font-semibold">{text}</span>
     {/if}
-</a>
+</svelte:element>
