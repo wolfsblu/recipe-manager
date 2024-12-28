@@ -9,6 +9,8 @@
     import {createUser} from "../../auth/user.svelte";
     import {createRouter} from "../../router.svelte";
     import type {MenuItem} from "../dropdown/types";
+    import Logout from "../../icons/Logout.svelte";
+    import Login from "../../icons/Login.svelte";
 
     const router = createRouter()
     const user = createUser()
@@ -20,11 +22,11 @@
     }
 
     const profileMenu: MenuItem[] = $derived(user.profile ? [
-        { class: "text-sm font-semibold", label: user.profile.email },
-        { icon: null, label: "Account", href: "/" },
-        { icon: null, label: "Sign Out", onClick: onLogout },
+        { class: "text-xs font-semibold", label: user.profile.email },
+        { icon: User, label: "Account", href: "/" },
+        { icon: Logout, label: "Sign Out", onClick: onLogout },
     ] : [
-        { icon: null, label: "Sign In", href: "/login" },
+        { icon: Login, label: "Sign In", href: "/login" },
     ])
 </script>
 

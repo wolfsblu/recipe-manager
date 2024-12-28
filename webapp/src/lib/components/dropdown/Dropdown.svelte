@@ -20,6 +20,9 @@
         e.stopPropagation()
         isOpen = !isOpen;
     }
+
+    const iconClass = "relative h-5 w-5"
+    const menuItemClass = "flex gap-x-3 items-center justify-self-stretch px-4 py-2 text-gray-700 text-sm"
 </script>
 
 <div class="relative inline-block text-left" bind:this={dropdownNode}>
@@ -51,39 +54,33 @@
                     <a href={item.href}
                        tabindex="-1"
                        class={`
-                            block
                             cursor-pointer
                             hover:bg-orange-50
-                            px-4
-                            py-2
-                            text-gray-700
-                            text-sm
+                            ${menuItemClass}
                             ${item.class}
                     `}>
+                        <span class={iconClass}>
+                            <item.icon />
+                        </span>
                         {item.label}
                     </a>
                 {:else if item.onClick}
                     <button onclick={item.onClick}
                             class={`
-                            block
                             hover:bg-orange-50
-                            px-4
-                            py-2
-                            text-gray-700
                             text-left
-                            text-sm
                             w-full
+                            ${menuItemClass}
                             ${item.class}
                     `}>
+                        <span class={iconClass}>
+                            <item.icon />
+                        </span>
                         {item.label}
                     </button>
                 {:else}
                     <span class={`
-                            block
-                            px-4
-                            py-2
-                            text-gray-700
-                            text-sm
+                            ${menuItemClass}
                             ${item.class}
                     `}>
                         {item.label}
