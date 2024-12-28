@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {Snippet} from "svelte";
+    import type {Component, Snippet} from "svelte";
     import type {MenuItem} from "./types";
 
     interface Props {
@@ -21,7 +21,7 @@
         isOpen = !isOpen;
     }
 
-    const iconClass = "relative h-5 w-5"
+    const iconClass = ""
     const menuItemClass = "flex gap-x-3 items-center justify-self-stretch px-4 py-2 text-gray-700 text-sm"
 </script>
 
@@ -49,6 +49,14 @@
         "
          role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="py-1" role="none">
+            {#snippet icon(IconComponent?: Component)}
+                {#if IconComponent}
+                    <span class="relative h-5 w-5">
+                        <IconComponent />
+                    </span>
+                {/if}
+            {/snippet}
+
             {#each menu as item}
                 {#if item.href}
                     <a href={item.href}
@@ -59,9 +67,7 @@
                             ${menuItemClass}
                             ${item.class}
                     `}>
-                        <span class={iconClass}>
-                            <item.icon />
-                        </span>
+                        {@render icon(item.icon)}
                         {item.label}
                     </a>
                 {:else if item.onClick}
@@ -73,9 +79,7 @@
                             ${menuItemClass}
                             ${item.class}
                     `}>
-                        <span class={iconClass}>
-                            <item.icon />
-                        </span>
+                        {@render icon(item.icon)}
                         {item.label}
                     </button>
                 {:else}
