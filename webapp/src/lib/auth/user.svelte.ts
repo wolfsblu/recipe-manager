@@ -2,6 +2,7 @@ import {
     confirmAccount as apiConfirmAccount,
     fetchProfile as apiFetchProfile,
     login as apiLogin,
+    logout as apiLogout,
     register as apiRegister,
     resetPassword as apiResetPassword,
     updatePassword as apiUpdatePassword,
@@ -23,6 +24,15 @@ export const createUser = () => {
             throw response.error
         } else {
             profile = response.data
+        }
+    }
+
+    const logout = async () => {
+        const response = await apiLogout()
+        if (response.error) {
+            throw response.error
+        } else {
+            profile = null
         }
     }
 
@@ -62,6 +72,7 @@ export const createUser = () => {
         confirmAccount,
         fetchProfile,
         login,
+        logout,
         register,
         resetPassword,
         updatePassword,

@@ -6,6 +6,26 @@
     import {t} from "../../i18n/i18n.svelte"
     import Dropdown from "../dropdown/Dropdown.svelte";
     import type {Component} from "svelte";
+    import {createUser} from "../../auth/user.svelte";
+    import {createRouter} from "../../router.svelte";
+    import type {MenuItem} from "../dropdown/types";
+
+    const router = createRouter()
+    const user = createUser()
+
+    const onLogout = async () => {
+        console.log("HI");
+        await user.logout()
+        router.redirectToNext()
+    }
+
+    const profileMenu: MenuItem[] = $derived(user.profile ? [
+        { class: "text-sm font-semibold", label: user.profile.email },
+        { icon: null, label: "Account", href: "/" },
+        { icon: null, label: "Sign Out", onClick: onLogout },
+    ] : [
+        { icon: null, label: "Sign In", href: "/login" },
+    ])
 </script>
 
 <div class="flex items-center justify-between bg-orange-200 px-3 py-2">
@@ -22,17 +42,10 @@
             <NavButton {href} {icon} />
         {/snippet}
 
-        <Dropdown>
+        <Dropdown menu={profileMenu}>
             {#snippet button()}
-                {@render navButton( User)}
+                {@render navButton(User)}
             {/snippet}
-            <!-- Active: "bg-gray-100 text-gray-900 outline-none", Not Active: "text-gray-700" -->
-            <a href="/" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-0">Account settings</a>
-            <a href="/" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-1">Support</a>
-            <a href="/" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-2">License</a>
-            <form method="POST" action="#" role="none">
-                <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-3">Sign out</button>
-            </form>
         </Dropdown>
     </div>
 </div>

@@ -39,6 +39,10 @@ export const login = (credentials: Credentials) => {
     })
 }
 
+export const logout = () => {
+    return client.POST("/logout")
+}
+
 export const register = (credentials: Credentials) => {
     return client.POST("/register", {
         body: {

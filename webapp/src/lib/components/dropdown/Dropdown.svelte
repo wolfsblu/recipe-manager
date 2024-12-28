@@ -1,12 +1,13 @@
 <script lang="ts">
     import type {Snippet} from "svelte";
+    import type {MenuItem} from "./types";
 
     interface Props {
         button: Snippet
-        children: Snippet
+        menu: MenuItem[]
     }
 
-    let {button, children}: Props = $props()
+    let {button, menu}: Props = $props()
     let isOpen = $state(false)
 
     let dropdownNode: Node;
@@ -26,23 +27,69 @@
         {@render button()}
     </button>
 
-    <!--
-      Dropdown menu, show/hide based on menu state.
-
-      Entering: "transition ease-out duration-100"
-        From: "transform opacity-0 scale-95"
-        To: "transform opacity-100 scale-100"
-      Leaving: "transition ease-in duration-75"
-        From: "transform opacity-100 scale-100"
-        To: "transform opacity-0 scale-95"
-    -->
-    <div class:hidden={!isOpen} class="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+    <div class:hidden={!isOpen}
+         class="
+             absolute
+             bg-white
+             divide-gray-100
+             divide-y
+             focus:outline-none
+             mt-2
+             origin-top-right
+             right-0
+             ring-1
+             ring-black/5
+             rounded-md
+             shadow-lg
+             w-56
+             z-10
+        "
          role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
         <div class="py-1" role="none">
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-0">Profile</a>
-        </div>
-        <div class="py-1" role="none">
-            <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-2">Sign Out</a>
+            {#each menu as item}
+                {#if item.href}
+                    <a href={item.href}
+                       tabindex="-1"
+                       class={`
+                            block
+                            cursor-pointer
+                            hover:bg-orange-50
+                            px-4
+                            py-2
+                            text-gray-700
+                            text-sm
+                            ${item.class}
+                    `}>
+                        {item.label}
+                    </a>
+                {:else if item.onClick}
+                    <button onclick={item.onClick}
+                            class={`
+                            block
+                            hover:bg-orange-50
+                            px-4
+                            py-2
+                            text-gray-700
+                            text-left
+                            text-sm
+                            w-full
+                            ${item.class}
+                    `}>
+                        {item.label}
+                    </button>
+                {:else}
+                    <span class={`
+                            block
+                            px-4
+                            py-2
+                            text-gray-700
+                            text-sm
+                            ${item.class}
+                    `}>
+                        {item.label}
+                    </span>
+                {/if}
+            {/each}
         </div>
     </div>
 </div>
