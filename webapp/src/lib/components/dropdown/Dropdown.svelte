@@ -21,8 +21,7 @@
         isOpen = !isOpen;
     }
 
-    const iconClass = ""
-    const menuItemClass = "flex gap-x-3 items-center justify-self-stretch px-4 py-2 text-gray-700 text-sm"
+    const menuItemClass = "flex flex-1 gap-x-3 items-center justify-self-stretch px-4 py-2 text-gray-700 text-sm"
 </script>
 
 <div class="relative inline-block text-left" bind:this={dropdownNode}>
@@ -44,7 +43,8 @@
              ring-black/5
              rounded-md
              shadow-lg
-             w-56
+             min-w-56
+             max-w-96
              z-10
         "
          role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
@@ -83,12 +83,14 @@
                         {item.label}
                     </button>
                 {:else}
-                    <span class={`
+                    <div class={`
                             ${menuItemClass}
                             ${item.class}
                     `}>
-                        {item.label}
-                    </span>
+                        <span class="whitespace-nowrap overflow-hidden text-ellipsis">
+                            {item.label}
+                        </span>
+                    </div>
                 {/if}
             {/each}
         </div>
