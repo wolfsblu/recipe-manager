@@ -5,9 +5,10 @@
         icon: Component
         text?: string
         href?: string
+        prefix?: string
     }
 
-    const {icon: Icon, text, href}: Props = $props()
+    const {icon: Icon, prefix, text, href}: Props = $props()
     const tag = href ? "a" : "div"
 </script>
 
@@ -28,6 +29,11 @@
         text-orange-700
     "
                 {href}>
+    {#if prefix}
+        <span class="font-semibold text-sm">
+            {prefix}
+        </span>
+    {/if}
     <span class="group-active:text-orange-700 group-hover:text-orange-800 text-orange-700 relative h-7 w-7">
         <Icon/>
     </span>
