@@ -9,7 +9,6 @@
     const user = createUser()
 
     const onLogout = async () => {
-        console.log("HI");
         await user.logout()
         router.redirectToNext()
     }
