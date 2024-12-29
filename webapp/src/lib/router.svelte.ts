@@ -54,6 +54,7 @@ export const createRouter = () => {
         router("/confirm-account", requireGuest, setPage(async () => (await import("../pages/auth/ConfirmAccount.svelte")).default))
         router("/forgot-password", requireGuest, setPage(async () => (await import("../pages/auth/ForgotPassword.svelte")).default))
         router("/reset-password", requireGuest, setPage(async () => (await import("../pages/auth/ResetPassword.svelte")).default))
+        router("/user/account", requireLogin, setPage(async () => (await import("../pages/user/Account.svelte")).default))
         router("*", setPage(async () => (await import("../pages/errors/404.svelte")).default))
 
         router.start()

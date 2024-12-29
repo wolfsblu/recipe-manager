@@ -23,7 +23,7 @@
 
     const profileMenu: MenuItem[] = $derived(user.profile ? [
         { class: "text-xs font-semibold", label: user.profile.email },
-        { icon: User, label: "Account", href: "/" },
+        { icon: User, label: "Account", href: "/user/account" },
         { icon: Logout, label: "Sign Out", onClick: onLogout },
     ] : [
         { icon: Login, label: "Sign In", href: "/login" },
