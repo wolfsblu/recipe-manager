@@ -29,12 +29,6 @@
             </span>
             Account
         </a>
-        <button tabindex="-1" class={`hover:bg-orange-50 ${itemClass}`} onclick={onLogout}>
-            <span class={iconClass}>
-                <Logout/>
-            </span>
-            Sign Out
-        </button>
     {:else}
         <a href="/login" tabindex="-1" class={`cursor-pointer hover:bg-orange-50 ${itemClass}`}>
             <span class={iconClass}>
@@ -44,3 +38,13 @@
         </a>
     {/if}
 </div>
+{#if user.profile}
+    <div class="py-1" role="none">
+        <button tabindex="-1" class={`hover:bg-orange-50 ${itemClass}`} onclick={onLogout}>
+                    <span class={iconClass}>
+                        <Logout/>
+                    </span>
+            Sign Out
+        </button>
+    </div>
+{/if}
