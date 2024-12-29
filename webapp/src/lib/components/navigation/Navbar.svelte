@@ -1,11 +1,11 @@
 <script lang="ts">
+    import Dropdown from "../dropdown/Dropdown.svelte";
     import NavButton from "./NavButton.svelte";
     import Plus from "../../icons/Plus.svelte";
-    import logo from "../../../assets/images/logo.svg"
-    import {t} from "../../i18n/i18n.svelte"
-    import Dropdown from "../dropdown/Dropdown.svelte";
     import User from "../../icons/User.svelte";
     import UserDropdown from "./UserDropdown.svelte";
+    import logo from "../../../assets/images/logo.svg"
+    import {t} from "../../i18n/i18n.svelte"
 </script>
 
 <div class="flex items-center justify-between bg-orange-200 px-3 py-2">
