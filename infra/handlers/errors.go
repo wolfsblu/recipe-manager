@@ -2,20 +2,11 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	ogenhttp "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
 	"net/http"
-	"strings"
-)
-
-const (
-	JsonIndentationChar   = " "
-	JsonIndentationPrefix = ""
-	JsonIndentationWidth  = 2
 )
 
 var errorStatusCodeMap = map[*domain.Error]int{
@@ -55,33 +46,6 @@ func (h *RecipeHandler) NewError(_ context.Context, err error) (r *api.ErrorStat
 			Message: domainErr.Message,
 		},
 	}
-}
-
-func (h *RecipeHandler) CustomErrorHandler(_ context.Context, w http.ResponseWriter, _ *http.Request, err error) {
-	var (
-		code    int
-		message string
-		ogenErr ogenerrors.Error
-	)
-
-	switch {
-	case errors.Is(err, ogenhttp.ErrNotImplemented):
-		code = http.StatusNotImplemented
-		message = http.StatusText(http.StatusNotImplemented)
-	case errors.As(err, &ogenErr):
-		code = ogenErr.Code()
-		message = ogenErr.Error()
-	default:
-		code = http.StatusInternalServerError
-		message = err.Error()
-	}
-
-	w.WriteHeader(code)
-	encoder := json.NewEncoder(w)
-	encoder.SetIndent(JsonIndentationPrefix, strings.Repeat(JsonIndentationChar, JsonIndentationWidth))
-	_ = encoder.Encode(api.Error{
-		Message: message,
-	})
 }
 
 func mapDomainErrorToStatusCode(err *domain.Error) int {

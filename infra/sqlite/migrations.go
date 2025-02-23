@@ -7,7 +7,7 @@ import (
 	"io/fs"
 )
 
-func (s *Store) Migrate() error {
+func (s *Store) migrate() error {
 	subFS, err := fs.Sub(migrationFS, "migrations")
 	if err != nil {
 		return err

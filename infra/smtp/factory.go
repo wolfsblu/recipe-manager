@@ -1,6 +1,10 @@
 package smtp
 
-import "github.com/wolfsblu/go-chef/infra/env"
+import (
+	"github.com/google/wire"
+	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/go-chef/infra/env"
+)
 
 func NewSMTPMailer() *Mailer {
 	return &Mailer{
@@ -12,3 +16,8 @@ func NewSMTPMailer() *Mailer {
 		},
 	}
 }
+
+var Set = wire.NewSet(
+	NewSMTPMailer,
+	wire.Bind(new(domain.NotificationSender), new(*Mailer)),
+)

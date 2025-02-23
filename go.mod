@@ -6,6 +6,7 @@ require (
 	ariga.io/atlas-go-sdk v0.6.5
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
+	github.com/google/wire v0.6.0
 	github.com/gorilla/securecookie v1.1.2
 	github.com/joho/godotenv v1.5.1
 	github.com/ogen-go/ogen v1.8.1
