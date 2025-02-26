@@ -20,9 +20,9 @@ func main() {
 	if err != nil {
 		log.Fatalln("failed to initialize API server:", err)
 	}
-	mux := routing.NewServeMux(apiServer)
 
 	host := env.MustGet("HOST")
+	mux := routing.NewServeMux(apiServer)
 	err = http.ListenAndServe(host, mux)
 	if err != nil {
 		log.Fatalln("failed to start web server:", err)
