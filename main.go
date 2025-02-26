@@ -2,27 +2,26 @@ package main
 
 import (
 	"github.com/wolfsblu/go-chef/infra/env"
-	"github.com/wolfsblu/go-chef/infra/routing"
 	"log"
 	"net/http"
 )
 
 func main() {
 	env.Load()
-
-	scheduler, err := InitializeScheduler()
+	recipeService, err := InitializeRecipeService()
 	if err != nil {
-		log.Fatal("failed to initialize scheduler:", err)
+		log.Fatal("failed to initialize recipe service:", err)
 	}
+
+	scheduler := InitializeScheduler(recipeService)
 	defer scheduler.Quit()
 
-	apiServer, err := InitializeAPIServer()
+	mux, err := InitializeWebServer(recipeService)
 	if err != nil {
-		log.Fatalln("failed to initialize API server:", err)
+		log.Fatal("failed to initialize web server:", err)
 	}
 
 	host := env.MustGet("HOST")
-	mux := routing.NewServeMux(apiServer)
 	err = http.ListenAndServe(host, mux)
 	if err != nil {
 		log.Fatalln("failed to start web server:", err)

@@ -7,44 +7,40 @@
 package main
 
 import (
-	"github.com/google/wire"
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/handlers"
 	"github.com/wolfsblu/go-chef/infra/jobs"
+	"github.com/wolfsblu/go-chef/infra/routing"
 	"github.com/wolfsblu/go-chef/infra/smtp"
 	"github.com/wolfsblu/go-chef/infra/sqlite"
+	"net/http"
 )
 
 // Injectors from wire.go:
 
-func InitializeAPIServer() (*api.Server, error) {
+func InitializeRecipeService() (*domain.RecipeService, error) {
 	mailer := smtp.NewSMTPMailer()
 	store, err := sqlite.NewSqliteStore()
 	if err != nil {
 		return nil, err
 	}
 	recipeService := domain.NewRecipeService(mailer, store)
-	recipeHandler := handlers.NewRecipeHandler(recipeService)
-	securityHandler := handlers.NewSecurityHandler(recipeService)
+	return recipeService, nil
+}
+
+func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) {
+	recipeHandler := handlers.NewRecipeHandler(service)
+	securityHandler := handlers.NewSecurityHandler(service)
 	server, err := api.NewAPIServer(recipeHandler, securityHandler)
 	if err != nil {
 		return nil, err
 	}
-	return server, nil
+	serveMux := routing.NewServeMux(server)
+	return serveMux, nil
 }
 
-func InitializeScheduler() (*jobs.Scheduler, error) {
-	mailer := smtp.NewSMTPMailer()
-	store, err := sqlite.NewSqliteStore()
-	if err != nil {
-		return nil, err
-	}
-	recipeService := domain.NewRecipeService(mailer, store)
-	scheduler := jobs.NewScheduler(recipeService)
-	return scheduler, nil
+func InitializeScheduler(service *domain.RecipeService) *jobs.Scheduler {
+	scheduler := jobs.NewScheduler(service)
+	return scheduler
 }
-
-// wire.go:
-
-var recipeServiceSet = wire.NewSet(smtp.Set, sqlite.Set, domain.NewRecipeService)
