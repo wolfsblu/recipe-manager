@@ -14,7 +14,7 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to initialize scheduler:", err)
 	}
-	scheduler.Start()
+	defer scheduler.Quit()
 
 	apiServer, err := InitializeAPIServer()
 	if err != nil {
