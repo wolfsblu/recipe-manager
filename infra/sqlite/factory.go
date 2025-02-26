@@ -25,12 +25,9 @@ func NewSqliteStore() (*Store, error) {
 	dbPath := env.MustGet("DB_PATH")
 	once.Do(func() {
 		con, err := connect(dbPath)
-		if err != nil {
-			return
-		}
-		store = &Store{db: con, q: New(con), path: dbPath}
-		if err = store.migrate(); err != nil {
-			return
+		if err == nil {
+			store = &Store{db: con, q: New(con), path: dbPath}
+			err = store.migrate()
 		}
 	})
 	return store, err
