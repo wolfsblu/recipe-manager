@@ -6,10 +6,13 @@ import (
 	"time"
 )
 
-var quit chan struct{}
+type Scheduler struct {
+	quit    chan struct{}
+	service *domain.RecipeService
+}
 
-func StartScheduler(service *domain.RecipeService) {
-	quit = make(chan struct{})
+func (s *Scheduler) Start() {
+	s.quit = make(chan struct{})
 	initializeTickers()
 
 	oneWeek := 7 * 24 * time.Hour
@@ -19,13 +22,13 @@ func StartScheduler(service *domain.RecipeService) {
 			select {
 			case <-getC(cleanupPasswordResets):
 				go func() {
-					_ = service.DeletePasswordResetsOlderThan(ctx, oneWeek)
+					_ = s.service.DeletePasswordResetsOlderThan(ctx, oneWeek)
 				}()
 			case <-getC(cleanupRegistrations):
 				go func() {
-					_ = service.DeleteRegistrationsOlderThan(ctx, oneWeek)
+					_ = s.service.DeleteRegistrationsOlderThan(ctx, oneWeek)
 				}()
-			case <-quit:
+			case <-s.quit:
 				cancel()
 				stopTickers()
 				return
@@ -34,6 +37,6 @@ func StartScheduler(service *domain.RecipeService) {
 	}()
 }
 
-func QuitScheduler() {
-	close(quit)
+func (s *Scheduler) Quit() {
+	close(s.quit)
 }

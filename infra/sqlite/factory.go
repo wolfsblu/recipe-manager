@@ -6,7 +6,6 @@ import (
 	"github.com/google/wire"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/env"
-	"log"
 	"sync"
 )
 
@@ -32,7 +31,6 @@ func NewSqliteStore() (*Store, error) {
 	var err error
 	dbPath := env.MustGet("DB_PATH")
 	once.Do(func() {
-		log.Println("creating new sqlite store")
 		con, err := connect(dbPath)
 		if err != nil {
 			return

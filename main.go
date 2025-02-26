@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/wolfsblu/go-chef/infra/env"
-	"github.com/wolfsblu/go-chef/infra/jobs"
 	"github.com/wolfsblu/go-chef/infra/routing"
 	"log"
 	"net/http"
@@ -11,13 +10,11 @@ import (
 func main() {
 	env.Load()
 
-	recipeService, err := InitializeRecipeService()
+	scheduler, err := InitializeScheduler()
 	if err != nil {
-		log.Fatalln("failed to initialize recipe service:", err)
+		log.Fatal("failed to initialize scheduler:", err)
 	}
-
-	jobs.StartScheduler(recipeService)
-	defer jobs.QuitScheduler()
+	scheduler.Start()
 
 	apiServer, err := InitializeAPIServer()
 	if err != nil {

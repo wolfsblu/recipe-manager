@@ -7,24 +7,16 @@
 package main
 
 import (
+	"github.com/google/wire"
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/handlers"
+	"github.com/wolfsblu/go-chef/infra/jobs"
 	"github.com/wolfsblu/go-chef/infra/smtp"
 	"github.com/wolfsblu/go-chef/infra/sqlite"
 )
 
 // Injectors from wire.go:
-
-func InitializeRecipeService() (*domain.RecipeService, error) {
-	mailer := smtp.NewSMTPMailer()
-	store, err := sqlite.NewSqliteStore()
-	if err != nil {
-		return nil, err
-	}
-	recipeService := domain.NewRecipeService(mailer, store)
-	return recipeService, nil
-}
 
 func InitializeAPIServer() (*api.Server, error) {
 	mailer := smtp.NewSMTPMailer()
@@ -41,3 +33,18 @@ func InitializeAPIServer() (*api.Server, error) {
 	}
 	return server, nil
 }
+
+func InitializeScheduler() (*jobs.Scheduler, error) {
+	mailer := smtp.NewSMTPMailer()
+	store, err := sqlite.NewSqliteStore()
+	if err != nil {
+		return nil, err
+	}
+	recipeService := domain.NewRecipeService(mailer, store)
+	scheduler := jobs.NewScheduler(recipeService)
+	return scheduler, nil
+}
+
+// wire.go:
+
+var recipeServiceSet = wire.NewSet(smtp.Set, sqlite.Set, domain.NewRecipeService)

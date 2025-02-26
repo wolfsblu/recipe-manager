@@ -8,6 +8,7 @@ import (
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/handlers"
+	"github.com/wolfsblu/go-chef/infra/jobs"
 	"github.com/wolfsblu/go-chef/infra/smtp"
 	"github.com/wolfsblu/go-chef/infra/sqlite"
 )
@@ -18,11 +19,6 @@ var recipeServiceSet = wire.NewSet(
 	domain.NewRecipeService,
 )
 
-func InitializeRecipeService() (*domain.RecipeService, error) {
-	wire.Build(recipeServiceSet)
-	return &domain.RecipeService{}, nil
-}
-
 func InitializeAPIServer() (*api.Server, error) {
 	wire.Build(
 		handlers.Set,
@@ -30,4 +26,9 @@ func InitializeAPIServer() (*api.Server, error) {
 		api.NewAPIServer,
 	)
 	return &api.Server{}, nil
+}
+
+func InitializeScheduler() (*jobs.Scheduler, error) {
+	wire.Build(recipeServiceSet, jobs.NewScheduler)
+	return &jobs.Scheduler{}, nil
 }
