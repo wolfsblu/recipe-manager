@@ -7,6 +7,7 @@ import (
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/env"
 	"log"
+	"sync"
 )
 
 type Store struct {
@@ -17,26 +18,31 @@ type Store struct {
 	tx   *sql.Tx
 }
 
+var (
+	store *Store
+	once  sync.Once
+)
+
 var Set = wire.NewSet(
 	NewSqliteStore,
 	wire.Bind(new(domain.RecipeStore), new(*Store)),
 )
 
 func NewSqliteStore() (*Store, error) {
-	log.Println("creating new sqlite store")
+	var err error
 	dbPath := env.MustGet("DB_PATH")
-	con, err := connect(dbPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to the database: %w", err)
-	}
-
-	s := &Store{db: con, q: New(con), path: dbPath}
-	err = s.migrate()
-	if err != nil {
-		log.Fatalln("failed to apply database migrations:", err)
-	}
-
-	return s, nil
+	once.Do(func() {
+		log.Println("creating new sqlite store")
+		con, err := connect(dbPath)
+		if err != nil {
+			return
+		}
+		store = &Store{db: con, q: New(con), path: dbPath}
+		if err = store.migrate(); err != nil {
+			return
+		}
+	})
+	return store, err
 }
 
 func connect(path string) (*sql.DB, error) {
