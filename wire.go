@@ -17,17 +17,22 @@ import (
 
 func InitializeRecipeService() (*domain.RecipeService, error) {
 	panic(wire.Build(
-		smtp.Set,
-		sqlite.Set,
 		domain.NewRecipeService,
+		smtp.NewSMTPMailer,
+		sqlite.NewSqliteStore,
+		wire.Bind(new(domain.NotificationSender), new(*smtp.Mailer)),
+		wire.Bind(new(domain.RecipeStore), new(*sqlite.Store)),
 	))
 }
 
 func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) {
 	panic(wire.Build(
-		handlers.Set,
 		api.NewAPIServer,
+		handlers.NewRecipeHandler,
+		handlers.NewSecurityHandler,
 		routing.NewServeMux,
+		wire.Bind(new(api.Handler), new(*handlers.RecipeHandler)),
+		wire.Bind(new(api.SecurityHandler), new(*handlers.SecurityHandler)),
 	))
 }
 

@@ -3,8 +3,6 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
-	"github.com/google/wire"
-	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/env"
 	"sync"
 )
@@ -20,11 +18,6 @@ type Store struct {
 var (
 	store *Store
 	once  sync.Once
-)
-
-var Set = wire.NewSet(
-	NewSqliteStore,
-	wire.Bind(new(domain.RecipeStore), new(*Store)),
 )
 
 func NewSqliteStore() (*Store, error) {
