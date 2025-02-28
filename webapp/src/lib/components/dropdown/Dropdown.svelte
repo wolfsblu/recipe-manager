@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type {Snippet} from "svelte";
+    import {onMount, type Snippet} from "svelte";
 
     interface Props {
         button: Snippet
@@ -10,11 +10,25 @@
     let isOpen = $state(false)
 
     let dropdownNode: Node;
-    window.addEventListener("click", (e: MouseEvent) => {
+    const handleClick = (e: MouseEvent) => {
         const target = e.target as HTMLElement
         isOpen = dropdownNode && dropdownNode.contains(target);
+    }
+    const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape" && isOpen) {
+            isOpen = false;
+        }
+    }
+    onMount(() => {
+        window.addEventListener("click", handleClick)
+        window.addEventListener("keydown", handleKeyDown)
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown)
+            window.removeEventListener("click", handleClick)
+        }
     })
-    const onClick = (e: MouseEvent) => {
+
+    const onOpen = (e: MouseEvent) => {
         e.preventDefault()
         e.stopPropagation()
         isOpen = !isOpen;
@@ -22,7 +36,7 @@
 </script>
 
 <div class="relative inline-block text-left" bind:this={dropdownNode}>
-    <button onclick={onClick}>
+    <button onclick={onOpen}>
         {@render button()}
     </button>
 
