@@ -9,7 +9,7 @@ package main
 import (
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/infra/handlers"
+	"github.com/wolfsblu/go-chef/infra/handler"
 	"github.com/wolfsblu/go-chef/infra/job"
 	"github.com/wolfsblu/go-chef/infra/routing"
 	"github.com/wolfsblu/go-chef/infra/smtp"
@@ -30,8 +30,8 @@ func InitializeRecipeService() (*domain.RecipeService, error) {
 }
 
 func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) {
-	recipeHandler := handlers.NewRecipeHandler(service)
-	securityHandler := handlers.NewSecurityHandler(service)
+	recipeHandler := handler.NewRecipeHandler(service)
+	securityHandler := handler.NewSecurityHandler(service)
 	server, err := api.NewAPIServer(recipeHandler, securityHandler)
 	if err != nil {
 		return nil, err

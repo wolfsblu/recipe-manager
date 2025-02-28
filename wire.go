@@ -7,7 +7,7 @@ import (
 	"github.com/google/wire"
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/infra/handlers"
+	"github.com/wolfsblu/go-chef/infra/handler"
 	"github.com/wolfsblu/go-chef/infra/job"
 	"github.com/wolfsblu/go-chef/infra/routing"
 	"github.com/wolfsblu/go-chef/infra/smtp"
@@ -28,11 +28,11 @@ func InitializeRecipeService() (*domain.RecipeService, error) {
 func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) {
 	panic(wire.Build(
 		api.NewAPIServer,
-		handlers.NewRecipeHandler,
-		handlers.NewSecurityHandler,
+		handler.NewRecipeHandler,
+		handler.NewSecurityHandler,
 		routing.NewServeMux,
-		wire.Bind(new(api.Handler), new(*handlers.RecipeHandler)),
-		wire.Bind(new(api.SecurityHandler), new(*handlers.SecurityHandler)),
+		wire.Bind(new(api.Handler), new(*handler.RecipeHandler)),
+		wire.Bind(new(api.SecurityHandler), new(*handler.SecurityHandler)),
 	))
 }
 
