@@ -2,10 +2,5 @@
 /api/*_gen.go
 tmp
 
-# sqlc artifacts
-/infra/sqlite/db.go
-/infra/sqlite/models.go
-/infra/sqlite/*.sql.go
-
 .env*
 !.env.example
