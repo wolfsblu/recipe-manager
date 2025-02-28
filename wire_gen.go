@@ -10,7 +10,7 @@ import (
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/handlers"
-	"github.com/wolfsblu/go-chef/infra/jobs"
+	"github.com/wolfsblu/go-chef/infra/job"
 	"github.com/wolfsblu/go-chef/infra/routing"
 	"github.com/wolfsblu/go-chef/infra/smtp"
 	"github.com/wolfsblu/go-chef/infra/sqlite"
@@ -40,7 +40,7 @@ func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) 
 	return serveMux, nil
 }
 
-func InitializeScheduler(service *domain.RecipeService) *jobs.Scheduler {
-	scheduler := jobs.NewScheduler(service)
+func InitializeScheduler(service *domain.RecipeService) *job.Scheduler {
+	scheduler := job.NewScheduler(service)
 	return scheduler
 }
