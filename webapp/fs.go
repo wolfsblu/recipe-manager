@@ -1,4 +1,4 @@
-package app
+package kit
 
 import "embed"
 

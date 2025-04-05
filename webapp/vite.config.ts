@@ -1,11 +1,19 @@
-import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import {paraglideVitePlugin} from '@inlang/paraglide-js'
+import tailwindcss from '@tailwindcss/vite';
+import {sveltekit} from '@sveltejs/kit/vite';
+import {defineConfig} from 'vite';
 
-// https://vite.dev/config/
 export default defineConfig({
-  envDir: './..',
-  plugins: [svelte()],
-  server: {
-    host: '127.0.0.1'
-  }
-})
+    plugins: [
+        paraglideVitePlugin({
+            project: './project.inlang',
+            outdir: './src/lib/paraglide',
+            strategy: ["preferredLanguage", "baseLocale"]
+        }),
+        tailwindcss(),
+        sveltekit()
+    ],
+    server: {
+        host: '127.0.0.1'
+    }
+});

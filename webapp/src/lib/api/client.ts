@@ -1,64 +1,8 @@
 import createClient from "openapi-fetch";
-import type {paths} from "../../../api";
+import type { paths } from './schema'
+import { PUBLIC_API_URL } from "$env/static/public";
 
-const client = createClient<paths>({
-    baseUrl: import.meta.env.VITE_API_URL ?? '/api',
+export const client = createClient<paths>({
+    baseUrl: PUBLIC_API_URL ?? '/api',
     credentials: "include",
 })
-
-export const confirmAccount = async (token: string) => {
-    return client.POST("/user/confirm", {
-        body: {token}
-    })
-}
-
-export const fetchProfile = async () => {
-    return client.GET("/user/profile")
-}
-
-export const fetchRecipes = async () => {
-    return client.GET("/recipes")
-}
-
-export const createRecipe = (recipe: Recipe) => {
-    return client.POST("/recipes", {
-        body: {
-            name: recipe.name,
-            minutes: recipe.minutes,
-            servings: recipe.servings,
-        }
-    })
-}
-
-export const login = (credentials: Credentials) => {
-    return client.POST("/login", {
-        body: {
-            email: credentials.email,
-            password: credentials.password,
-        }
-    })
-}
-
-export const logout = () => {
-    return client.POST("/logout")
-}
-
-export const register = (credentials: Credentials) => {
-    return client.POST("/register", {
-        body: {
-            ...credentials
-        }
-    })
-}
-
-export const resetPassword = (email: string) => {
-    return client.POST("/user/password/reset", {
-        body: {email}
-    })
-}
-
-export const updatePassword = (password: string, token: string) => {
-    return client.POST("/user/password", {
-        body: {password, token}
-    })
-}

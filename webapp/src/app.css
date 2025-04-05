@@ -1,21 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-html, body, #app {
-    @apply h-screen;
+@plugin '@tailwindcss/forms';
+@plugin 'flowbite/plugin';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --color-primary-50: #fff5f2;
+    --color-primary-100: #fff1ee;
+    --color-primary-200: #ffe4de;
+    --color-primary-300: #ffd5cc;
+    --color-primary-400: #ffbcad;
+    --color-primary-500: #fe795d;
+    --color-primary-600: #ef562f;
+    --color-primary-700: #eb4f27;
+    --color-primary-800: #cc4522;
+    --color-primary-900: #a5371b;
 }
 
-#app {
-    @apply flex flex-col;
-}
 
-p a:link, p a:visited {
-    @apply text-blue-500 underline;
-}
-p a:active, p a:hover {
-    @apply text-blue-400 no-underline;
-}
-p a:active {
-    @apply text-blue-500;
-}
+@source "../node_modules/flowbite-svelte/dist";
