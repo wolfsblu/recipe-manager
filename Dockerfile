@@ -2,7 +2,6 @@ FROM docker.io/node:lts-alpine as frontend
 
 WORKDIR /webapp
 
-COPY .env /
 COPY webapp .
 
 RUN --mount=type=cache,target=/webapp/.npm \

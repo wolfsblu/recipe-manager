@@ -10,10 +10,7 @@ const config = {
 			assets: 'dist',
 			precompress: false,
 			strict: true
-		}),
-		env: {
-			dir: './..'
-		}
+		})
 	}
 };
 
