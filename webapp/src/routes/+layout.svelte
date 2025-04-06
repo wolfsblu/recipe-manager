@@ -1,17 +1,24 @@
 <script lang="ts">
 	import '../app.css';
     import Languages from "$lib/components/i18n/Languages.svelte";
-    import NavDrawer from "$lib/components/nav/NavDrawer.svelte";
+    import NavDrawer from "$lib/components/nav/Navigation.svelte";
+    import Menu from '$lib/components/nav/Menu.svelte';
 
     let { children } = $props();
 </script>
 
 <Languages />
 
-<div class="flex h-screen">
-    <NavDrawer />
+<div class="flex flex-col h-screen">
+    <NavDrawer classes="md:hidden" />
 
-    <main class="flex flex-col grow">
-        {@render children()}
-    </main>
+    <div class="flex grow">
+        <div class="hidden md:block w-64">
+            <Menu />
+        </div>
+
+        <main class="flex flex-col grow p-3">
+            {@render children()}
+        </main>
+    </div>
 </div>
