@@ -11,7 +11,12 @@ const config = {
 			precompress: false,
 			strict: true
 		})
-	}
+	},
+	paths: {
+		base: '',
+		assets: '/'
+	},
+	trailingSlash: 'always'
 };
 
 export default config;
