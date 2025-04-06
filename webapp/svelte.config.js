@@ -6,15 +6,12 @@ const config = {
 	kit: {
 		appDir: 'assets',
 		adapter: adapter({
+			fallback: 'index.html',
 			pages: 'dist',
 			assets: 'dist',
 			precompress: false,
 			strict: true
 		})
-	},
-	paths: {
-		base: '',
-		assets: '/'
 	},
 	trailingSlash: 'always'
 };
