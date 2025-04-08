@@ -1,6 +1,8 @@
 <script lang="ts">
     import {Button, Drawer, Navbar, NavBrand, NavHamburger} from "flowbite-svelte";
     import Menu from "$lib/components/nav/Menu.svelte";
+    import { fly } from "svelte/transition";
+    import {sineIn} from "svelte/easing";
 
     interface Props {
         classes: string
@@ -20,7 +22,8 @@
     <NavHamburger onClick={() => hideNavigation = !hideNavigation}  />
 </Navbar>
 
-<Drawer transitionType='fly'
+<Drawer transitionType="fly"
+        transitionParams={{x: -256, duration: 150, easing: sineIn}}
         bind:hidden={hideNavigation}
         divClass="overflow-y-auto z-50 bg-white dark:bg-gray-800"
         width="w-64">
