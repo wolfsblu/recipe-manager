@@ -37,14 +37,15 @@
             </svelte:fragment>
 
             {toast.message}
-
         </Toast>
+
 
         {#if toast.visible}
             <div transition:blur={{ amount: 10 }}>
                 <Progressbar bind:progress={toast.progress}
+                             animate={toast.timeoutHandle > 0}
                              color={getColor(toast)}
-                             animate class="mb-3"
+                             class="mb-3"
                              size="h-0.5"
                              easing={linear}
                              tweenDuration={toast.timeout}
