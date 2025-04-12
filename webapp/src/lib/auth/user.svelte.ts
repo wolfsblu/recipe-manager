@@ -19,6 +19,15 @@ export const user = $state(getDefaultUser())
 
 export const isAuthenticated = () => user.id !== getDefaultUser().id
 
+export const getProfile = async () => {
+    const response = await client.GET("/user/profile")
+    if (response.error) {
+        throw response.error
+    }
+    Object.assign(user, response.data)
+    return response.data
+}
+
 export const login = async (credentials: Credentials) => {
     const response = await client.POST("/login", {
         body: {
