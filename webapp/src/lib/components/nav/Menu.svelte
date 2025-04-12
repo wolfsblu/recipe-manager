@@ -6,7 +6,8 @@
         ChartPieSolid,
         EditOutline,
         GridSolid,
-        UserCircleSolid
+        UserCircleSolid,
+        ReceiptSolid
     } from "flowbite-svelte-icons";
     import { page } from "$app/state";
     import { isAuthenticated, logout } from "$lib/auth/user.svelte";
@@ -44,6 +45,13 @@
                     <span class={bubbleClass}>Pro</span>
                 </svelte:fragment>
             </SidebarItem>
+            {#if isAuthenticated()}
+                <SidebarItem label="Recipes" {spanClass} href="/recipes" on:click={() => onNavigate?.()}>
+                    <svelte:fragment slot="icon">
+                        <ReceiptSolid class={iconClass} />
+                    </svelte:fragment>
+                </SidebarItem>
+            {/if}
         </SidebarGroup>
         <SidebarGroup border>
             {#if !isAuthenticated()}
