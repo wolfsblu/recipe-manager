@@ -4,7 +4,7 @@
 
 <Card class="self-center my-auto">
     <form class="flex flex-col space-y-6" action="/">
-        <h3 class="text-xl font-medium text-gray-900 dark:text-white">Register on our platform</h3>
+        <h3 class="text-xl font-medium text-gray-900 dark:text-white">Register</h3>
         <Label class="space-y-2">
             <span>Email</span>
             <Input type="email" name="email" placeholder="name@company.com" required />
@@ -14,5 +14,8 @@
             <Input type="password" name="password" placeholder="•••••" required />
         </Label>
         <Button type="submit" class="w-full">Create a new account</Button>
+        <div class="text-sm font-medium text-gray-500 dark:text-gray-300">
+            Already have an account? <a href="/auth/login" class="text-primary-700 hover:underline dark:text-primary-500">Login</a>
+        </div>
     </form>
 </Card>
