@@ -46,3 +46,16 @@ export const logout = async () => {
     await client.POST("/logout")
     Object.assign(user, getDefaultUser())
 }
+
+export const register = async (credentials: Credentials) => {
+    const response = await client.POST("/register", {
+        body: {
+            email: credentials.email,
+            password: credentials.password,
+        }
+    })
+    if (response.error) {
+        throw response.error
+    }
+    return response.data
+}
