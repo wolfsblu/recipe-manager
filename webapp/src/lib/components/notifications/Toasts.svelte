@@ -29,8 +29,8 @@
                class="min-w-80"
                color={getColor(toast)}
                transition={blur}
-               params={{ amount: 10 }}>
-
+               params={{ amount: 10 }}
+        >
             <svelte:fragment slot="icon">
                 <ExclamationCircleOutline class="w-5 h-5"/>
                 <span class="sr-only">Error icon</span>
@@ -41,12 +41,15 @@
         </Toast>
 
         {#if toast.visible}
-            <Progressbar bind:progress={toast.progress}
-                         color={getColor(toast)}
-                         animate class="mb-3"
-                         size="h-0.5"
-                         easing={linear}
-                         tweenDuration={toast.timeout}/>
+            <div transition:blur={{ amount: 10 }}>
+                <Progressbar bind:progress={toast.progress}
+                             color={getColor(toast)}
+                             animate class="mb-3"
+                             size="h-0.5"
+                             easing={linear}
+                             tweenDuration={toast.timeout}
+                />
+            </div>
         {/if}
     {/each}
 </section>

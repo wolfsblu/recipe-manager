@@ -6,6 +6,7 @@ export interface Toast {
     timeout: number
     visible: boolean
     progress: number
+    showProgress: boolean
     type: 'error' | 'info' | 'success' | 'warning'
 }
 
@@ -19,6 +20,7 @@ const getDefaultToast = (): Toast => ({
     progress: 100,
     timeout: 5000,
     visible: true,
+    showProgress: true,
     type: 'info',
 })
 
