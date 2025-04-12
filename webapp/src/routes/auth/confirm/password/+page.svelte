@@ -12,10 +12,10 @@
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get("token") ?? ""
             await confirmPassword(newPassword, token)
-            addToast({ message: "Password was reset successfully", type: "success" })
+            addToast({ message: "Password was reset successfully", type: "success", group: "password" })
             await goto("/auth/login")
         } catch (e) {
-            addToast({ message: "Failed to reset password", type: "error" })
+            addToast({ message: "Failed to reset password", type: "error", group: "password" })
         }
     }
 </script>
