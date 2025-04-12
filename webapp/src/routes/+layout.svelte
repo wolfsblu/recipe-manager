@@ -4,7 +4,6 @@
     import NavDrawer from "$lib/components/nav/Navigation.svelte";
     import Menu from '$lib/components/nav/Menu.svelte';
     import Toasts from "$lib/components/notifications/Toasts.svelte";
-    import {isAuthenticated, user} from "$lib/auth/user.svelte";
 
     let { children } = $props();
 </script>

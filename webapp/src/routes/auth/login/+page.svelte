@@ -22,7 +22,7 @@
 </script>
 
 <Card class="self-center my-auto">
-    <form class="flex flex-col space-y-6" on:submit="{onSubmit}">
+    <form class="flex flex-col space-y-6" onsubmit="{onSubmit}">
         <h3 class="text-xl font-medium text-gray-900 dark:text-white">Sign in</h3>
         <Label class="space-y-2">
             <span>Email</span>

@@ -18,7 +18,7 @@ type Mailer struct {
 
 func (s *Mailer) SendPasswordReset(token domain.PasswordResetToken) error {
 	tpl, err := buildTemplate("password-reset.html", PasswordResetTemplate{
-		ResetLink: buildUrlWithQuery("reset-password", map[string]string{"token": token.Token}),
+		ResetLink: buildUrlWithQuery("auth/confirm/password", map[string]string{"token": token.Token}),
 	})
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func (s *Mailer) SendPasswordReset(token domain.PasswordResetToken) error {
 }
 func (s *Mailer) SendUserRegistration(registration domain.UserRegistration) error {
 	tpl, err := buildTemplate("user-registration.html", UserRegistrationTemplate{
-		ConfirmLink: buildUrlWithQuery("confirm-account", map[string]string{"token": registration.Token}),
+		ConfirmLink: buildUrlWithQuery("auth/confirm/email", map[string]string{"token": registration.Token}),
 	})
 	if err != nil {
 		return err

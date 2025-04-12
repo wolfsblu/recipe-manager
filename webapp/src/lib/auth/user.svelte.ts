@@ -19,6 +19,26 @@ export const user = $state(getDefaultUser())
 
 export const isAuthenticated = () => user.id !== getDefaultUser().id
 
+export const confirmEmail = async (token: string) => {
+    const response = await client.POST("/user/confirm", {
+        body: { token }
+    })
+    if (response.error) {
+        throw response.error
+    }
+    return response.data
+}
+
+export const confirmPassword = async (newPassword: string, token: string) => {
+    const response = await client.POST("/user/password", {
+        body: { password: newPassword, token }
+    })
+    if (response.error) {
+        throw response.error
+    }
+    return response.data
+}
+
 export const getProfile = async () => {
     const response = await client.GET("/user/profile")
     if (response.error) {
@@ -53,6 +73,16 @@ export const register = async (credentials: Credentials) => {
             email: credentials.email,
             password: credentials.password,
         }
+    })
+    if (response.error) {
+        throw response.error
+    }
+    return response.data
+}
+
+export const resetPassword = async (email: string) => {
+    const response = await client.POST("/user/password/reset", {
+        body: { email }
     })
     if (response.error) {
         throw response.error
