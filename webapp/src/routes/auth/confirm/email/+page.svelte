@@ -1,10 +1,11 @@
 <script lang="ts">
     import {Alert, Button, Card} from "flowbite-svelte";
     import {CheckOutline} from "flowbite-svelte-icons";
-    import {onMount} from "svelte";
+    import {onDestroy, onMount} from "svelte";
     import {goto} from "$app/navigation";
     import {confirmEmail} from "$lib/auth/user.svelte.js";
 
+    let redirectHandle = 0
     let redirectDelay = $state(5)
 
     onMount(async () => {
@@ -12,14 +13,17 @@
         const token = urlParams.get("token") ?? ""
         try {
             await confirmEmail(token)
-            let handle = setInterval(() => {
+            redirectHandle = setInterval(() => {
                 if (--redirectDelay <= 0) {
-                    clearInterval(handle)
+                    clearInterval(redirectHandle)
                     goto("/auth/login")
                 }
             }, 1000)
-        } catch (err) {
-        }
+        } catch (err) {}
+    })
+
+    onDestroy(() => {
+        clearInterval(redirectHandle)
     })
 </script>
 
