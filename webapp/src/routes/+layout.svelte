@@ -21,8 +21,6 @@
         </div>
 
         <main class="flex flex-col grow p-3">
-            <pre>{isAuthenticated()}</pre>
-            <pre>{JSON.stringify(user)}</pre>
             {@render children()}
         </main>
     </div>
