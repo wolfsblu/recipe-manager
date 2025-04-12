@@ -13,10 +13,10 @@
         e.preventDefault()
         try {
             await login(credentials)
-            addToast({ message: "Signed in successfully", type: "success" })
+            addToast({ message: "Signed in successfully", type: "success", group: "login" })
             await goto("/")
         } catch (error) {
-            addToast({ message: "Failed to login, please verify your credentials", type: "error" })
+            addToast({ message: "Failed to login, please verify your credentials", type: "error", group: "login" })
         }
     }
 </script>

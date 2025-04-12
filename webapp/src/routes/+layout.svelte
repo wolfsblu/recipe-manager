@@ -9,12 +9,13 @@
 </script>
 
 <Languages />
-<Toasts />
 
 <div class="flex flex-col h-screen">
     <NavDrawer classes="md:hidden" />
 
-    <div class="flex grow">
+    <div class="flex grow relative">
+        <Toasts />
+
         <div class="hidden md:block w-64">
             <Menu />
         </div>

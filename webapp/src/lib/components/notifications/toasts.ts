@@ -7,11 +7,13 @@ export interface Toast {
     visible: boolean
     progress: number
     showProgress: boolean
-    type: 'error' | 'info' | 'success' | 'warning'
+    type: 'error' | 'info' | 'success' | 'warning',
+    group: string
 }
 
 export type NewToast = Pick<Toast, 'message'> & {
     type?: Toast['type']
+    group?: Toast['group']
 }
 
 const getDefaultToast = (): Toast => ({
@@ -22,6 +24,7 @@ const getDefaultToast = (): Toast => ({
     visible: true,
     showProgress: true,
     type: 'info',
+    group: 'default',
 })
 
 export const toasts = writable<Toast[]>([]);
@@ -37,6 +40,6 @@ export const dismissToast = (id: number) => {
 }
 export const addToast = (toast: NewToast) => {
     const newToast = Object.assign(getDefaultToast(), toast)
-    toasts.update((all) => [newToast, ...all])
+    toasts.update((all) => [newToast, ...all.filter(t => t.type !== toast.type && t.group !== toast.group)])
     setTimeout(() => dismissToast(newToast.id), newToast.timeout)
 }

@@ -13,7 +13,7 @@
         e.preventDefault()
         try {
             await register(credentials)
-            addToast({ message: "Account registered successfully", type: "success" })
+            addToast({ message: "Account registered, please verify your email", type: "success" })
             await goto("/")
         } catch (e) {
             addToast({ message: "Failed to register account", type: "error" })

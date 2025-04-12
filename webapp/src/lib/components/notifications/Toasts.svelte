@@ -23,11 +23,11 @@
     }
 </script>
 
-<section class="absolute top-5 end-5">
+<section class="p-3 absolute top-0 start-0 md:start-auto md:end-0 w-full md:max-w-1/2 lg:max-w-1/3">
     {#each $toasts as toast (toast.id)}
         <Toast bind:toastStatus={toast.visible}
-               class="min-w-80"
                color={getColor(toast)}
+               divClass="md:w-full p-4 text-gray-500 bg-white shadow-sm dark:text-gray-400 dark:bg-gray-800 gap-3"
                transition={blur}
                params={{ amount: 10 }}
         >
