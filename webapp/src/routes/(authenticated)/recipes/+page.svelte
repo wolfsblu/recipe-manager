@@ -15,21 +15,13 @@
         if (files == null) {
             return
         }
-        const uploadPromises = []
         for (let i = 0; i < files.length; ++i) {
             const file = files[i]
-            uploadPromises.push(uploadFile(file))
-        }
-
-        const uploads = await Promise.allSettled(uploadPromises)
-        for (let i = 0; i < uploads.length; ++i) {
-            const upload = uploads[i]
-            if (upload.status === "fulfilled" && upload.value.url) {
-                images.push({
-                    alt: "Image",
-                    src: upload.value.url,
-                })
-            }
+            const upload = await uploadFile(file)
+            images.push({
+                alt: "Image",
+                src: upload.url ?? "",
+            })
         }
     }
     
