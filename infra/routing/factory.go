@@ -27,6 +27,6 @@ func handleAPI(mux *http.ServeMux, apiServer http.Handler) {
 }
 
 func handleUploads(mux *http.ServeMux, uploadServer *tusd.Handler) {
-	mux.Handle("/api/uploads/", http.StripPrefix("/api/uploads/", uploadServer))
-	mux.Handle("/api/uploads", http.StripPrefix("/api/uploads", uploadServer))
+	mux.Handle("/api/uploads/", cors(http.StripPrefix("/api/uploads/", uploadServer)))
+	mux.Handle("/api/uploads", cors(http.StripPrefix("/api/uploads", uploadServer)))
 }

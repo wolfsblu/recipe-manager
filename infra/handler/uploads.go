@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"github.com/tus/tusd/v2/pkg/filelocker"
 	"github.com/tus/tusd/v2/pkg/filestore"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
@@ -11,7 +10,6 @@ import (
 	"golang.org/x/exp/slog"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 )
 
@@ -32,14 +30,6 @@ func NewUploadHandler(recipes *domain.RecipeService) (*tusd.Handler, error) {
 		NotifyCreatedUploads:  true,
 		NotifyCompleteUploads: true,
 		Logger:                logger,
-		Cors: &tusd.CorsConfig{
-			AllowOrigin:      regexp.MustCompile(env.MustGet("CORS_ORIGIN")),
-			AllowCredentials: true,
-			AllowMethods:     tusd.DefaultCorsConfig.AllowMethods,
-			AllowHeaders:     fmt.Sprintf("%s, Cookie", tusd.DefaultCorsConfig.AllowHeaders),
-			MaxAge:           tusd.DefaultCorsConfig.MaxAge,
-			ExposeHeaders:    tusd.DefaultCorsConfig.ExposeHeaders,
-		},
 	})
 
 	go registerEventListeners(handler, recipes)

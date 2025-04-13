@@ -11,6 +11,7 @@ func cors(h http.Handler) http.HandlerFunc {
 		if ok {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			w.Header().Set("Access-Control-Allow-Headers", "Cookie")
 		}
 		h.ServeHTTP(w, r)
 	}
