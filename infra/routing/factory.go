@@ -10,8 +10,8 @@ import (
 func NewServeMux(server *api.Server, uploadServer *tusd.Handler) *http.ServeMux {
 	mux := http.NewServeMux()
 	handleFrontend(mux)
-	handleAPI(mux, server)
 	handleUploads(mux, uploadServer)
+	handleAPI(mux, server)
 	return mux
 }
 
@@ -27,6 +27,6 @@ func handleAPI(mux *http.ServeMux, apiServer http.Handler) {
 }
 
 func handleUploads(mux *http.ServeMux, uploadServer *tusd.Handler) {
-	mux.HandleFunc("/files/", cors(http.StripPrefix("/files/", uploadServer)))
-	mux.HandleFunc("/files", cors(http.StripPrefix("/files", uploadServer)))
+	mux.Handle("/api/uploads/", http.StripPrefix("/api/uploads/", uploadServer))
+	mux.Handle("/api/uploads", http.StripPrefix("/api/uploads", uploadServer))
 }

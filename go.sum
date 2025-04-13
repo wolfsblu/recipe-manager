@@ -89,6 +89,8 @@ github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOf
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/swaggest/swgui v1.8.2 h1:JGpRCLGLZ7EqTwHsBEOo//kx8CM7Rv3RchgvfNpB+6E=
 github.com/swaggest/swgui v1.8.2/go.mod h1:nkzGeyMfq5FstGGNJKr1LORvM4RdsjTmvWvqvyZeDDc=
+github.com/tus/lockfile v1.2.0 h1:92dMoNyeb5zaNi8eQ79WLqt/npUWUFkaM5ZM9kOMIDM=
+github.com/tus/lockfile v1.2.0/go.mod h1:JyfWCHNyfd7eGxudGohrkt38kuKRki6L0JH82p2e+mc=
 github.com/tus/tusd/v2 v2.8.0 h1:X2jGxQ05jAW4inDd2ogmOKqwnb4c/D0lw2yhgHayWyU=
 github.com/tus/tusd/v2 v2.8.0/go.mod h1:3/zEOVQQIwmJhvNam8phV4x/UQt68ZmZiTzeuJUNhVo=
 github.com/vearutop/statigz v1.4.3 h1:eDWkkbQuiG1h8Eu4feV3Rb1x6048LMNIudT77a7Husc=

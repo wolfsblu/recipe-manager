@@ -5,6 +5,7 @@ import (
 	"github.com/tus/tusd/v2/pkg/filestore"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 	"github.com/wolfsblu/go-chef/infra/env"
+	"regexp"
 )
 
 func NewUploadHandler() (*tusd.Handler, error) {
@@ -15,14 +16,24 @@ func NewUploadHandler() (*tusd.Handler, error) {
 	store.UseIn(composer)
 	locker.UseIn(composer)
 
+	// corsAllowOrigin := regexp.MustCompile(".*") //env.MustGet("CORS_ORIGIN"))
+
 	handler, err := tusd.NewHandler(tusd.Config{
-		BasePath:              "/files/",
+		BasePath:              "/api/uploads/",
 		StoreComposer:         composer,
-		NotifyCompleteUploads: true,
+		NotifyCompleteUploads: false,
+		Cors: &tusd.CorsConfig{
+			AllowOrigin:      regexp.MustCompile(".*"),
+			AllowCredentials: true,
+			AllowMethods:     tusd.DefaultCorsConfig.AllowMethods,
+			AllowHeaders:     tusd.DefaultCorsConfig.AllowHeaders,
+			MaxAge:           tusd.DefaultCorsConfig.MaxAge,
+			ExposeHeaders:    tusd.DefaultCorsConfig.ExposeHeaders,
+		},
 	})
+
 	if err != nil {
 		return nil, err
 	}
-
 	return handler, nil
 }
