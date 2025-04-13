@@ -42,8 +42,8 @@
 
         {#if toast.visible}
             <div transition:blur={{ amount: 10 }}>
-                <Progressbar bind:progress={toast.progress}
-                             animate={toast.timeoutHandle > 0}
+                <Progressbar progress={100}
+                             animate
                              color={getColor(toast)}
                              class="mb-3"
                              size="h-0.5"
