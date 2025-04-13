@@ -13,10 +13,12 @@
         if (files == null) {
             return
         }
+        const uploadPromises = []
         for (let i = 0; i < files.length; ++i) {
             const file = files[i]
-            await uploadFile(file)
+            uploadPromises.push(uploadFile(file))
         }
+        await Promise.allSettled(uploadPromises)
     }
     
     const iconClass = "w-6 h-6"
