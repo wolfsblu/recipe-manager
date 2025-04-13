@@ -13,14 +13,14 @@
 <div class="flex flex-col h-screen">
     <NavDrawer classes="md:hidden" />
 
-    <div class="flex grow relative">
+    <div class="flex grow relative max-h-screen">
         <Toasts />
 
         <div class="hidden md:block w-64">
             <Menu />
         </div>
 
-        <main class="flex flex-col grow p-3">
+        <main class="flex flex-col grow p-3 overflow-y-auto">
             {@render children()}
         </main>
     </div>
