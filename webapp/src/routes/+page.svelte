@@ -3,6 +3,7 @@
     import {Fileupload} from "flowbite-svelte";
     import {Upload} from 'tus-js-client'
     import type {ChangeEventHandler} from "svelte/elements";
+    import {PUBLIC_API_URL} from "$env/static/public";
 
     const onFileChange: ChangeEventHandler<HTMLInputElement> = async (e) => {
         const files = (e.target as HTMLInputElement)?.files
@@ -11,11 +12,15 @@
         }
         const file = files[0]
         const upload = new Upload(file, {
-            endpoint: 'http://127.0.0.1:8080/api/uploads/',
+            endpoint: PUBLIC_API_URL + '/uploads/',
             retryDelays: [0, 3000, 5000, 10000, 20000],
             metadata: {
                 filename: file.name,
                 filetype: file.type,
+            },
+            onBeforeRequest: (req) => {
+                const xhr = req.getUnderlyingObject()
+                xhr.withCredentials = true
             },
             onError: (error) => {
                 console.error(error)
