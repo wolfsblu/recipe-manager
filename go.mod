@@ -13,6 +13,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/ogen-go/ogen v1.10.1
 	github.com/swaggest/swgui v1.8.2
+	github.com/tus/tusd/v2 v2.8.0
 	go.opentelemetry.io/otel v1.35.0
 	go.opentelemetry.io/otel/metric v1.35.0
 	go.opentelemetry.io/otel/trace v1.35.0

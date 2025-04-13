@@ -30,6 +30,7 @@ func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) 
 		api.NewAPIServer,
 		handler.NewRecipeHandler,
 		handler.NewSecurityHandler,
+		handler.NewUploadHandler,
 		routing.NewServeMux,
 		wire.Bind(new(api.Handler), new(*handler.RecipeHandler)),
 		wire.Bind(new(api.SecurityHandler), new(*handler.SecurityHandler)),
