@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Sidebar, SidebarGroup, SidebarItem, SidebarWrapper } from "flowbite-svelte";
+    import {DarkMode, Sidebar, SidebarGroup, SidebarItem, SidebarWrapper, Tooltip} from "flowbite-svelte";
     import {
         ArrowLeftToBracketOutline,
         ArrowRightToBracketOutline,
@@ -33,7 +33,7 @@
 </script>
 
 <Sidebar {activeUrl} asideClass="w-full h-full">
-    <SidebarWrapper class="h-full flex flex-col justify-between">
+    <SidebarWrapper class="h-full flex flex-col justify-between rounded-l-none">
         <SidebarGroup>
             <SidebarItem label="Browse" href="/" on:click={() => onNavigate?.()}>
                 <svelte:fragment slot="icon">
@@ -86,7 +86,7 @@
                         <BellOutline class={iconClass} />
                     </svelte:fragment>
                     <svelte:fragment slot="subtext">
-                        <span class="inline-flex justify-center items-center p-3 ms-3 w-3 h-3 text-sm font-medium text-primary-600 bg-primary-200 rounded-full dark:bg-primary-900 dark:text-primary-200">
+                        <span class={bubbleClass}>
                             3
                         </span>
                     </svelte:fragment>
@@ -97,6 +97,13 @@
                     </svelte:fragment>
                 </SidebarItem>
             {/if}
+            <section class="flex justify-center">
+                <DarkMode class="cursor-pointer" />
+                <Tooltip>
+                    Toggle dark mode
+                </Tooltip>
+            </section>
         </SidebarGroup>
+
     </SidebarWrapper>
 </Sidebar>
