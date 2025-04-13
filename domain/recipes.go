@@ -10,8 +10,11 @@ type RecipeService struct {
 }
 
 type RecipeDetails struct {
-	Name      string
-	CreatedBy *User
+	Name        string
+	Description string
+	CreatedBy   *User
+	Servings    int
+	Minutes     int
 }
 
 type Recipe struct {
@@ -21,6 +24,10 @@ type Recipe struct {
 
 func (s *RecipeService) Add(ctx context.Context, r RecipeDetails) (Recipe, error) {
 	return s.store.CreateRecipe(ctx, r)
+}
+
+func (s *RecipeService) Browse(ctx context.Context) ([]Recipe, error) {
+	return s.store.BrowseRecipes(ctx)
 }
 
 func (s *RecipeService) Delete(ctx context.Context, id int64) error {

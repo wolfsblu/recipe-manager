@@ -9,19 +9,64 @@ import (
 	"context"
 )
 
+const browseRecipes = `-- name: BrowseRecipes :many
+SELECT id, name, servings, minutes, description, created_by, created_at
+FROM recipes
+`
+
+func (q *Queries) BrowseRecipes(ctx context.Context) ([]Recipe, error) {
+	rows, err := q.db.QueryContext(ctx, browseRecipes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Recipe
+	for rows.Next() {
+		var i Recipe
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Servings,
+			&i.Minutes,
+			&i.Description,
+			&i.CreatedBy,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const createRecipe = `-- name: CreateRecipe :one
-INSERT INTO recipes (name, created_by)
-VALUES (?, ?)
+INSERT INTO recipes (name, servings, minutes, description, created_by)
+VALUES (?, ?, ?, ?, ?)
 RETURNING id, name, servings, minutes, description, created_by, created_at
 `
 
 type CreateRecipeParams struct {
-	Name      string
-	CreatedBy int64
+	Name        string
+	Servings    int64
+	Minutes     int64
+	Description string
+	CreatedBy   int64
 }
 
 func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Recipe, error) {
-	row := q.db.QueryRowContext(ctx, createRecipe, arg.Name, arg.CreatedBy)
+	row := q.db.QueryRowContext(ctx, createRecipe,
+		arg.Name,
+		arg.Servings,
+		arg.Minutes,
+		arg.Description,
+		arg.CreatedBy,
+	)
 	var i Recipe
 	err := row.Scan(
 		&i.ID,

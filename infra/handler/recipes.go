@@ -16,11 +16,14 @@ func NewRecipeHandler(service *domain.RecipeService) *RecipeHandler {
 	}
 }
 
-func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipe) (*api.ReadRecipe, error) {
+func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipeMultipart) (*api.ReadRecipe, error) {
 	user := ctx.Value(ctxKeyUser).(*domain.User)
 	recipe, err := h.Recipes.Add(ctx, domain.RecipeDetails{
-		Name:      req.Name,
-		CreatedBy: user,
+		Name:        req.Name,
+		Description: req.Description,
+		CreatedBy:   user,
+		Servings:    req.Servings,
+		Minutes:     req.Minutes,
 	})
 	if err != nil {
 		return nil, err
@@ -29,6 +32,21 @@ func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipe) (*a
 		ID:   recipe.ID,
 		Name: recipe.Name,
 	}, nil
+}
+
+func (h *RecipeHandler) BrowseRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
+	recipes, err := h.Recipes.Browse(ctx)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]api.ReadRecipe, len(recipes))
+	for i, r := range recipes {
+		result[i] = api.ReadRecipe{
+			ID:   r.ID,
+			Name: r.Name,
+		}
+	}
+	return result, nil
 }
 
 func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecipeParams) error {
@@ -66,7 +84,7 @@ func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeB
 	}, nil
 }
 
-func (h *RecipeHandler) UpdateRecipe(_ context.Context, _ *api.WriteRecipe, _ api.UpdateRecipeParams) (*api.ReadRecipe, error) {
+func (h *RecipeHandler) UpdateRecipe(_ context.Context, _ *api.WriteRecipeMultipart, _ api.UpdateRecipeParams) (*api.ReadRecipe, error) {
 	// TODO: Implement
 	return &api.ReadRecipe{}, nil
 }

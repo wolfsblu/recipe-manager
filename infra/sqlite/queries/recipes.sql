@@ -1,3 +1,7 @@
+-- name: BrowseRecipes :many
+SELECT *
+FROM recipes;
+
 -- name: GetRecipe :one
 SELECT *
 FROM recipes
@@ -11,8 +15,8 @@ WHERE created_by = ?
 ORDER BY name;
 
 -- name: CreateRecipe :one
-INSERT INTO recipes (name, created_by)
-VALUES (?, ?)
+INSERT INTO recipes (name, servings, minutes, description, created_by)
+VALUES (?, ?, ?, ?, ?)
 RETURNING *;
 
 -- name: UpdateRecipe :exec

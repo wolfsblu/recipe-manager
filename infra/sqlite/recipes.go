@@ -6,10 +6,24 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+func (s *Store) BrowseRecipes(ctx context.Context) (recipes []domain.Recipe, err error) {
+	result, err := s.query().BrowseRecipes(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, recipe := range result {
+		recipes = append(recipes, recipe.AsDomainModel())
+	}
+	return recipes, err
+}
+
 func (s *Store) CreateRecipe(ctx context.Context, r domain.RecipeDetails) (recipe domain.Recipe, _ error) {
 	payload := CreateRecipeParams{
-		Name:      r.Name,
-		CreatedBy: r.CreatedBy.ID,
+		Name:        r.Name,
+		Servings:    0,
+		Minutes:     0,
+		Description: "",
+		CreatedBy:   r.CreatedBy.ID,
 	}
 
 	result, err := s.query().CreateRecipe(ctx, payload)

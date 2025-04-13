@@ -6,13 +6,25 @@ info:
   title: Recipes
   description: An API to manage your favourite recipes
 tags:
-  - name: Recipe
+  - name: Recipes
     description: Everything about your recipes
   - name: User
     description: Everything related to the user
 security:
   - cookieAuth: []
 paths:
+  /browse:
+    get:
+      tags:
+        - Recipes
+      summary: Browse public recipes
+      operationId: browseRecipes
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/RecipeList'
+        default:
+          $ref: '#/components/responses/Error'
   /login:
     post:
       tags:
@@ -125,7 +137,7 @@ paths:
   /recipes:
     get:
       tags:
-        - Recipe
+        - Recipes
       summary: Get all recipes
       operationId: getRecipes
       responses:
@@ -136,7 +148,7 @@ paths:
           $ref: '#/components/responses/Error'
     post:
       tags:
-        - Recipe
+        - Recipes
       summary: Add a new recipe to the store
       operationId: addRecipe
       responses:
@@ -151,7 +163,7 @@ paths:
   '/recipes/{recipeId}':
     get:
       tags:
-        - Recipe
+        - Recipes
       summary: Find a recipe by ID
       description: Returns a single recipe
       operationId: getRecipeById
@@ -171,7 +183,7 @@ paths:
           $ref: '#/components/responses/Error'
     post:
       tags:
-        - Recipe
+        - Recipes
       summary: Updates a recipe in the store
       description: ''
       operationId: updateRecipe
@@ -193,7 +205,7 @@ paths:
           $ref: '#/components/responses/Error'
     delete:
       tags:
-        - Recipe
+        - Recipes
       summary: Deletes a recipe
       description: ''
       operationId: deleteRecipe
@@ -256,12 +268,33 @@ components:
     WriteRecipe:
       type: object
       required:
+        - description
+        - minutes
         - name
+        - servings
       properties:
         name:
           type: string
           examples:
             - Spaghetti Carbonara
+        description:
+          type: string
+          description: The HTML description of the recipe
+          examples:
+            - <p>My tasty spaghetti recipe</p>
+        servings:
+          type: integer
+          description: How many servings you'll get with this recipe
+          examples:
+            - 4
+        minutes:
+          type: integer
+          description: How long it takes to prepare this recipe (in minutes)
+          examples:
+            - 45
+      encoding:
+        images:
+          contentType: image/jpeg, image/png
     ReadRecipe:
       allOf:
         - $ref: '#/components/schemas/WriteRecipe'
@@ -318,10 +351,10 @@ components:
           schema:
             $ref: '#/components/schemas/Credentials'
     Recipe:
-      description: Recipe object that needs to be added to the store
+      description: Recipe object and related images
       required: true
       content:
-        application/json:
+        multipart/form-data:
           schema:
             $ref: '#/components/schemas/WriteRecipe'
     UpdatePassword:

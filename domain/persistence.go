@@ -7,6 +7,7 @@ import (
 
 type RecipeStore interface {
 	Begin(ctx context.Context) error
+	BrowseRecipes(ctx context.Context) ([]Recipe, error)
 	Commit() error
 	CreateRecipe(ctx context.Context, recipe RecipeDetails) (Recipe, error)
 	CreatePasswordResetToken(ctx context.Context, user *User) (PasswordResetToken, error)
