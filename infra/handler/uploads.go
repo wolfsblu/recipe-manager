@@ -25,11 +25,12 @@ func NewUploadHandler(recipes *domain.RecipeService) (*tusd.Handler, error) {
 	logger := slog.New(logHandler)
 
 	handler, err := tusd.NewHandler(tusd.Config{
-		BasePath:              "/api/uploads/",
-		StoreComposer:         composer,
-		NotifyCreatedUploads:  true,
-		NotifyCompleteUploads: true,
-		Logger:                logger,
+		BasePath:                "/api/uploads/",
+		StoreComposer:           composer,
+		NotifyCreatedUploads:    true,
+		NotifyCompleteUploads:   true,
+		Logger:                  logger,
+		RespectForwardedHeaders: true,
 	})
 
 	go registerEventListeners(handler, recipes)
