@@ -36,7 +36,7 @@ func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) 
 	if err != nil {
 		return nil, err
 	}
-	handlerHandler, err := handler.NewUploadHandler()
+	handlerHandler, err := handler.NewUploadHandler(service)
 	if err != nil {
 		return nil, err
 	}
