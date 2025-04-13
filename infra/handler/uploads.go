@@ -9,7 +9,7 @@ import (
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/env"
 	"golang.org/x/exp/slog"
-	"log"
+	"net/http"
 	"os"
 	"regexp"
 	"strings"
@@ -62,11 +62,10 @@ func registerEventListeners(handler *tusd.Handler, recipes *domain.RecipeService
 }
 
 func onUploadCreated(recipes *domain.RecipeService, event tusd.HookEvent) {
-	userId, err := getUserIdFromUpload(event.HTTPRequest)
+	_, err := getUserIdFromUpload(event.HTTPRequest)
 	if err != nil {
-		// Abort upload
+		event.Upload.StopUpload(newForbiddenResponse())
 	}
-	log.Printf("userId: %d", userId)
 }
 
 func onUploadCompleted(recipes *domain.RecipeService, event tusd.HookEvent) {
@@ -87,4 +86,12 @@ func getUserIdFromUpload(req tusd.HTTPRequest) (int64, error) {
 		}
 	}
 	return 0, errors.New("upload requires authentication")
+}
+
+func newForbiddenResponse() tusd.HTTPResponse {
+	return tusd.HTTPResponse{
+		StatusCode: http.StatusForbidden,
+		Body:       "",
+		Header:     nil,
+	}
 }
