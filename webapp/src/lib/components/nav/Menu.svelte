@@ -32,7 +32,7 @@
     let activeUrl = $derived(page.url.pathname);
 </script>
 
-<Sidebar {activeUrl} asideClass="w-full h-full">
+<Sidebar {activeUrl} asideClass="w-full h-full shadow">
     <SidebarWrapper class="h-full flex flex-col justify-between rounded-l-none">
         <SidebarGroup>
             <SidebarItem label="Browse" href="/" on:click={() => onNavigate?.()}>
