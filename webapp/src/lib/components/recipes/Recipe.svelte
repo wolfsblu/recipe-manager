@@ -38,7 +38,7 @@
             <Button class="h-7 w-7 p-2" outline pill>
                 <DotsVerticalOutline class="w-6 h-6"/>
             </Button>
-            <Dropdown>
+            <Dropdown placement="left">
                 <DropdownItem>Edit</DropdownItem>
                 <DropdownDivider/>
                 <DropdownItem>Delete</DropdownItem>

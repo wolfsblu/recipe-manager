@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {DarkMode, Sidebar, SidebarGroup, SidebarItem, SidebarWrapper, Tooltip} from "flowbite-svelte";
+    import {DarkMode, Sidebar, SidebarDropdownItem, SidebarDropdownWrapper, SidebarGroup, SidebarItem, SidebarWrapper, Tooltip} from "flowbite-svelte";
     import {
         ArrowLeftToBracketOutline,
         ArrowRightToBracketOutline,
@@ -30,6 +30,9 @@
     let iconClass = 'w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white'
     let spanClass = 'flex-1 ms-3 whitespace-nowrap';
     let activeUrl = $derived(page.url.pathname);
+    const isActive = (url: string) => {
+        return activeUrl.endsWith(url)
+    }
 </script>
 
 <Sidebar {activeUrl} asideClass="w-full h-full shadow">
@@ -41,11 +44,14 @@
                 </svelte:fragment>
             </SidebarItem>
             {#if isAuthenticated()}
-                <SidebarItem label="Recipes" {spanClass} href="/recipes" on:click={() => onNavigate?.()}>
+                <SidebarDropdownWrapper label="Recipes" isOpen>
                     <svelte:fragment slot="icon">
                         <ReceiptSolid class={iconClass} />
                     </svelte:fragment>
-                </SidebarItem>
+                    <SidebarDropdownItem label="My Recipes" href="/recipes" onclick={() => onNavigate?.()} active={isActive("/recipes")} />
+                        <SidebarDropdownItem label="Planned Recipes" href="/recipes/plan" onclick={() => onNavigate?.()} active={isActive("/recipes/plan")} />
+                    <SidebarDropdownItem label="Saved Recipes" href="/recipes/saved" onclick={() => onNavigate?.()} active={isActive("/recipes/saved")} />
+                </SidebarDropdownWrapper>
                 <SidebarItem label="Ingredients" {spanClass} href="/ingredients" on:click={() => onNavigate?.()}>
                     <svelte:fragment slot="icon">
                         <ShoppingBagSolid class={iconClass} />

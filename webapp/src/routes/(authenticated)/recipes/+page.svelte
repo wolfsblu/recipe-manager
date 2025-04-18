@@ -41,7 +41,7 @@
     <SpeedDialButton name="Ingredient">
         <ShoppingBagSolid class={iconClass} />
     </SpeedDialButton>
-    <SpeedDialButton name="Recipe">
-        <ReceiptSolid class={iconClass} />
+    <SpeedDialButton name="Recipe" href="/recipes/create">
+        <ReceiptSolid class={iconClass}  />
     </SpeedDialButton>
 </SpeedDial>
