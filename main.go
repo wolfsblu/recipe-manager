@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/wolfsblu/go-chef/infra/env"
 	"log"
 	"net/http"
+
+	"github.com/wolfsblu/go-chef/infra/env"
 )
 
 func main() {

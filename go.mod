@@ -1,8 +1,6 @@
 module github.com/wolfsblu/go-chef
 
-go 1.23.0
-
-toolchain go1.24.0
+go 1.24.2
 
 require (
 	ariga.io/atlas-go-sdk v0.7.0
@@ -60,7 +58,7 @@ require (
 	golang.org/x/tools v0.32.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	modernc.org/libc v1.62.1 // indirect
+	modernc.org/libc v1.63.0 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
-	modernc.org/memory v1.9.1 // indirect
+	modernc.org/memory v1.10.0 // indirect
 )
