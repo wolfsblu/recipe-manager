@@ -9,6 +9,7 @@
         <span class="sr-only">Info</span>
     </span>
     <p class="font-medium">
-        Work in progress! This page will show you the recipes that you saved from others.
+        Work in progress! This page will show a calendar for planning upcoming
+        meals.
     </p>
 </Alert>
