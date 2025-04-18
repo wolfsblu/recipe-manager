@@ -3,8 +3,9 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
-	"github.com/wolfsblu/go-chef/infra/env"
 	"sync"
+
+	"github.com/wolfsblu/go-chef/infra/env"
 )
 
 type Store struct {
@@ -24,7 +25,8 @@ func NewSqliteStore() (*Store, error) {
 	var err error
 	dbPath := env.MustGet("DB_PATH")
 	once.Do(func() {
-		con, err := connect(dbPath)
+		var con *sql.DB
+		con, err = connect(dbPath)
 		if err == nil {
 			store = &Store{db: con, q: New(con), path: dbPath}
 			err = store.migrate()

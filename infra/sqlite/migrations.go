@@ -1,10 +1,11 @@
 package sqlite
 
 import (
-	"ariga.io/atlas-go-sdk/atlasexec"
 	"context"
 	"fmt"
 	"io/fs"
+
+	"ariga.io/atlas-go-sdk/atlasexec"
 )
 
 func (s *Store) migrate() error {
