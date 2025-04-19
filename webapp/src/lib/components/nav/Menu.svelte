@@ -152,7 +152,8 @@
                 <SidebarItem
                     spanClass="flex-1 ms-3"
                     label="Notifications"
-                    onclick={() => showNotifications = true}
+                    href="/user/notifications"
+                    onclick={(e) => { e.preventDefault(); showNotifications = true}}
                 >
                     <svelte:fragment slot="icon">
                         <div class="relative">
