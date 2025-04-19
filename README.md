@@ -1,3 +1,6 @@
+## Screenshot
+![Promotional screenshot](screenshots/promo.webp)
+
 ## Build Steps
 1. Generate the API server and SQL queries
     ```
