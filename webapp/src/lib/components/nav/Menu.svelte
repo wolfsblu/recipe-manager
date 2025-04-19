@@ -1,6 +1,6 @@
 <script lang="ts">
     import {
-        DarkMode,
+        DarkMode, Indicator,
         Sidebar,
         SidebarDropdownItem,
         SidebarDropdownWrapper,
@@ -48,6 +48,8 @@
 
     let showNotifications = $state(false);
 </script>
+
+<Notifications bind:open={showNotifications} />
 
 <Sidebar {activeUrl} asideClass="w-full h-full shadow">
     <SidebarWrapper class="h-full flex flex-col justify-between rounded-l-none">
@@ -150,18 +152,18 @@
                 <SidebarItem
                     spanClass="flex-1 ms-3"
                     label="Notifications"
-                    on:click={() => {
-                        showNotifications = true;
-                    }}
+                    onclick={() => showNotifications = true}
                 >
                     <svelte:fragment slot="icon">
-                        <BellOutline class={iconClass} />
+                        <div class="relative">
+                            <BellOutline class={iconClass} />
+                            <Indicator color="red" size="xs" placement="bottom-right" />
+                        </div>
                     </svelte:fragment>
                     <svelte:fragment slot="subtext">
                         <span class={bubbleClass}> 3 </span>
                     </svelte:fragment>
                 </SidebarItem>
-                <Notifications />
 
                 <SidebarItem
                     label="Sign Out"
@@ -176,7 +178,6 @@
             <section class="flex justify-center">
                 <DarkMode class="cursor-pointer" />
                 <Tooltip>Toggle dark mode</Tooltip>
-
             </section>
         </SidebarGroup>
     </SidebarWrapper>
