@@ -11,7 +11,7 @@ func main() {
 	env.Load()
 	recipeService, err := InitializeRecipeService()
 	if err != nil {
-		log.Fatal("failed to initialize recipe service:", err)
+		log.Fatal("failed to initialize recipe service: ", err)
 	}
 
 	scheduler := InitializeScheduler(recipeService)
@@ -19,12 +19,12 @@ func main() {
 
 	mux, err := InitializeWebServer(recipeService)
 	if err != nil {
-		log.Fatal("failed to initialize web server:", err)
+		log.Fatal("failed to initialize web server: ", err)
 	}
 
 	host := env.MustGet("HOST")
 	err = http.ListenAndServe(host, mux)
 	if err != nil {
-		log.Fatalln("failed to start web server:", err)
+		log.Fatalln("failed to start web server: ", err)
 	}
 }
