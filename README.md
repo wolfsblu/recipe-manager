@@ -17,6 +17,9 @@
     ```
 
 ## Running the Application
+
+### Natively
+
 Assuming you want to run the binary directly from the repository:
 
 1. Download the DB schema migration tool [atlas](https://atlasgo.io/docs)
@@ -31,4 +34,16 @@ Assuming you want to run the binary directly from the repository:
     ```
     ./tmp/main
     ```
+3. Open the [frontend](http://localhost:8080) or browse the [API](http://localhost:8080/api/docs)
+
+### With Docker
+
+1. Pull the image
+   ```
+   docker pull ghcr.io/wolfsblu/go-chef:latest
+   ```
+2. Launch the container
+   ```
+   docker run -d --env-file .env.example -p 8080:8080 go-chef
+   ```
 3. Open the [frontend](http://localhost:8080) or browse the [API](http://localhost:8080/api/docs)
