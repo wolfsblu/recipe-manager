@@ -2,14 +2,15 @@
 ![Promotional screenshot](screenshots/promo.webp)
 
 ## Build Steps
-1. Generate the API server and SQL queries
+1. Download dependencies and generate API server and SQL queries
     ```
+    go mod tidy
     go generate
     ```
 2. Build the frontend application 
     ```
-    npm --prefix app install
-    npm --prefix app run build
+    npm --prefix webapp install
+    npm --prefix webapp run build
     ```
 3. Build the project
     ```
