@@ -1,74 +1,56 @@
 <script lang="ts">
-    import {Alert, Card, Group, GroupItem, Timeline, TimelineItem} from "flowbite-svelte";
-    import {InfoCircleSolid} from "flowbite-svelte-icons";
-    import {getDaysInMonth, inCurrentMonth, isToday} from "$lib/calendar/calendar";
-
-    // TODO: Use https://wicky.nillia.ms/cally/components/calendar-range/ for selecting the date range
-    // TODO: Display as calendar next to schedule https://tailwindcss.com/plus/ui-blocks/application-ui/data-display/calendars#component-5bb74a1ac1c8cf96e7b3d1ea2bf4570b
+    import {Button, Card} from "flowbite-svelte";
+    import {AngleLeftOutline, AngleRightOutline} from "flowbite-svelte-icons";
+    import {getDaysInMonth, getWeekdays, isToday} from "$lib/calendar/calendar";
 
     const now = new Date();
     const days = getDaysInMonth(now);
-
-    let groupTimelines = [
-        {
-            title: '<span class="font-medium text-gray-900 dark:text-white">Jese Leos</span> likes <span class="font-medium text-gray-900 dark:text-white">Bonnie Green\'s</span> post in <span class="font-medium text-gray-900 dark:text-white"> How to start with Flowbite library</span>',
-            src: '/images/profile-picture-1.webp',
-            alt: 'alt here',
-            href: '/',
-            isPrivate: true,
-            comment: '"I wanted to share a webinar zeroheight."'
-        },
-        {
-            title: '<span class="font-medium text-gray-900 dark:text-white">Bonnie Green</span> react to <span class="font-medium text-gray-900 dark:text-white">Thomas Lean\'s</span> comment',
-            src: '/images/profile-picture-2.webp',
-            alt: 'alt here',
-            href: '/',
-            isPrivate: true,
-            comment: '"I wanted to share a webinar zeroheight."'
-        }
-    ]
+    const weekdays = getWeekdays()
 </script>
 
-<Alert border class="items-start! mb-3" color="blue">
-    <span slot="icon">
-        <InfoCircleSolid class="w-5 h-5"/>
-        <span class="sr-only">Info</span>
-    </span>
-    <p class="font-medium">
-        Work in progress! This page will show a calendar for planning upcoming
-        meals.
-    </p>
-</Alert>
-
-<div class="grid grid-cols-3 gap-3">
-    <Card size="none">
-        <div class="grid grid-cols-7 overflow-hidden rounded-md border border-gray-200 dark:border-gray-600">
-            {#each days as date, i}
-                <div class="flex justify-center p-1 border-t border-l border-gray-200 dark:border-gray-600 font-semibold
-                {i % 7 === 0 ? 'border-l-0' : ''}
-                {i < 7 ? 'border-t-0' : ''}
-                {inCurrentMonth(date) ? 'text-gray-700 dark:text-gray-100' : 'bg-gray-100 dark:bg-gray-700'}"
-                >
-                    <time class="flex items-center justify-center w-10 h-10
-                    {isToday(date) ? ' bg-primary-300 rounded-full text-primary-600 dark:text-primary-400 dark:bg-primary-600' : ''}"
-                    >
-                        {date.getDate()}
-                    </time>
-                </div>
-            {/each}
+<Card size="none">
+    <div class="border-b flex flex-col sm:flex-row justify-between items-center pb-4 gap-3">
+        <h2 class="text-2xl font-semibold">January 2022</h2>
+        <div class="flex space-x-2">
+            <Button color="alternative">
+                <AngleLeftOutline class="w-5 h-5"/>
+            </Button>
+            <Button color="alternative">
+                <AngleRightOutline class="w-5 h-5"/>
+            </Button>
+            <Button>
+                Today
+            </Button>
         </div>
-    </Card>
-    <Card size="none" class="col-span-2">
-        <Timeline>
-            <TimelineItem title="Application UI code in Tailwind CSS" date="February 2022">
-                <p class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">Get access to over 20+ pages including a dashboard layout, charts, kanban board, calendar, and pre-order E-commerce & Marketing pages.</p>
-            </TimelineItem>
-            <TimelineItem title="Application UI code in Tailwind CSS" date="March 2022">
-                <p class="text-base font-normal text-gray-500 dark:text-gray-400">All of the pages and components are first designed in Figma and we keep a parity between the two versions even as we update the project.</p>
-            </TimelineItem>
-            <TimelineItem title="Application UI code in Tailwind CSS" date="April 2022">
-                <p class="text-base font-normal text-gray-500 dark:text-gray-400">Get started with dozens of web components and interactive elements built on top of Tailwind CSS.</p>
-            </TimelineItem>
-        </Timeline>
-    </Card>
-</div>
+    </div>
+    <div class="grid grid-cols-7 text-center text-gray-600 dark:text-gray-300 font-semibold border-b">
+        {#each weekdays as weekday, i}
+            <div class="block sm:hidden py-2">{weekday.substring(0, 1)}</div>
+            <div class="hidden sm:block py-2">{weekday}</div>
+        {/each}
+    </div>
+    <!-- Calendar grid -->
+    <div class="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-700">
+        <!-- Week 1 -->
+        {#each days as day, i}
+            <div class="overflow-y-auto overflow-x-hidden flex-col gap-2 bg-white dark:bg-gray-800 h-12 sm:h-30 text-base p-1">
+                <time class="sticky top-0 mb-1 text-gray-600 dark:text-gray-300 w-8 h-8 flex items-center justify-center rounded-full font-semibold
+                      {isToday(day) ? 'bg-primary-300 text-primary-600 dark:bg-primary-600 dark:text-primary-300' : ''}"
+                      datetime="2022-01-01">
+                    {day.getDate()}
+                </time>
+                {#if i === 23}
+                <div class="overflow-y-auto">
+                    {#each Array(10).fill(0) as item, i}
+                        <Card size="none" class="mb-2" padding="none">
+                            <div class="text-center text-nowrap p-1">
+                                <p class="overflow-hidden text-ellipsis">Schnitzel Braten mit Sose und Ketchup</p>
+                            </div>
+                        </Card>
+                    {/each}
+                </div>
+                {/if}
+            </div>
+        {/each}
+    </div>
+</Card>

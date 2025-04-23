@@ -27,3 +27,7 @@ export const isToday = (date: Date) => {
 export const inCurrentMonth = (date: Date) => {
     return date.getMonth() === new Date().getMonth();
 }
+
+export const getWeekdays = () => {
+    return ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+}
