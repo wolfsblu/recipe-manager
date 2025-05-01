@@ -23,6 +23,11 @@
 {/snippet}
 
 <Card size="none">
+    <div>
+        {#each weekdays as weekday}
+            <span>{weekday}</span>
+        {/each}
+    </div>
     <div class="flex flex-col sm:flex-row justify-between items-center pb-4 gap-3">
         <h2 class="text-2xl font-semibold">January 2022</h2>
         <div class="flex space-x-2">

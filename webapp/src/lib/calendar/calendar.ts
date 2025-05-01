@@ -1,3 +1,5 @@
+import {DateTime, Info, Settings} from 'luxon'
+
 export const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth(); // 0 = January
@@ -28,6 +30,9 @@ export const inCurrentMonth = (date: Date) => {
     return date.getMonth() === new Date().getMonth();
 }
 
-export const getWeekdays = () => {
-    return ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+export const getWeekdays = (locale: string = Settings.defaultLocale) => {
+    const weekdays = Info.weekdaysFormat('short', { locale });
+    const firstDay = Info.getStartOfWeek({ locale }); // returns 1 for most of Europe, 0 for US
+    // Reorder weekdays starting from the locale's first day of the week
+    return [...weekdays.slice(firstDay), ...weekdays.slice(0, firstDay)];
 }
