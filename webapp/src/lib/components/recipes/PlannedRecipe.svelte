@@ -10,7 +10,7 @@
         Listgroup,
         ListgroupItem
     } from "flowbite-svelte";
-    import {DotsVerticalOutline} from "flowbite-svelte-icons";
+    import {TrashBinOutline} from "flowbite-svelte-icons";
 
     const listItemClass = "px-0 flex justify-between"
 
@@ -23,6 +23,19 @@
     }: Props = $props()
 </script>
 
+<div class="flex flex-col justify-between w-full h-36 bg-cover rounded-md shadow-md" style="background-image: url({placeholder})">
+    <div class="flex justify-end p-1">
+        <Button class="h-7 w-7 p-2" color="red" outline pill>
+            <TrashBinOutline class="w-4 h-4"/>
+        </Button>
+    </div>
+    <div class="flex flex-col justify-end py-3 h-1/2 text-white bg-gradient-to-b from-transparent to-gray-800 rounded-b-md">
+        <h1 class="font-semibold">
+            {title}
+        </h1>
+    </div>
+</div>
+<!--
 <Card class="card" img={placeholder} imgClass="max-h-42 object-cover" padding="sm" size="none">
     <div class="flex flex-col flex-grow justify-between">
         <section class="mb-2 flex gap-1 justify-between items-top">
@@ -47,3 +60,4 @@
         flex-grow: 1;
     }
 </style>
+-->

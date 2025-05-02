@@ -1,12 +1,15 @@
 <script lang="ts">
+    import {dndzone} from "svelte-dnd-action";
     import {Button, Card} from "flowbite-svelte";
     import {AngleLeftOutline, AngleRightOutline} from "flowbite-svelte-icons";
-    import {getWeekdays, isToday} from "$lib/calendar/calendar";
+    import {isToday} from "$lib/calendar/calendar";
     import PlannedRecipe from "$lib/components/recipes/PlannedRecipe.svelte";
     import {DateTime} from "luxon";
+    import {flip} from "svelte/animate";
 
     let selectedDate = $state(DateTime.now())
-    const weekdays = $derived(getWeekdays(selectedDate))
+
+    const flipDuration = 100
 
     const onNextClick = () => {
         selectedDate = selectedDate.plus({day: 7})
@@ -14,6 +17,76 @@
     const onPrevClick = () => {
         selectedDate = selectedDate.minus({day: 7})
     }
+
+    let recipes = $state([
+        {
+            id: 1,
+            name: 'Monday',
+            date: new Date(2025, 3, 27),
+            items: [
+                {id: 10, name: 'My super duper recipe'},
+            ]
+        },
+        {
+            id: 2,
+            name: 'Tuesday',
+            date: new Date(2025, 3, 28),
+            items: [
+                {id: 20, name: 'My super duper recipe'},
+            ]
+        },
+        {
+            id: 3,
+            name: 'Wednesday',
+            date: new Date(2025, 3, 29),
+            items: [
+                {id: 30, name: 'My super duper recipe'},
+            ]
+        },
+        {
+            id: 4,
+            name: 'Thursday',
+            date: new Date(2025, 3, 30),
+            items: [
+                {id: 40, name: 'My super duper recipe'},
+            ]
+        },
+        {
+            id: 5,
+            name: 'Friday',
+            date: new Date(2025, 4, 1),
+            items: [
+                {id: 50, name: 'My super duper recipe'},
+            ]
+        },
+        {
+            id: 6,
+            name: 'Saturday',
+            date: new Date(2025, 4, 2),
+            items: [
+                {id: 60, name: 'My super duper recipe'},
+            ]
+        },
+        {
+            id: 7,
+            name: 'Sunday',
+            date: new Date(2025, 4, 3),
+            items: [
+                {id: 70, name: 'My super duper recipe'},
+            ]
+        },
+    ])
+
+    const handleDndConsiderCards = (cid: number, e) => {
+        const colIdx = recipes.findIndex(c => c.id === cid);
+        recipes[colIdx].items = e.detail.items;
+        recipes = [...recipes];
+    }
+    const handleDndFinalizeCards = (cid: number, e) => {
+        const colIdx = recipes.findIndex(c => c.id === cid);
+        recipes[colIdx].items = e.detail.items;
+        recipes = [...recipes];
+    };
 </script>
 
 <Card padding="none" size="none">
@@ -36,14 +109,22 @@
     </div>
 
     <div class="grid grid-cols-7">
-        {#each weekdays as weekday}
-            <div class="text-center py-3 dark:text-white
-                        {isToday(weekday.date) ? 'bg-primary-200 dark:bg-primary-900' : ''}">
-                <p class="font-thin mb-1">{weekday.name.toUpperCase()}</p>
-                <p class="font-bold">{weekday.date.toLocaleString({day: "numeric"})}</p>
+        {#each recipes as recipe (recipe.id)}
+            <div class="text-center dark:text-white flex flex-col
+                        {isToday(DateTime.fromJSDate(recipe.date)) ? 'bg-gray-100 dark:bg-gray-900' : ''}">
+                <div class="border-y py-1 border-gray-200 dark:border-gray-700">
+                    <p class="font-thin mb-1">{DateTime.fromJSDate(recipe.date).weekdayShort}</p>
+                    <p class="font-bold">{DateTime.fromJSDate(recipe.date).toLocaleString({day: "numeric"})}</p>
+                </div>
 
-                <div class="p-3 pb-6 {isToday(weekday.date) ? 'bg-primary-200 dark:bg-primary-900' : ''}">
-                    <PlannedRecipe title="My super duper recipe"/>
+                <div class="flex flex-col flex-grow space-y-3 p-3" use:dndzone={{items: recipe.items, flipDurationMs: flipDuration}}
+                     onconsider={(e) => handleDndConsiderCards(recipe.id, e)}
+                     onfinalize={(e) => handleDndFinalizeCards(recipe.id, e)}>
+                    {#each recipe.items as item (item.id)}
+                        <div animate:flip={{duration: flipDuration}}>
+                            <PlannedRecipe title={item.name}/>
+                        </div>
+                    {/each}
                 </div>
             </div>
         {/each}
