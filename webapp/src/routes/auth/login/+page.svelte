@@ -21,7 +21,7 @@
     }
 </script>
 
-<Card class="self-center my-auto">
+<Card class="self-center my-auto p-6">
     <form class="flex flex-col space-y-6" onsubmit="{onSubmit}">
         <h3 class="text-xl font-medium text-gray-900 dark:text-white">Sign in</h3>
         <Label class="space-y-2">

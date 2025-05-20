@@ -29,8 +29,8 @@
     }: Props = $props()
 </script>
 
-<Card class="card" img={placeholder} imgClass="max-h-42 object-cover" padding="sm" size="none">
-    <div class="flex flex-col flex-grow justify-between">
+<Card img={placeholder} imgClass="max-h-42 object-cover">
+    <div class="flex flex-col flex-grow justify-between p-3">
         <section class="mb-2 flex gap-1 justify-between items-top">
             <h1 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
                 {title}
@@ -44,16 +44,16 @@
                 <DropdownItem>Delete</DropdownItem>
             </Dropdown>
         </section>
-        <Listgroup class="border-0 dark:bg-transparent!">
-            <ListgroupItem normalClass={listItemClass}>
+        <Listgroup class="border-0 dark:bg-transparent! w-full">
+            <ListgroupItem class={listItemClass}>
                 <span>Time</span>
                 <span>{minutes} min</span>
             </ListgroupItem>
-            <ListgroupItem normalClass={listItemClass}>
+            <ListgroupItem class={listItemClass}>
                 <span>Servings</span>
                 <Badge>{servings}</Badge>
             </ListgroupItem>
-            <ListgroupItem normalClass={listItemClass}>
+            <ListgroupItem class={listItemClass}>
                 <span>Ingredients</span>
                 <Badge>{ingredients}</Badge>
             </ListgroupItem>

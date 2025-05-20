@@ -27,7 +27,7 @@
     })
 </script>
 
-<Card class="self-center my-auto" padding="none" size="lg">
+<Card class="self-center my-auto p-6">
     <Alert color="green">
         <div class="flex items-center gap-3">
             <CheckOutline class="w-5 h-5" />

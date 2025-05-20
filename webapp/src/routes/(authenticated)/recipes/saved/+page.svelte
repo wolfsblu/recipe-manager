@@ -4,10 +4,10 @@
 </script>
 
 <Alert border color="blue" class="items-start!">
-    <span slot="icon">
+    {#snippet icon()}
         <InfoCircleSolid class="w-5 h-5" />
         <span class="sr-only">Info</span>
-    </span>
+    {/snippet}
     <p class="font-medium">
         Work in progress! This page will show you the recipes that you saved from others.
     </p>

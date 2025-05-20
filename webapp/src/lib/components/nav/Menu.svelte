@@ -51,23 +51,23 @@
 
 <Notifications bind:open={showNotifications} />
 
-<Sidebar {activeUrl} asideClass="w-full h-full shadow">
+<Sidebar {activeUrl} class="h-full shadow" divClass="h-full" isSingle={false}>
     <SidebarWrapper class="h-full flex flex-col justify-between rounded-l-none">
         <SidebarGroup>
             <SidebarItem
                 label="Browse"
                 href="/"
-                on:click={() => onNavigate?.()}
+                onclick={() => onNavigate?.()}
             >
-                <svelte:fragment slot="icon">
+                {#snippet icon()}
                     <SearchOutline class={iconClass} />
-                </svelte:fragment>
+                {/snippet}
             </SidebarItem>
             {#if isAuthenticated()}
                 <SidebarDropdownWrapper label="Recipes" isOpen>
-                    <svelte:fragment slot="icon">
+                    {#snippet icon()}
                         <ReceiptSolid class={iconClass} />
-                    </svelte:fragment>
+                    {/snippet}
                     <SidebarDropdownItem
                         label="My Recipes"
                         href="/recipes"
@@ -91,31 +91,31 @@
                     label="Ingredients"
                     {spanClass}
                     href="/ingredients"
-                    on:click={() => onNavigate?.()}
+                    onclick={() => onNavigate?.()}
                 >
-                    <svelte:fragment slot="icon">
+                    {#snippet icon()}
                         <ShoppingBagSolid class={iconClass} />
-                    </svelte:fragment>
+                    {/snippet}
                 </SidebarItem>
                 <SidebarItem
                     label="Measurements"
                     {spanClass}
                     href="/measurements"
-                    on:click={() => onNavigate?.()}
+                    onclick={() => onNavigate?.()}
                 >
-                    <svelte:fragment slot="icon">
+                    {#snippet icon()}
                         <RulerCombinedOutline class={iconClass} />
-                    </svelte:fragment>
+                    {/snippet}
                 </SidebarItem>
                 <SidebarItem
                     label="Shopping List"
                     {spanClass}
                     href="/shopping"
-                    on:click={() => onNavigate?.()}
+                    onclick={() => onNavigate?.()}
                 >
-                    <svelte:fragment slot="icon">
+                    {#snippet icon()}
                         <CartOutline class={iconClass} />
-                    </svelte:fragment>
+                    {/snippet}
                 </SidebarItem>
             {/if}
         </SidebarGroup>
@@ -124,30 +124,30 @@
                 <SidebarItem
                     label="Sign In"
                     href="/auth/login"
-                    on:click={() => onNavigate?.()}
+                    onclick={() => onNavigate?.()}
                 >
-                    <svelte:fragment slot="icon">
+                    {#snippet icon()}
                         <ArrowRightToBracketOutline class={iconClass} />
-                    </svelte:fragment>
+                    {/snippet}
                 </SidebarItem>
                 <SidebarItem
                     label="Sign Up"
                     href="/auth/register"
-                    on:click={() => onNavigate?.()}
+                    onclick={() => onNavigate?.()}
                 >
-                    <svelte:fragment slot="icon">
+                    {#snippet icon()}
                         <EditOutline class={iconClass} />
-                    </svelte:fragment>
+                    {/snippet}
                 </SidebarItem>
             {:else}
                 <SidebarItem
                     label="Account"
                     href="/user/account"
-                    on:click={() => onNavigate?.()}
+                    onclick={() => onNavigate?.()}
                 >
-                    <svelte:fragment slot="icon">
+                    {#snippet icon()}
                         <UserCircleSolid class={iconClass} />
-                    </svelte:fragment>
+                    {/snippet}
                 </SidebarItem>
                 <SidebarItem
                     spanClass="flex-1 ms-3"
@@ -155,25 +155,25 @@
                     href="/user/notifications"
                     onclick={(e) => { e.preventDefault(); showNotifications = true}}
                 >
-                    <svelte:fragment slot="icon">
+                    {#snippet icon()}
                         <div class="relative">
                             <BellOutline class={iconClass} />
                             <Indicator color="red" size="xs" placement="bottom-right" />
                         </div>
-                    </svelte:fragment>
-                    <svelte:fragment slot="subtext">
+                    {/snippet}
+                    {#snippet subtext()}
                         <span class={bubbleClass}> 3 </span>
-                    </svelte:fragment>
+                    {/snippet}
                 </SidebarItem>
 
                 <SidebarItem
                     label="Sign Out"
                     href="/auth/login"
-                    on:click={onLogout}
+                    onclick={onLogout}
                 >
-                    <svelte:fragment slot="icon">
+                    {#snippet icon()}
                         <ArrowLeftToBracketOutline class={iconClass} />
-                    </svelte:fragment>
+                    {/snippet}
                 </SidebarItem>
             {/if}
             <section class="flex justify-center">

@@ -27,14 +27,14 @@
     {#each $toasts as toast (toast.id)}
         <Toast bind:toastStatus={toast.visible}
                color={getColor(toast)}
-               divClass="md:w-full p-4 text-gray-500 bg-white shadow-sm dark:text-gray-400 dark:bg-gray-800 gap-3"
+               class="md:max-w-full rounded-none p-4 text-gray-500 bg-white shadow-sm dark:text-gray-400 dark:bg-gray-800 gap-3"
                transition={blur}
                params={{ amount: 10 }}
         >
-            <svelte:fragment slot="icon">
+            {#snippet icon()}
                 <ExclamationCircleOutline class="w-5 h-5"/>
                 <span class="sr-only">Error icon</span>
-            </svelte:fragment>
+            {/snippet}
 
             {toast.message}
         </Toast>

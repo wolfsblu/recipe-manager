@@ -18,13 +18,12 @@
     <NavBrand href="/">
         <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Go Chef</span>
     </NavBrand>
-    <NavHamburger onClick={() => hideNavigation = !hideNavigation}  />
+    <NavHamburger onclick={() => hideNavigation = !hideNavigation}  />
 </Navbar>
 
 <Drawer bind:hidden={hideNavigation}
-        transitionType="fly"
         transitionParams={{x: -256, duration: 125, easing: sineIn}}
-        divClass="overflow-y-auto z-50 bg-white dark:bg-gray-800"
-        width="w-64">
+        class="overflow-y-auto z-50 bg-white dark:bg-gray-800"
+>
     <Menu onNavigate={toggleNavigation} />
 </Drawer>

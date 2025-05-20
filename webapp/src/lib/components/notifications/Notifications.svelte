@@ -11,10 +11,10 @@
     }: Props = $props()
 </script>
 
-<Modal bind:open={open} autoclose outsideclose classBody="p-0 md:p-0">
-    <h1 class="font-bold" slot="header">
+<Modal autoclose bind:open={open} outsideclose>
+    {#snippet header()}
         Notifications
-    </h1>
+    {/snippet}
     <Listgroup class="rounded-none border-0">
         <ListgroupItem class="flex space-x-4 rtl:space-x-reverse">
             <div class="ps-3 w-full">
@@ -65,10 +65,11 @@
             </div>
         </ListgroupItem>
     </Listgroup>
-    <svelte:fragment slot="footer">
+
+    {#snippet footer()}
         <Button color="alternative" href="/user/notifications" onclick={() => open = false}>
             <EyeSolid class="me-2 w-4 h-4"/>
             View all
         </Button>
-    </svelte:fragment>
+    {/snippet}
 </Modal>

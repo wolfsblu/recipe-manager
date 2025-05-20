@@ -2,6 +2,7 @@
     import {
         SpeedDial,
         SpeedDialButton,
+        SpeedDialTrigger,
         Search,
     } from "flowbite-svelte";
     import {
@@ -16,17 +17,14 @@
 </script>
 
 <form class="flex gap-2 mb-4">
-    <Search
-        wrapperClass="relative w-full"
-        placeholder="Find a recipe"
-    />
+    <Search placeholder="Find a recipe" />
 </form>
 
 {#snippet DummyRecipe(
     title: string,
     servings: number,
     ingredients: number,
-    minutes: number,
+    minutes: number
 )}
     <Recipe {title} {servings} {ingredients} {minutes} />
 {/snippet}
@@ -39,7 +37,8 @@
     {/each}
 </section>
 
-<SpeedDial>
+<SpeedDialTrigger class="absolute end-6 bottom-6" />
+<SpeedDial class="fixed end-6 bottom-6">
     <SpeedDialButton name="Shopping Item">
         <CartOutline class={iconClass} />
     </SpeedDialButton>

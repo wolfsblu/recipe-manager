@@ -20,7 +20,7 @@
     }
 </script>
 
-<Card class="self-center my-auto">
+<Card class="self-center my-auto p-6">
     <form class="flex flex-col space-y-6" onsubmit={onReset}>
         <h3 class="text-xl font-medium text-gray-900 dark:text-white">Register</h3>
         <Label class="space-y-2">

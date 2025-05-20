@@ -1,7 +1,11 @@
 <script lang="ts">
     import {dndzone} from "svelte-dnd-action";
-    import {Button, Card} from "flowbite-svelte";
-    import {AngleLeftOutline, AngleRightOutline} from "flowbite-svelte-icons";
+    import {Button, Card, SpeedDialTrigger} from "flowbite-svelte";
+    import {
+        AngleLeftOutline,
+        AngleRightOutline,
+        PlusOutline
+    } from "flowbite-svelte-icons";
     import {isToday} from "$lib/calendar/calendar";
     import PlannedRecipe from "$lib/components/recipes/PlannedRecipe.svelte";
     import {DateTime} from "luxon";
@@ -89,7 +93,7 @@
     };
 </script>
 
-<Card padding="none" size="none">
+<Card class="max-w-full" >
     <div class="flex flex-col sm:flex-row justify-between items-center pb-4 gap-3 p-6">
         <h2 class="text-2xl font-semibold">
             {selectedDate.toLocaleString({month: "long"})}
@@ -117,9 +121,11 @@
                     <p class="font-bold">{DateTime.fromJSDate(recipe.date).toLocaleString({day: "numeric"})}</p>
                 </div>
 
-                <div class="flex flex-col flex-grow space-y-3 p-3" use:dndzone={{items: recipe.items, flipDurationMs: flipDuration}}
+                <div class="flex flex-col flex-grow space-y-3 p-3"
                      onconsider={(e) => handleDndConsiderCards(recipe.id, e)}
-                     onfinalize={(e) => handleDndFinalizeCards(recipe.id, e)}>
+                     onfinalize={(e) => handleDndFinalizeCards(recipe.id, e)}
+                     use:dndzone={{items: recipe.items, flipDurationMs: flipDuration, dropTargetStyle: {}}}
+                >
                     {#each recipe.items as item (item.id)}
                         <div animate:flip={{duration: flipDuration}}>
                             <PlannedRecipe title={item.name}/>
@@ -130,3 +136,9 @@
         {/each}
     </div>
 </Card>
+
+<SpeedDialTrigger class="absolute end-24 bottom-6">
+    {#snippet icon()}
+        <PlusOutline class="h-8 w-8" />
+    {/snippet}
+</SpeedDialTrigger>
