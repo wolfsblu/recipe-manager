@@ -37,7 +37,7 @@
     {/each}
 </section>
 
-<SpeedDialTrigger class="absolute end-6 bottom-6" />
+<SpeedDialTrigger class="fixed end-6 bottom-6" />
 <SpeedDial class="fixed end-6 bottom-6">
     <SpeedDialButton name="Shopping Item">
         <CartOutline class={iconClass} />

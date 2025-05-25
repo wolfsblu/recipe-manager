@@ -29,7 +29,7 @@
     }: Props = $props()
 </script>
 
-<Card img={placeholder} imgClass="max-h-42 object-cover">
+<Card img={placeholder} class="max-w-full" imgClass="max-h-42 object-cover">
     <div class="flex flex-col flex-grow justify-between p-3">
         <section class="mb-2 flex gap-1 justify-between items-top">
             <h1 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white">
