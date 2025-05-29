@@ -1,6 +1,7 @@
 <script lang="ts">
     import {Button, Listgroup, ListgroupItem, Modal} from "flowbite-svelte";
     import {EyeSolid} from "flowbite-svelte-icons";
+    import {goto} from "$app/navigation";
 
     interface Props {
         open: boolean
@@ -9,6 +10,11 @@
     let {
         open = $bindable(),
     }: Props = $props()
+
+    const goToNotifications = () => {
+        open = false
+        goto("/user/notifications")
+    }
 </script>
 
 <Modal autoclose bind:open={open} outsideclose>
@@ -67,7 +73,7 @@
     </Listgroup>
 
     {#snippet footer()}
-        <Button color="alternative" href="/user/notifications" onclick={() => open = false}>
+        <Button color="alternative" onclick={() => goToNotifications()}>
             <EyeSolid class="me-2 w-4 h-4"/>
             View all
         </Button>
