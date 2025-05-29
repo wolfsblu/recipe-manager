@@ -17,11 +17,11 @@
     }
 </script>
 
-<Modal autoclose bind:open={open} outsideclose>
+<Modal autoclose bind:open={open} outsideclose bodyClass="md:p-0">
     {#snippet header()}
         Notifications
     {/snippet}
-    <Listgroup class="rounded-none border-0">
+    <Listgroup class="rounded-none border-0 w-full">
         <ListgroupItem class="flex space-x-4 rtl:space-x-reverse">
             <div class="ps-3 w-full">
                 <div class="text-gray-500 text-sm mb-1.5 dark:text-gray-400">
