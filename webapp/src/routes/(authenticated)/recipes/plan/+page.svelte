@@ -137,7 +137,7 @@
     </div>
 </Card>
 
-<SpeedDialTrigger class="absolute end-24 bottom-6">
+<SpeedDialTrigger class="absolute end-6 bottom-6">
     {#snippet icon()}
         <PlusOutline class="h-8 w-8" />
     {/snippet}
