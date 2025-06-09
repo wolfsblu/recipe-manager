@@ -42,8 +42,8 @@ func (s *Store) DeleteRecipe(ctx context.Context, id int64) error {
 func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Time, until time.Time) ([]domain.MealPlan, error) {
 	result, err := s.query().GetMealPlan(ctx, GetMealPlanParams{
 		UserID:    user.ID,
-		FromDate:  from.Format("2006-01-02"),
-		UntilDate: until.Format("2006-01-02"),
+		FromDate:  from.Format(time.DateOnly),
+		UntilDate: until.Format(time.DateOnly),
 	})
 	if err != nil {
 		return []domain.MealPlan{}, err
@@ -56,7 +56,7 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 
 	mealplan := make([]domain.MealPlan, len(grouped))
 	for key, recipes := range grouped {
-		date, err := time.Parse("2006-01-02", key)
+		date, err := time.Parse(time.DateOnly, key)
 		if err != nil {
 			return []domain.MealPlan{}, err
 		}

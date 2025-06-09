@@ -134,6 +134,33 @@ paths:
           $ref: '#/components/responses/User'
         default:
           $ref: '#/components/responses/Error'
+  /mealplan:
+    get:
+      tags:
+        - Meal Plan
+      summary: Get your meal plan
+      operationId: getMealPlan
+      parameters:
+        - name: from
+          in: query
+          description: From when to fetch the meal plan
+          schema:
+            type: string
+            format: date
+            example: '2023-01-01'
+        - name: until
+          in: query
+          description: Until when to fetch the meal plan
+          schema:
+            type: string
+            format: date
+            example: '2023-01-01'
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/MealPlan'
+        default:
+          $ref: '#/components/responses/Error'
   /recipes:
     get:
       tags:
@@ -295,6 +322,20 @@ components:
       encoding:
         images:
           contentType: image/jpeg, image/png
+    ReadMealPlan:
+      type: object
+      required:
+        - date
+      properties:
+        date:
+          type: string
+          description: When are these recipes planned
+          examples:
+            - 2006-06-01
+        recipes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadRecipe'
     ReadRecipe:
       allOf:
         - $ref: '#/components/schemas/WriteRecipe'
@@ -387,6 +428,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ReadUser'
+    MealPlan:
+      description: Meal plan for the user
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ReadMealPlan'
     RecipeList:
       description: Recipe object returned as result
       content:

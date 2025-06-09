@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
+	"time"
 )
 
 type RecipeHandler struct {
@@ -55,6 +56,29 @@ func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecip
 		return err
 	}
 	return nil
+}
+
+func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanParams) ([]api.ReadMealPlan, error) {
+	user := ctx.Value(ctxKeyUser).(*domain.User)
+	mealplan, err := h.Recipes.GetMealPlan(ctx, user, params.From.Or(time.Now()), params.Until.Or(time.Now()))
+	if err != nil {
+		return nil, err
+	}
+	var response []api.ReadMealPlan
+	for _, item := range mealplan {
+		var recipes []api.ReadRecipe
+		for _, recipe := range item.Recipes {
+			recipes = append(recipes, api.ReadRecipe{
+				ID:   recipe.ID,
+				Name: recipe.Name,
+			})
+		}
+		response = append(response, api.ReadMealPlan{
+			Date:    item.Date.Format(time.DateOnly),
+			Recipes: recipes,
+		})
+	}
+	return response, nil
 }
 
 func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
