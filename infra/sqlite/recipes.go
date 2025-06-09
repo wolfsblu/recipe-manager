@@ -39,8 +39,33 @@ func (s *Store) DeleteRecipe(ctx context.Context, id int64) error {
 	return s.query().DeleteRecipe(ctx, id)
 }
 
-func (s *Store) GetMealPlan(ctx context.Context, from time.Time, until time.Time) (mealPlan []domain.MealPlan, _ error) {
+func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Time, until time.Time) ([]domain.MealPlan, error) {
+	result, err := s.query().GetMealPlan(ctx, GetMealPlanParams{
+		UserID:    user.ID,
+		FromDate:  from.Format("2006-01-02"),
+		UntilDate: until.Format("2006-01-02"),
+	})
+	if err != nil {
+		return []domain.MealPlan{}, err
+	}
 
+	grouped := make(map[string][]domain.Recipe)
+	for _, item := range result {
+		grouped[item.MealPlan.Date] = append(grouped[item.MealPlan.Date], item.Recipe.AsDomainModel())
+	}
+
+	mealplan := make([]domain.MealPlan, len(grouped))
+	for key, recipes := range grouped {
+		date, err := time.Parse("2006-01-02", key)
+		if err != nil {
+			return []domain.MealPlan{}, err
+		}
+		mealplan = append(mealplan, domain.MealPlan{
+			Date:    date,
+			Recipes: recipes,
+		})
+	}
+	return mealplan, nil
 }
 
 func (s *Store) GetRecipeById(ctx context.Context, id int64) (recipe domain.Recipe, _ error) {

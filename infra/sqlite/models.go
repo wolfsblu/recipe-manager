@@ -28,6 +28,14 @@ type Ingredient struct {
 	Amount   float64
 }
 
+type MealPlan struct {
+	ID       int64
+	Date     string
+	UserID   int64
+	RecipeID int64
+	Order    int64
+}
+
 type PasswordReset struct {
 	UserID    int64
 	Token     string

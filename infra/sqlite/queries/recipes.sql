@@ -23,9 +23,9 @@ SELECT sqlc.embed(meal_plan),
        sqlc.embed(recipes)
 FROM meal_plan
     INNER JOIN recipes ON meal_plan.recipe_id = recipes.id
-WHERE user_id = $1
-    AND meal_plan.date >= $2
-    AND meal_plan.date <= $3;
+WHERE user_id = ?
+    AND meal_plan.date >= sqlc.arg(from_date)
+    AND meal_plan.date <= sqlc.arg(until_date);
 
 -- name: ListRecipes :many
 SELECT *

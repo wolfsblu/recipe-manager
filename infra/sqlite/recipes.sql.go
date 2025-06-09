@@ -48,7 +48,7 @@ func (q *Queries) BrowseRecipes(ctx context.Context) ([]Recipe, error) {
 const createRecipe = `-- name: CreateRecipe :one
 INSERT INTO recipes (name, servings, minutes, description, created_by)
 VALUES (?, ?, ?, ?, ?)
-RETURNING id, name, servings, minutes, description, created_by, created_at
+    RETURNING id, name, servings, minutes, description, created_by, created_at
 `
 
 type CreateRecipeParams struct {
@@ -89,6 +89,63 @@ WHERE id = ?
 func (q *Queries) DeleteRecipe(ctx context.Context, id int64) error {
 	_, err := q.db.ExecContext(ctx, deleteRecipe, id)
 	return err
+}
+
+const getMealPlan = `-- name: GetMealPlan :many
+SELECT meal_plan.id, meal_plan.date, meal_plan.user_id, meal_plan.recipe_id, meal_plan."order",
+       recipes.id, recipes.name, recipes.servings, recipes.minutes, recipes.description, recipes.created_by, recipes.created_at
+FROM meal_plan
+    INNER JOIN recipes ON meal_plan.recipe_id = recipes.id
+WHERE user_id = ?
+    AND meal_plan.date >= ?2
+    AND meal_plan.date <= ?3
+`
+
+type GetMealPlanParams struct {
+	UserID    int64
+	FromDate  string
+	UntilDate string
+}
+
+type GetMealPlanRow struct {
+	MealPlan MealPlan
+	Recipe   Recipe
+}
+
+func (q *Queries) GetMealPlan(ctx context.Context, arg GetMealPlanParams) ([]GetMealPlanRow, error) {
+	rows, err := q.db.QueryContext(ctx, getMealPlan, arg.UserID, arg.FromDate, arg.UntilDate)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetMealPlanRow
+	for rows.Next() {
+		var i GetMealPlanRow
+		if err := rows.Scan(
+			&i.MealPlan.ID,
+			&i.MealPlan.Date,
+			&i.MealPlan.UserID,
+			&i.MealPlan.RecipeID,
+			&i.MealPlan.Order,
+			&i.Recipe.ID,
+			&i.Recipe.Name,
+			&i.Recipe.Servings,
+			&i.Recipe.Minutes,
+			&i.Recipe.Description,
+			&i.Recipe.CreatedBy,
+			&i.Recipe.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getRecipe = `-- name: GetRecipe :one

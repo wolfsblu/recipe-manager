@@ -36,8 +36,8 @@ func (s *RecipeService) Browse(ctx context.Context) ([]Recipe, error) {
 	return s.store.BrowseRecipes(ctx)
 }
 
-func (s *RecipeService) GetMealPlan(ctx context.Context, from time.Time, until time.Time) ([]MealPlan, error) {
-	return s.store.GetMealPlan(ctx, from, until)
+func (s *RecipeService) GetMealPlan(ctx context.Context, user *User, from time.Time, until time.Time) ([]MealPlan, error) {
+	return s.store.GetMealPlan(ctx, user, from, until)
 }
 
 func (s *RecipeService) Delete(ctx context.Context, id int64) error {
