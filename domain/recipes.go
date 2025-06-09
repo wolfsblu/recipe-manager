@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"time"
 )
 
 type RecipeService struct {
@@ -22,12 +23,21 @@ type Recipe struct {
 	RecipeDetails
 }
 
+type MealPlan struct {
+	Date    time.Time
+	Recipes []Recipe
+}
+
 func (s *RecipeService) Add(ctx context.Context, r RecipeDetails) (Recipe, error) {
 	return s.store.CreateRecipe(ctx, r)
 }
 
 func (s *RecipeService) Browse(ctx context.Context) ([]Recipe, error) {
 	return s.store.BrowseRecipes(ctx)
+}
+
+func (s *RecipeService) GetMealPlan(ctx context.Context, from time.Time, until time.Time) ([]MealPlan, error) {
+	return s.store.GetMealPlan(ctx, from, until)
 }
 
 func (s *RecipeService) Delete(ctx context.Context, id int64) error {

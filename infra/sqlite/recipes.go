@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/wolfsblu/go-chef/domain"
 	_ "modernc.org/sqlite"
+	"time"
 )
 
 func (s *Store) BrowseRecipes(ctx context.Context) (recipes []domain.Recipe, err error) {
@@ -36,6 +37,10 @@ func (s *Store) CreateRecipe(ctx context.Context, r domain.RecipeDetails) (recip
 
 func (s *Store) DeleteRecipe(ctx context.Context, id int64) error {
 	return s.query().DeleteRecipe(ctx, id)
+}
+
+func (s *Store) GetMealPlan(ctx context.Context, from time.Time, until time.Time) (mealPlan []domain.MealPlan, _ error) {
+
 }
 
 func (s *Store) GetRecipeById(ctx context.Context, id int64) (recipe domain.Recipe, _ error) {

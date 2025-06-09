@@ -85,3 +85,12 @@ CREATE TABLE awards
     name        TEXT NOT NULL,
     description TEXT NOT NULL
 );
+
+CREATE TABLE meal_plan
+(
+    id INTEGER PRIMARY KEY,
+    date TEXT NOT NULL DEFAULT CURRENT_DATE,
+    user_id   INTEGER   NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    recipe_id INTEGER   NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
+    order INTEGER NOT NULL DEFAULT 0
+);
