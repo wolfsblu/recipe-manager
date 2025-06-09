@@ -10,6 +10,8 @@ tags:
     description: Everything about your recipes
   - name: User
     description: Everything related to the user
+  - name: Meal Plan
+    description: Define and fetch meal plans
 security:
   - cookieAuth: []
 paths:
