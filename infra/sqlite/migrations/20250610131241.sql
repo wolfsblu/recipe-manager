@@ -1,0 +1,2 @@
+-- Create "meal_plan" table
+CREATE TABLE `meal_plan` (`id` integer NULL, `date` text NOT NULL DEFAULT (CURRENT_DATE), `user_id` integer NOT NULL, `recipe_id` integer NOT NULL, `sort_order` integer NOT NULL DEFAULT 0, PRIMARY KEY (`id`), CONSTRAINT `0` FOREIGN KEY (`recipe_id`) REFERENCES `recipes` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE, CONSTRAINT `1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON UPDATE NO ACTION ON DELETE CASCADE);
