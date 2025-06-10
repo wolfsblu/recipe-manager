@@ -29,11 +29,11 @@ type Ingredient struct {
 }
 
 type MealPlan struct {
-	ID       int64
-	Date     string
-	UserID   int64
-	RecipeID int64
-	Order    int64
+	ID        int64
+	Date      string
+	UserID    int64
+	RecipeID  int64
+	SortOrder int64
 }
 
 type PasswordReset struct {

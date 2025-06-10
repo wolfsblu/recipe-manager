@@ -54,16 +54,18 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 		grouped[item.MealPlan.Date] = append(grouped[item.MealPlan.Date], item.Recipe.AsDomainModel())
 	}
 
+	i := 0
 	mealplan := make([]domain.MealPlan, len(grouped))
 	for key, recipes := range grouped {
 		date, err := time.Parse(time.DateOnly, key)
 		if err != nil {
 			return []domain.MealPlan{}, err
 		}
-		mealplan = append(mealplan, domain.MealPlan{
+		mealplan[i] = domain.MealPlan{
 			Date:    date,
 			Recipes: recipes,
-		})
+		}
+		i++
 	}
 	return mealplan, nil
 }

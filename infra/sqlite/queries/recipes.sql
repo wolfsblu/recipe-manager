@@ -25,7 +25,8 @@ FROM meal_plan
     INNER JOIN recipes ON meal_plan.recipe_id = recipes.id
 WHERE user_id = ?
     AND meal_plan.date >= sqlc.arg(from_date)
-    AND meal_plan.date <= sqlc.arg(until_date);
+    AND meal_plan.date <= sqlc.arg(until_date)
+ORDER BY meal_plan.date, meal_plan.sort_order;
 
 -- name: ListRecipes :many
 SELECT *

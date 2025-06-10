@@ -92,13 +92,14 @@ func (q *Queries) DeleteRecipe(ctx context.Context, id int64) error {
 }
 
 const getMealPlan = `-- name: GetMealPlan :many
-SELECT meal_plan.id, meal_plan.date, meal_plan.user_id, meal_plan.recipe_id, meal_plan."order",
+SELECT meal_plan.id, meal_plan.date, meal_plan.user_id, meal_plan.recipe_id, meal_plan.sort_order,
        recipes.id, recipes.name, recipes.servings, recipes.minutes, recipes.description, recipes.created_by, recipes.created_at
 FROM meal_plan
     INNER JOIN recipes ON meal_plan.recipe_id = recipes.id
 WHERE user_id = ?
     AND meal_plan.date >= ?2
     AND meal_plan.date <= ?3
+ORDER BY meal_plan.date, meal_plan.sort_order
 `
 
 type GetMealPlanParams struct {
@@ -126,7 +127,7 @@ func (q *Queries) GetMealPlan(ctx context.Context, arg GetMealPlanParams) ([]Get
 			&i.MealPlan.Date,
 			&i.MealPlan.UserID,
 			&i.MealPlan.RecipeID,
-			&i.MealPlan.Order,
+			&i.MealPlan.SortOrder,
 			&i.Recipe.ID,
 			&i.Recipe.Name,
 			&i.Recipe.Servings,
