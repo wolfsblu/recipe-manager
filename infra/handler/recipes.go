@@ -60,7 +60,9 @@ func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecip
 
 func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanParams) ([]api.ReadMealPlan, error) {
 	user := ctx.Value(ctxKeyUser).(*domain.User)
-	mealplan, err := h.Recipes.GetMealPlan(ctx, user, params.From.Or(time.Now()), params.Until.Or(time.Now()))
+	from := params.From.Or(time.Now())
+	until := params.Until.Or(from.Add(7 * 24 * time.Hour))
+	mealplan, err := h.Recipes.GetMealPlan(ctx, user, from, until)
 	if err != nil {
 		return nil, err
 	}
