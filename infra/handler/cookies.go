@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const CookieName = "SESSID"
+const AuthCookieName = "SESSID"
 
 func createSessionCookie(userId int64) (string, error) {
 	payload, err := encryptUserId(userId)
@@ -16,13 +16,13 @@ func createSessionCookie(userId int64) (string, error) {
 	}
 	expiry := 7 * 24 * time.Hour // One week
 	return fmt.Sprintf(
-		"%s=%s; HttpOnly; Secure; SameSite=strict; Path=/; Max-Age=%d", CookieName, payload, int64(expiry/time.Second),
+		"%s=%s; HttpOnly; Secure; SameSite=strict; Path=/; Max-Age=%d", AuthCookieName, payload, int64(expiry/time.Second),
 	), nil
 }
 
 func expireSessionCookie() string {
 	return fmt.Sprintf(
-		"%s=; HttpOnly; Secure; SameSite=strict; Path=/; Max-Age=%d", CookieName, 0,
+		"%s=; HttpOnly; Secure; SameSite=strict; Path=/; Max-Age=%d", AuthCookieName, 0,
 	)
 }
 
@@ -35,7 +35,7 @@ func encryptUserId(userId int64) (string, error) {
 		[]byte(env.MustGet("COOKIE_HASH_KEY")),
 		[]byte(env.MustGet("COOKIE_BLOCK_KEY")),
 	)
-	encoded, err := s.Encode(CookieName, userId)
+	encoded, err := s.Encode(AuthCookieName, userId)
 	if err != nil {
 		return "", err
 	}
@@ -48,7 +48,7 @@ func decryptUserId(cookieValue string) (int64, error) {
 		[]byte(env.MustGet("COOKIE_HASH_KEY")),
 		[]byte(env.MustGet("COOKIE_BLOCK_KEY")),
 	)
-	err := s.Decode(CookieName, cookieValue, &userId)
+	err := s.Decode(AuthCookieName, cookieValue, &userId)
 	if err != nil {
 		return -1, err
 	}

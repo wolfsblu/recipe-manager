@@ -66,10 +66,8 @@ func onUploadCompleted(recipes *domain.RecipeService, event tusd.HookEvent) {
 func getUserIdFromUpload(req tusd.HTTPRequest) (int64, error) {
 	for k, v := range req.Header {
 		if k == "Cookie" {
-			allCookies := strings.Join(v, ";")
-			cookies := strings.Split(allCookies, ";")
-			for _, cookie := range cookies {
-				if strings.HasPrefix(cookie, CookieName) {
+			for _, cookie := range v {
+				if strings.HasPrefix(cookie, AuthCookieName) {
 					sessionCookie := strings.Split(cookie, "=")
 					return getUserFromSessionCookie(sessionCookie[1])
 				}
