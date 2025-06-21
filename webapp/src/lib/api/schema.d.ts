@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/browse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Browse public recipes */
+        get: operations["browseRecipes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/login": {
         parameters: {
             query?: never;
@@ -123,6 +140,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/mealplan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get your meal plan */
+        get: operations["getMealPlan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/recipes": {
         parameters: {
             query?: never;
@@ -182,6 +216,17 @@ export interface components {
         RecipeStatus: "available" | "pending" | "sold";
         WriteRecipe: {
             name: string;
+            /** @description The HTML description of the recipe */
+            description: string;
+            /** @description How many servings you'll get with this recipe */
+            servings: number;
+            /** @description How long it takes to prepare this recipe (in minutes) */
+            minutes: number;
+        };
+        ReadMealPlan: {
+            /** @description When are these recipes planned */
+            date: string;
+            recipes?: components["schemas"]["ReadRecipe"][];
         };
         ReadRecipe: components["schemas"]["WriteRecipe"] & {
             /** Format: int64 */
@@ -217,6 +262,15 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["ReadUser"];
+            };
+        };
+        /** @description Meal plan for the user */
+        MealPlan: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ReadMealPlan"][];
             };
         };
         /** @description Recipe object returned as result */
@@ -255,10 +309,10 @@ export interface components {
                 "application/json": components["schemas"]["Credentials"];
             };
         };
-        /** @description Recipe object that needs to be added to the store */
+        /** @description Recipe object and related images */
         Recipe: {
             content: {
-                "application/json": components["schemas"]["WriteRecipe"];
+                "multipart/form-data": components["schemas"]["WriteRecipe"];
             };
         };
         /** @description The user's new password as well as the required reset token */
@@ -282,6 +336,20 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    browseRecipes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["RecipeList"];
+            default: components["responses"]["Error"];
+        };
+    };
     login: {
         parameters: {
             query?: never;
@@ -412,6 +480,25 @@ export interface operations {
         responses: {
             /** @description Successful operation */
             200: components["responses"]["User"];
+            default: components["responses"]["Error"];
+        };
+    };
+    getMealPlan: {
+        parameters: {
+            query?: {
+                /** @description From when to fetch the meal plan */
+                from?: string;
+                /** @description Until when to fetch the meal plan */
+                until?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["MealPlan"];
             default: components["responses"]["Error"];
         };
     };
