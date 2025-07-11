@@ -1,27 +1,19 @@
 <script lang="ts">
 	import '../app.css';
     import Languages from "$lib/components/i18n/Languages.svelte";
-    import NavDrawer from "$lib/components/nav/Navigation.svelte";
-    import Menu from '$lib/components/nav/Menu.svelte';
-    import Toasts from "$lib/components/notifications/Toasts.svelte";
+    import { ModeWatcher } from "mode-watcher";
+    import * as Sidebar from "$lib/components/ui/sidebar/index.js";
+    import AppSidebar from "$lib/components/nav/AppSidebar.svelte";
 
     let { children } = $props();
 </script>
 
 <Languages />
+<ModeWatcher />
 
-<div class="flex flex-col h-screen">
-    <NavDrawer classes="md:hidden" />
-
-    <div class="flex grow relative max-h-screen">
-        <Toasts />
-
-        <div class="hidden md:block w-64">
-            <Menu />
-        </div>
-
-        <main class="flex flex-col grow p-3 overflow-y-auto">
-            {@render children()}
-        </main>
-    </div>
-</div>
+<Sidebar.Provider>
+    <AppSidebar />
+    <main>
+        {@render children?.()}
+    </main>
+</Sidebar.Provider>
