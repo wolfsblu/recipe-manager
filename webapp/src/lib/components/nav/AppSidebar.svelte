@@ -93,9 +93,5 @@
                 </DropdownMenu.Root>
             </Sidebar.MenuItem>
         </Sidebar.Menu>
-        <Sidebar.Separator />
-        <div class="mx-auto">
-            <ModeToggle />
-        </div>
     </Sidebar.Footer>
 </Sidebar.Root>
