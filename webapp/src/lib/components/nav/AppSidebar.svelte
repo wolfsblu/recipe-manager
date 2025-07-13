@@ -1,10 +1,12 @@
 <script lang="ts">
     import CalendarIcon from "@lucide/svelte/icons/calendar";
     import ChevronUpIcon from "@lucide/svelte/icons/chevron-up";
-    import ChefHat from "@lucide/svelte/icons/chef-hat";
+    import ChefIcon from "@lucide/svelte/icons/chef-hat";
     import InboxIcon from "@lucide/svelte/icons/inbox";
-    import PlusIcon from "@lucide/svelte/icons/plus";
     import LoginIcon from "@lucide/svelte/icons/log-in";
+    import PlusIcon from "@lucide/svelte/icons/plus";
+    import RulerIcon from "@lucide/svelte/icons/ruler";
+    import SaladIcon from "@lucide/svelte/icons/salad";
     import SearchIcon from "@lucide/svelte/icons/search";
     import UtensilsIcon from "@lucide/svelte/icons/utensils";
     import SettingsIcon from "@lucide/svelte/icons/settings";
@@ -16,7 +18,7 @@
 
 </script>
 
-<Sidebar.Root variant="inset">
+<Sidebar.Root variant="inset" collapsible="icon">
     <Sidebar.Header>
         <Sidebar.Menu>
             <Sidebar.MenuItem>
@@ -40,7 +42,7 @@
                         <Sidebar.MenuButton>
                             {#snippet child({ props })}
                                 <a href="/recipes" {...props}>
-                                    <ChefHat />
+                                    <ChefIcon />
                                     <span>Recipes</span>
                                 </a>
                             {/snippet}
@@ -48,6 +50,42 @@
                         <Sidebar.MenuAction showOnHover>
                             <PlusIcon />
                         </Sidebar.MenuAction>
+                    </Sidebar.MenuItem>
+                    <Sidebar.MenuItem>
+                        <Sidebar.MenuButton>
+                            {#snippet child({ props })}
+                                <a href="/ingredients" {...props}>
+                                    <SaladIcon />
+                                    <span>Ingredients</span>
+                                </a>
+                            {/snippet}
+                        </Sidebar.MenuButton>
+                        <Sidebar.MenuAction showOnHover>
+                            <PlusIcon />
+                        </Sidebar.MenuAction>
+                    </Sidebar.MenuItem>
+                    <Sidebar.MenuItem>
+                        <Sidebar.MenuButton>
+                            {#snippet child({ props })}
+                                <a href="/measurements" {...props}>
+                                    <RulerIcon />
+                                    <span>Measurements</span>
+                                </a>
+                            {/snippet}
+                        </Sidebar.MenuButton>
+                        <Sidebar.MenuAction showOnHover>
+                            <PlusIcon />
+                        </Sidebar.MenuAction>
+                    </Sidebar.MenuItem>
+                    <Sidebar.MenuItem>
+                        <Sidebar.MenuButton>
+                            {#snippet child({ props })}
+                                <a href="/mealplan" {...props}>
+                                    <CalendarIcon />
+                                    <span>Meal Plan</span>
+                                </a>
+                            {/snippet}
+                        </Sidebar.MenuButton>
                     </Sidebar.MenuItem>
                 </Sidebar.Menu>
             </Sidebar.GroupContent>
