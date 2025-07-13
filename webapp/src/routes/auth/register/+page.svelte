@@ -30,7 +30,7 @@
                 } catch (error) {
                     toast.error("Failed to register account")
                 }
-                setMessage(form, "Login successful");
+                setMessage(form, "Registration submitted successfully");
             }
         }
     })
