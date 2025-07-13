@@ -1,11 +1,10 @@
 <script lang="ts">
     import { Kbd } from '$lib/components/ui/kbd';
     import { Button } from '$lib/components/ui/button';
-    import SearchIcon from '@lucide/svelte/icons/search';
     import { cn } from '$lib/utils/utils';
     import { cmdOrCtrl } from '$lib/hooks/is-mac.svelte';
-	import type {UseBoolean} from "$lib/hooks/use-boolean.svelte";
-	import {commandContext} from "$lib/context";
+	import { commandContext } from "$lib/context";
+	import SearchIcon from '@lucide/svelte/icons/search';
 
     type Props = {
         class?: string;

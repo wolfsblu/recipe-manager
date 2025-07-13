@@ -1,35 +1,26 @@
 <script lang="ts">
     import CalendarIcon from "@lucide/svelte/icons/calendar";
     import ChevronUpIcon from "@lucide/svelte/icons/chevron-up";
-    import HouseIcon from "@lucide/svelte/icons/house";
+    import ChefHat from "@lucide/svelte/icons/chef-hat";
     import InboxIcon from "@lucide/svelte/icons/inbox";
+    import PlusIcon from "@lucide/svelte/icons/plus";
     import SearchIcon from "@lucide/svelte/icons/search";
+    import UtensilsIcon from "@lucide/svelte/icons/utensils";
     import SettingsIcon from "@lucide/svelte/icons/settings";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import * as Sidebar from "$lib/components/ui/sidebar/index";
-    import ModeToggle from "$lib/components/theme/ModeToggle.svelte";
 
     // Menu items.
     const items = [
         {
-            title: "Home",
-            url: "#",
-            icon: HouseIcon,
-        },
-        {
-            title: "Inbox",
-            url: "#",
-            icon: InboxIcon,
+            title: "Recipes",
+            url: "/",
+            icon: ChefHat,
         },
         {
             title: "Calendar",
             url: "#",
             icon: CalendarIcon,
-        },
-        {
-            title: "Search",
-            url: "#",
-            icon: SearchIcon,
         },
         {
             title: "Settings",
@@ -40,23 +31,38 @@
 </script>
 
 <Sidebar.Root>
+    <Sidebar.Header>
+        <Sidebar.Menu>
+            <Sidebar.MenuItem>
+                <Sidebar.MenuButton>
+                    {#snippet child({ props })}
+                        <a href="/" {...props}>
+                            <UtensilsIcon class="!size-5" />
+                            <span class="text-base font-semibold">Grecipes</span>
+                        </a>
+                    {/snippet}
+                </Sidebar.MenuButton>
+            </Sidebar.MenuItem>
+        </Sidebar.Menu>
+    </Sidebar.Header>
     <Sidebar.Content>
         <Sidebar.Group>
             <Sidebar.GroupLabel>Application</Sidebar.GroupLabel>
             <Sidebar.GroupContent>
                 <Sidebar.Menu>
-                    {#each items as item (item.title)}
-                        <Sidebar.MenuItem>
-                            <Sidebar.MenuButton>
-                                {#snippet child({ props })}
-                                    <a href={item.url} {...props}>
-                                        <item.icon />
-                                        <span>{item.title}</span>
-                                    </a>
-                                {/snippet}
-                            </Sidebar.MenuButton>
-                        </Sidebar.MenuItem>
-                    {/each}
+                    <Sidebar.MenuItem>
+                        <Sidebar.MenuButton>
+                            {#snippet child({ props })}
+                                <a href="/recipes" {...props}>
+                                    <ChefHat />
+                                    <span>Recipes</span>
+                                </a>
+                            {/snippet}
+                        </Sidebar.MenuButton>
+                        <Sidebar.MenuAction showOnHover>
+                            <PlusIcon />
+                        </Sidebar.MenuAction>
+                    </Sidebar.MenuItem>
                 </Sidebar.Menu>
             </Sidebar.GroupContent>
         </Sidebar.Group>
