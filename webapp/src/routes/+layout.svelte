@@ -13,9 +13,13 @@
     import AppCommand from "$lib/components/nav/AppCommand.svelte";
     import ModeToggle from "$lib/components/theme/ModeToggle.svelte";
     import AppShortcuts from "$lib/components/nav/AppShortcuts.svelte";
+    import type {LayoutProps} from './$types';
+    import { page } from '$app/state'
 
-    let { children } = $props();
+    let { data, children }: LayoutProps = $props();
     commandContext.set(new UseBoolean(false))
+
+    const breadcrumbs = $derived(page.data.breadcrumbs || data.breadcrumbs)
 </script>
 
 <AppCommand />
@@ -35,13 +39,14 @@
                         <Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
                         <Breadcrumb.Root>
                             <Breadcrumb.List>
-                                <Breadcrumb.Item class="hidden md:block">
-                                    <Breadcrumb.Link href="#">Building Your Application</Breadcrumb.Link>
-                                </Breadcrumb.Item>
-                                <Breadcrumb.Separator class="hidden md:block" />
-                                <Breadcrumb.Item>
-                                    <Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
-                                </Breadcrumb.Item>
+                                {#each breadcrumbs as breadcrumb, i (breadcrumb.link)}
+                                    {#if i > 0}
+                                        <Breadcrumb.Separator class="hidden md:block" />
+                                    {/if}
+                                    <Breadcrumb.Item class="hidden md:block">
+                                        <Breadcrumb.Link href={breadcrumb.link}>{breadcrumb.name}</Breadcrumb.Link>
+                                    </Breadcrumb.Item>
+                                {/each}
                             </Breadcrumb.List>
                         </Breadcrumb.Root>
                     </div>
