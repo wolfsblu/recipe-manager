@@ -12,11 +12,8 @@
     import * as Sidebar from "$lib/components/ui/sidebar/index";
     import {isAuthenticated, logout, user} from "$lib/auth/user.svelte";
     import {toast} from "svelte-sonner";
+    import NavUser from "$lib/components/nav/user/NavUser.svelte";
 
-    const onLogout = async () => {
-        await logout()
-        toast.success("Logged out")
-    }
 </script>
 
 <Sidebar.Root variant="inset">
@@ -58,37 +55,7 @@
     </Sidebar.Content>
     <Sidebar.Footer>
         {#if isAuthenticated()}
-        <Sidebar.Menu>
-            <Sidebar.MenuItem>
-                <DropdownMenu.Root>
-                    <DropdownMenu.Trigger>
-                        {#snippet child({ props })}
-                            <Sidebar.MenuButton
-                                    {...props}
-                                    class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                            >
-                                {user.email}
-                                <ChevronUpIcon class="ml-auto" />
-                            </Sidebar.MenuButton>
-                        {/snippet}
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Content
-                            side="top"
-                            class="w-(--bits-dropdown-menu-anchor-width)"
-                    >
-                        <DropdownMenu.Item>
-                            <span>Account</span>
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item>
-                            <span>Billing</span>
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item onclick={onLogout}>
-                            <span>Sign out</span>
-                        </DropdownMenu.Item>
-                    </DropdownMenu.Content>
-                </DropdownMenu.Root>
-            </Sidebar.MenuItem>
-        </Sidebar.Menu>
+            <NavUser />
         {:else}
             <Sidebar.Menu>
                 <Sidebar.MenuItem>
