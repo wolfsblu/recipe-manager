@@ -51,7 +51,7 @@
                         <Form.Control>
                             {#snippet children({ props })}
                                 <Form.Label>Email</Form.Label>
-                                <Input {...props} bind:value={$formData.email} placeholder="m@example.com" />
+                                <Input {...props} bind:value={$formData.email} placeholder="mail@example.com" />
                             {/snippet}
                         </Form.Control>
                         <Form.Description />
@@ -68,7 +68,7 @@
                                         Forgot password?
                                     </a>
                                 </div>
-                                <Input {...props} type="password" bind:value={$formData.password} placeholder="******" />
+                                <Input {...props} type="password" bind:value={$formData.password} placeholder="●●●●●●●" />
                             {/snippet}
                         </Form.Control>
                         <Form.Description />

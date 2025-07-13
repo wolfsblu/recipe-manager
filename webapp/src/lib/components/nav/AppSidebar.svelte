@@ -24,7 +24,7 @@
                     {#snippet child({ props })}
                         <a href="/" {...props}>
                             <UtensilsIcon class="!size-5" />
-                            <span class="text-base font-semibold">Grecipes</span>
+                            <span class="text-base font-semibold">GRM</span>
                         </a>
                     {/snippet}
                 </Sidebar.MenuButton>
