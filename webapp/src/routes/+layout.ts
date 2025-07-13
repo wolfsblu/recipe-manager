@@ -1,5 +1,6 @@
 import { getProfile } from "$lib/auth/user.svelte";
 import type { LayoutLoad } from './$types';
+import {client} from "$lib/api/client";
 
 export const prerender = true
 export const ssr = false
