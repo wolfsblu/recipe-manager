@@ -11,30 +11,15 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import * as Sidebar from "$lib/components/ui/sidebar/index";
     import {isAuthenticated, logout, user} from "$lib/auth/user.svelte";
-    import {setMessage} from "sveltekit-superforms";
     import {toast} from "svelte-sonner";
 
-    // Menu items.
-    const items = [
-        {
-            title: "Recipes",
-            url: "/",
-            icon: ChefHat,
-        },
-        {
-            title: "Calendar",
-            url: "#",
-            icon: CalendarIcon,
-        },
-        {
-            title: "Settings",
-            url: "#",
-            icon: SettingsIcon,
-        },
-    ];
+    const onLogout = async () => {
+        await logout()
+        toast.success("Logged out")
+    }
 </script>
 
-<Sidebar.Root>
+<Sidebar.Root variant="inset">
     <Sidebar.Header>
         <Sidebar.Menu>
             <Sidebar.MenuItem>
@@ -97,7 +82,7 @@
                         <DropdownMenu.Item>
                             <span>Billing</span>
                         </DropdownMenu.Item>
-                        <DropdownMenu.Item onclick={() => logout()}>
+                        <DropdownMenu.Item onclick={onLogout}>
                             <span>Sign out</span>
                         </DropdownMenu.Item>
                     </DropdownMenu.Content>

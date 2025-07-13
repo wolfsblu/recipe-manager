@@ -26,31 +26,33 @@
 
 <Sidebar.Provider>
     <AppSidebar />
-    <main class="flex flex-col flex-grow">
-        <header class="bg-background shrink-0 items-center gap-2 transition-[width,height] ease-linear p-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2 px-2">
-                    <Sidebar.Trigger class="-ml-1" />
-                    <Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
-                    <Breadcrumb.Root>
-                        <Breadcrumb.List>
-                            <Breadcrumb.Item class="hidden md:block">
-                                <Breadcrumb.Link href="#">Building Your Application</Breadcrumb.Link>
-                            </Breadcrumb.Item>
-                            <Breadcrumb.Separator class="hidden md:block" />
-                            <Breadcrumb.Item>
-                                <Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
-                            </Breadcrumb.Item>
-                        </Breadcrumb.List>
-                    </Breadcrumb.Root>
+    <Sidebar.Inset>
+        <main class="flex flex-col flex-grow">
+            <header class="shrink-0 items-center gap-2 transition-[width,height] ease-linear p-3 border-b">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 px-2">
+                        <Sidebar.Trigger class="-ml-1" />
+                        <Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
+                        <Breadcrumb.Root>
+                            <Breadcrumb.List>
+                                <Breadcrumb.Item class="hidden md:block">
+                                    <Breadcrumb.Link href="#">Building Your Application</Breadcrumb.Link>
+                                </Breadcrumb.Item>
+                                <Breadcrumb.Separator class="hidden md:block" />
+                                <Breadcrumb.Item>
+                                    <Breadcrumb.Page>Data Fetching</Breadcrumb.Page>
+                                </Breadcrumb.Item>
+                            </Breadcrumb.List>
+                        </Breadcrumb.Root>
+                    </div>
+                    <div class="flex gap-2">
+                        <SearchButton />
+                        <ModeToggle />
+                    </div>
                 </div>
-                <div class="flex gap-2">
-                    <SearchButton />
-                    <ModeToggle />
-                </div>
-            </div>
-        </header>
+            </header>
 
-        {@render children?.()}
-    </main>
+            {@render children?.()}
+        </main>
+    </Sidebar.Inset>
 </Sidebar.Provider>
