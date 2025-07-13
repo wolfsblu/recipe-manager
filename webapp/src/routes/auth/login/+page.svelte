@@ -62,7 +62,12 @@
                     <Form.Field {form} name="password">
                         <Form.Control>
                             {#snippet children({ props })}
-                                <Form.Label>Password</Form.Label>
+                                <div class="flex items-center">
+                                    <Form.Label>Password</Form.Label>
+                                    <a href="/auth/reset" class="ml-auto inline-block text-sm underline">
+                                        Forgot password?
+                                    </a>
+                                </div>
                                 <Input {...props} type="password" bind:value={$formData.password} placeholder="******" />
                             {/snippet}
                         </Form.Control>
@@ -74,7 +79,7 @@
             </div>
             <div class="mt-4 text-center text-sm">
                 Don't have an account?
-                <a href="##" class="underline"> Sign up </a>
+                <a href="/auth/register" class="underline"> Sign up </a>
             </div>
         </form>
     </Card.Content>
