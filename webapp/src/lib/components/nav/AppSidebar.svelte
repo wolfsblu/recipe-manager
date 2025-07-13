@@ -47,7 +47,7 @@
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
-                        <Sidebar.MenuAction showOnHover>
+                        <Sidebar.MenuAction>
                             <PlusIcon />
                         </Sidebar.MenuAction>
                     </Sidebar.MenuItem>
@@ -60,7 +60,7 @@
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
-                        <Sidebar.MenuAction showOnHover>
+                        <Sidebar.MenuAction>
                             <PlusIcon />
                         </Sidebar.MenuAction>
                     </Sidebar.MenuItem>
@@ -73,7 +73,7 @@
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
-                        <Sidebar.MenuAction showOnHover>
+                        <Sidebar.MenuAction>
                             <PlusIcon />
                         </Sidebar.MenuAction>
                     </Sidebar.MenuItem>
