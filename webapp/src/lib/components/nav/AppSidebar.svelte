@@ -8,6 +8,7 @@
     import RulerIcon from "@lucide/svelte/icons/ruler";
     import SaladIcon from "@lucide/svelte/icons/salad";
     import SearchIcon from "@lucide/svelte/icons/search";
+    import ShoppingIcon from "@lucide/svelte/icons/shopping-cart";
     import UtensilsIcon from "@lucide/svelte/icons/utensils";
     import SettingsIcon from "@lucide/svelte/icons/settings";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
@@ -83,6 +84,16 @@
                                 <a href="/mealplan" {...props}>
                                     <CalendarIcon />
                                     <span>Meal Plan</span>
+                                </a>
+                            {/snippet}
+                        </Sidebar.MenuButton>
+                    </Sidebar.MenuItem>
+                    <Sidebar.MenuItem>
+                        <Sidebar.MenuButton>
+                            {#snippet child({ props })}
+                                <a href="/shopping" {...props}>
+                                    <ShoppingIcon />
+                                    <span>Shopping List</span>
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>

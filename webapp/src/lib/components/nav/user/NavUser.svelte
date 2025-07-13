@@ -12,12 +12,14 @@
     import {logout, user} from "$lib/auth/user.svelte.js";
     import avatarFallback from "$lib/components/nav/user/avatar.png";
     import {toast} from "svelte-sonner";
+    import {goto} from "$app/navigation";
 
     const sidebar = useSidebar();
 
     const onLogout = async () => {
         await logout()
         toast.success("Logged out")
+        await goto("/")
     }
 </script>
 
