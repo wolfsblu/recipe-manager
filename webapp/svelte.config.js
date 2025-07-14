@@ -11,7 +11,10 @@ const config = {
 			assets: 'dist',
 			precompress: false,
 			strict: true
-		})
+		}),
+		alias: {
+			$lib: 'src/lib',
+		}
 	},
 	trailingSlash: 'always'
 };

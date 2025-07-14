@@ -1,54 +1,38 @@
 <script lang="ts">
-    import {
-        SpeedDial,
-        SpeedDialButton,
-        SpeedDialTrigger,
-        Search,
-    } from "flowbite-svelte";
-    import {
-        ShoppingBagSolid,
-        ReceiptSolid,
-        RulerCombinedOutline,
-        CartOutline,
-    } from "flowbite-svelte-icons";
-    import Recipe from "$lib/components/recipes/Recipe.svelte";
-
-    const iconClass = "w-6 h-6";
+    import * as Card from "$lib/components/ui/card/index.js";
+    import * as Pagination from "$lib/components/ui/pagination/index.js";
+    import RecipeCard from "$lib/components/recipes/RecipeCard.svelte";
 </script>
 
-<form class="flex gap-2 mb-4">
-    <Search placeholder="Find a recipe" />
-</form>
-
-{#snippet DummyRecipe(
-    title: string,
-    servings: number,
-    ingredients: number,
-    minutes: number
-)}
-    <Recipe {title} {servings} {ingredients} {minutes} />
-{/snippet}
-
-<section
-    class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
->
-    {#each { length: 4 } as _, i}
-        {@render DummyRecipe("My super super tasty recipe", 4, 12, 45)}
+<div class="flex flex-col gap-5 h-full justify-between p-5">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-5">
+    {#each Array(10) as _, i}
+        <RecipeCard />
     {/each}
-</section>
-
-<SpeedDialTrigger class="fixed end-6 bottom-6" />
-<SpeedDial class="fixed end-6 bottom-6">
-    <SpeedDialButton name="Shopping Item">
-        <CartOutline class={iconClass} />
-    </SpeedDialButton>
-    <SpeedDialButton name="Measurement">
-        <RulerCombinedOutline class={iconClass} />
-    </SpeedDialButton>
-    <SpeedDialButton name="Ingredient">
-        <ShoppingBagSolid class={iconClass} />
-    </SpeedDialButton>
-    <SpeedDialButton name="Recipe" href="/recipes/create">
-        <ReceiptSolid class={iconClass} />
-    </SpeedDialButton>
-</SpeedDial>
+</div>
+<Pagination.Root count={100} perPage={10}>
+    {#snippet children({ pages, currentPage })}
+        <Pagination.Content>
+            <Pagination.Item>
+                <Pagination.PrevButton />
+            </Pagination.Item>
+            {#each pages as page (page.key)}
+                {#if page.type === "ellipsis"}
+                    <Pagination.Item>
+                        <Pagination.Ellipsis />
+                    </Pagination.Item>
+                {:else}
+                    <Pagination.Item>
+                        <Pagination.Link {page} isActive={currentPage === page.value}>
+                            {page.value}
+                        </Pagination.Link>
+                    </Pagination.Item>
+                {/if}
+            {/each}
+            <Pagination.Item>
+                <Pagination.NextButton />
+            </Pagination.Item>
+        </Pagination.Content>
+    {/snippet}
+</Pagination.Root>
+</div>

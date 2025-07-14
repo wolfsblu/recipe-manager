@@ -1,32 +1,68 @@
 <script lang="ts">
-    import { Card, Button, Label, Input } from 'flowbite-svelte';
-    import {confirmPassword} from "$lib/auth/user.svelte.js";
-    import {addToast} from "$lib/components/notifications/toasts";
+    import { Button } from "$lib/components/ui/button/index.js";
+    import * as Card from "$lib/components/ui/card/index.js";
+    import * as Form from "$lib/components/ui/form/index.js";
+    import { formSchema, type FormSchema } from "./schema";
+    import { Input } from "$lib/components/ui/input/index.js";
+    import {confirmPassword} from "$lib/auth/user.svelte";
     import {goto} from "$app/navigation";
+    import { toast } from "svelte-sonner";
+    import {
+        type SuperValidated,
+        type Infer,
+        superForm,
+        setMessage,
+    } from "sveltekit-superforms";
+    import { zodClient } from "sveltekit-superforms/adapters";
 
-    let newPassword = $state("")
+    let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 
-    const onReset = async (e: SubmitEvent) => {
-        e.preventDefault()
-        try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get("token") ?? ""
-            await confirmPassword(newPassword, token)
-            addToast({ message: "Password was reset successfully", type: "success", group: "password" })
-            await goto("/auth/login")
-        } catch (e) {
-            addToast({ message: "Failed to reset password", type: "error", group: "password" })
+    const form = superForm(data.form, {
+        SPA: true,
+        resetForm: false,
+        validators: zodClient(formSchema),
+        async onUpdate({ form }) {
+            if (form.valid) {
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const token = urlParams.get("token") ?? ""
+                    await confirmPassword(form.data.password, token)
+                    toast.success("Password was reset successfully")
+                    await goto("/auth/login")
+                } catch (e) {
+                    toast.error("Failed to reset password, please try again")
+                    await goto("/")
+                }
+                setMessage(form, "Reset performed successfully");
+            }
         }
-    }
+    })
+
+    const { form: formData, enhance } = form;
 </script>
 
-<Card class="self-center my-auto p-6">
-    <form class="flex flex-col space-y-6" onsubmit={onReset}>
-        <h3 class="text-xl font-medium text-gray-900 dark:text-white">Register</h3>
-        <Label class="space-y-2">
-            <span>New password</span>
-            <Input type="password" name="password" bind:value={newPassword} placeholder="•••••" required />
-        </Label>
-        <Button type="submit" class="w-full">Reset password</Button>
-    </form>
-</Card>
+<Card.Root class="m-auto w-full max-w-sm">
+    <Card.Header>
+        <Card.Title class="text-2xl">Reset Password</Card.Title>
+        <Card.Description>Enter your new password below</Card.Description>
+    </Card.Header>
+    <Card.Content>
+        <form method="POST" use:enhance>
+            <div class="grid gap-4">
+                <div class="grid gap-2">
+                    <Form.Field {form} name="password">
+                        <Form.Control>
+                            {#snippet children({ props })}
+                                <Form.Label>Password</Form.Label>
+                                <Input {...props} bind:value={$formData.password} placeholder="●●●●●●●" />
+                            {/snippet}
+                        </Form.Control>
+                        <Form.Description />
+                        <Form.FieldErrors />
+                    </Form.Field>
+                </div>
+                <Button type="submit" class="w-full">Confirm</Button>
+            </div>
+        </form>
+    </Card.Content>
+</Card.Root>

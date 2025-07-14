@@ -1,0 +1,1 @@
+<p>This is the recipe detail page</p>

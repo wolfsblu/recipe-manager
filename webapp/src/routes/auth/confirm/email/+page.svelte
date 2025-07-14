@@ -1,9 +1,11 @@
 <script lang="ts">
-    import {Alert, Button, Card} from "flowbite-svelte";
-    import {CheckOutline} from "flowbite-svelte-icons";
-    import {onDestroy, onMount} from "svelte";
+    import { Button } from "$lib/components/ui/button/index.js";
+    import * as Alert from "$lib/components/ui/alert/index.js";
+    import SuccessIcon from "@lucide/svelte/icons/check-circle-2";
+    import {confirmEmail} from "$lib/auth/user.svelte";
     import {goto} from "$app/navigation";
-    import {confirmEmail} from "$lib/auth/user.svelte.js";
+    import {onDestroy, onMount} from "svelte";
+    import {toast} from "svelte-sonner";
 
     let redirectHandle = 0
     let redirectDelay = $state(5)
@@ -19,28 +21,24 @@
                     goto("/auth/login")
                 }
             }, 1000)
-        } catch (err) {}
+        } catch (err) {
+            toast.error("Failed to verify your email, please try again")
+            await goto("/")
+        }
     })
-
     onDestroy(() => {
         clearInterval(redirectHandle)
     })
 </script>
 
-<Card class="self-center my-auto p-6">
-    <Alert color="green">
-        <div class="flex items-center gap-3">
-            <CheckOutline class="w-5 h-5" />
-            <span class="text-lg font-medium">
-                Your account has been confirmed
-            </span>
-        </div>
-        <p class="mt-2">
-            Your email address has been successfully verified, you will be redirected
-            to the login page in {redirectDelay} seconds, alternatively click on the button below
-        </p>
-        <div class="mt-4">
-            <Button class="w-full" size="xs" color="green" href="/auth/login">Go to login</Button>
-        </div>
-    </Alert>
-</Card>
+<Alert.Root class="max-w-xl m-auto">
+    <SuccessIcon />
+    <Alert.Title>Success! Your account has been confirmed</Alert.Title>
+    <Alert.Description>
+        Your email address has been successfully verified, you will be redirected
+        to the login page in {redirectDelay} seconds, alternatively click on the
+        button below.
+
+        <Button href="/auth/login">Login</Button>
+    </Alert.Description>
+</Alert.Root>

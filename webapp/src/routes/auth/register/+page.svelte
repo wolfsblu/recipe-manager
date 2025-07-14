@@ -1,40 +1,83 @@
 <script lang="ts">
-    import { Card, Button, Label, Input } from 'flowbite-svelte';
-    import {register} from "$lib/auth/user.svelte.js";
-    import {addToast} from "$lib/components/notifications/toasts";
+    import { Button } from "$lib/components/ui/button/index.js";
+    import * as Card from "$lib/components/ui/card/index.js";
+    import * as Form from "$lib/components/ui/form/index.js";
+    import { formSchema, type FormSchema } from "./schema";
+    import { Input } from "$lib/components/ui/input/index.js";
+    import {register} from "$lib/auth/user.svelte";
     import {goto} from "$app/navigation";
+    import { toast } from "svelte-sonner";
+    import {
+        type SuperValidated,
+        type Infer,
+        superForm,
+        setMessage,
+    } from "sveltekit-superforms";
+    import { zodClient } from "sveltekit-superforms/adapters";
 
-    const credentials = {
-        email: '',
-        password: '',
-    }
+    let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 
-    const onRegister = async (e: SubmitEvent) => {
-        e.preventDefault()
-        try {
-            await register(credentials)
-            addToast({ message: "Account registered, please verify your email", type: "success", group: "register" })
-            await goto("/")
-        } catch (e) {
-            addToast({ message: "Failed to register account", type: "error", group: "register" })
+    const form = superForm(data.form, {
+        SPA: true,
+        resetForm: false,
+        validators: zodClient(formSchema),
+        async onUpdate({ form }) {
+            if (form.valid) {
+                try {
+                    await register(form.data)
+                    toast.success("Account registered, please verify your email")
+                    await goto("/")
+                } catch (error) {
+                    toast.error("Failed to register account")
+                }
+                setMessage(form, "Registration submitted successfully");
+            }
         }
-    }
+    })
+
+    const { form: formData, enhance } = form;
 </script>
 
-<Card class="self-center my-auto p-6">
-    <form class="flex flex-col space-y-6" onsubmit={onRegister}>
-        <h3 class="text-xl font-medium text-gray-900 dark:text-white">Register</h3>
-        <Label class="space-y-2">
-            <span>Email</span>
-            <Input type="email" name="email" bind:value={credentials.email} placeholder="name@company.com" required />
-        </Label>
-        <Label class="space-y-2">
-            <span>Your password</span>
-            <Input type="password" name="password" bind:value={credentials.password} placeholder="•••••" required />
-        </Label>
-        <Button type="submit" class="w-full">Create a new account</Button>
-        <div class="text-sm font-medium text-gray-500 dark:text-gray-300">
-            Already have an account? <a href="/auth/login" class="text-primary-700 hover:underline dark:text-primary-500">Login</a>
-        </div>
-    </form>
-</Card>
+<Card.Root class="m-auto w-full max-w-sm">
+    <Card.Header>
+        <Card.Title class="text-2xl">Register</Card.Title>
+        <Card.Description>Enter your data below to create a new account</Card.Description>
+    </Card.Header>
+    <Card.Content>
+        <form method="POST" use:enhance>
+            <div class="grid gap-4">
+                <div class="grid gap-2">
+                    <Form.Field {form} name="email">
+                        <Form.Control>
+                            {#snippet children({ props })}
+                                <Form.Label>Email</Form.Label>
+                                <Input {...props} bind:value={$formData.email} placeholder="mail@example.com" />
+                            {/snippet}
+                        </Form.Control>
+                        <Form.Description />
+                        <Form.FieldErrors />
+                    </Form.Field>
+                </div>
+                <div class="grid gap-2">
+                    <Form.Field {form} name="password">
+                        <Form.Control>
+                            {#snippet children({ props })}
+                                <div class="flex items-center">
+                                    <Form.Label>Password</Form.Label>
+                                </div>
+                                <Input {...props} type="password" bind:value={$formData.password} placeholder="●●●●●●●" />
+                            {/snippet}
+                        </Form.Control>
+                        <Form.Description />
+                        <Form.FieldErrors />
+                    </Form.Field>
+                </div>
+                <Button type="submit" class="w-full">Register</Button>
+            </div>
+            <div class="mt-4 text-center text-sm">
+                Already have an account?
+                <a href="/auth/login" class="underline"> Login </a>
+            </div>
+        </form>
+    </Card.Content>
+</Card.Root>
