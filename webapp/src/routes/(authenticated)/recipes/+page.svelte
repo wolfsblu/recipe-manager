@@ -4,8 +4,8 @@
     import RecipeCard from "$lib/components/recipes/RecipeCard.svelte";
 </script>
 
-<div class="flex flex-col h-full justify-between p-5">
-<div class="grid grid-cols-5 gap-5">
+<div class="flex flex-col gap-5 h-full justify-between p-5">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-5">
     {#each Array(10) as _, i}
         <RecipeCard />
     {/each}
