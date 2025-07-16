@@ -7,16 +7,16 @@
 </script>
 
 <div class="bg-card rounded-lg shadow-sm overflow-hidden transition-all duration-300">
-    <div class="relative">
+    <a href="/recipes/1" class="block relative">
         <Badge variant="secondary" class="absolute top-2 left-2">
             <ClockIcon /> 45m
         </Badge>
         <img src={fruits} alt="fruits" class="w-full h-52 object-cover" />
-    </div>
-    <div class="pt-4 px-4 pb-2 space-y-2">
-        <h3 class="font-semibold text-base">
+    </a>
+    <div class="pt-3 px-4 pb-2 space-y-2">
+        <a href="/recipes/1" class="inline-block font-semibold text-base">
             My super duper tasty recipe
-        </h3>
+        </a>
         <div class="text-sm text-muted-foreground grid space-y-1">
             <div class="flex justify-between">
                 <span>Servings</span>
