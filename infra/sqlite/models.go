@@ -52,11 +52,21 @@ type Recipe struct {
 	CreatedAt   time.Time
 }
 
+type RecipeTag struct {
+	RecipeID int64
+	TagID    int64
+}
+
 type RecipeVote struct {
 	RecipeID int64
 	UserID   int64
 	Vote     int64
 	VotedAt  time.Time
+}
+
+type Tag struct {
+	ID   int64
+	Name string
 }
 
 type Unit struct {

@@ -7,6 +7,7 @@ package sqlite
 
 import (
 	"context"
+	"strings"
 )
 
 const browseRecipes = `-- name: BrowseRecipes :many
@@ -169,6 +170,55 @@ func (q *Queries) GetRecipe(ctx context.Context, id int64) (Recipe, error) {
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getTagsForRecipes = `-- name: GetTagsForRecipes :many
+SELECT tags.id, tags.name, recipe_tags.recipe_id
+FROM tags
+    INNER JOIN recipe_tags ON tags.id = recipe_tags.tag_id
+WHERE recipe_tags.recipe_id IN (
+    /*SLICE:recipe_ids*/?
+)
+ORDER BY tags.name
+`
+
+type GetTagsForRecipesRow struct {
+	ID       int64
+	Name     string
+	RecipeID int64
+}
+
+func (q *Queries) GetTagsForRecipes(ctx context.Context, recipeIds []int64) ([]GetTagsForRecipesRow, error) {
+	query := getTagsForRecipes
+	var queryParams []interface{}
+	if len(recipeIds) > 0 {
+		for _, v := range recipeIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", strings.Repeat(",?", len(recipeIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTagsForRecipesRow
+	for rows.Next() {
+		var i GetTagsForRecipesRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.RecipeID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listRecipes = `-- name: ListRecipes :many

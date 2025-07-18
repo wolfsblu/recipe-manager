@@ -84,8 +84,27 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipe
 		return nil, err
 	}
 
-	for _, item := range result {
+	ids := make([]int64, len(result))
+	for i, item := range result {
+		ids[i] = item.ID
 		recipes = append(recipes, item.AsDomainModel())
+	}
+
+	tags, err := s.query().GetTagsForRecipes(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	tagsByRecipe := make(map[int64][]string)
+	for _, tag := range tags {
+		tagsByRecipe[tag.RecipeID] = append(tagsByRecipe[tag.RecipeID], tag.Name)
+	}
+
+	recipes = make([]domain.Recipe, len(result))
+	for i, recipe := range result {
+		r := recipe.AsDomainModel()
+		r.Tags = tagsByRecipe[r.ID]
+		recipes[i] = r
 	}
 	return recipes, nil
 }

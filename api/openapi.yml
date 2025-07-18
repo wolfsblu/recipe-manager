@@ -313,14 +313,20 @@ components:
             - <p>My tasty spaghetti recipe</p>
         servings:
           type: integer
+          format: int64
           description: How many servings you'll get with this recipe
           examples:
             - 4
         minutes:
           type: integer
+          format: int64
           description: How long it takes to prepare this recipe (in minutes)
           examples:
             - 45
+        tags:
+          type: array
+          items:
+            type: string
       encoding:
         images:
           contentType: image/jpeg, image/png

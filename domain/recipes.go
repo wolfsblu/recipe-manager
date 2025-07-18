@@ -14,12 +14,13 @@ type RecipeDetails struct {
 	Name        string
 	Description string
 	CreatedBy   *User
-	Servings    int
-	Minutes     int
+	Servings    int64
+	Minutes     int64
 }
 
 type Recipe struct {
-	ID int64
+	ID   int64
+	Tags []string
 	RecipeDetails
 }
 

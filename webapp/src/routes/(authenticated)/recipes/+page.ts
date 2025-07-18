@@ -8,7 +8,7 @@ export const load: PageLoad = async () => {
     ]
 
     const recipes = await getRecipes()
-
+    console.log(recipes)
     return {
         breadcrumbs,
         recipes,

@@ -92,8 +92,12 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error
 	var response []api.ReadRecipe
 	for _, recipe := range recipes {
 		response = append(response, api.ReadRecipe{
-			ID:   recipe.ID,
-			Name: recipe.Name,
+			Name:        recipe.Name,
+			Description: recipe.Description,
+			Servings:    recipe.Servings,
+			Minutes:     recipe.Minutes,
+			ID:          recipe.ID,
+			Tags:        recipe.Tags,
 		})
 	}
 	return response, nil

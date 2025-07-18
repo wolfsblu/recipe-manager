@@ -1,9 +1,12 @@
 <script lang="ts">
     import fruits from './fruits.jpg'
     import ClockIcon from '@lucide/svelte/icons/clock'
+    import TagIcon from "@lucide/svelte/icons/tag";
+    import PlusIcon from "@lucide/svelte/icons/plus";
     import { Badge } from "$lib/components/ui/badge/index.js";
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
+    import Button from '../ui/button/button.svelte';
 
     let { recipe } = $props()
 </script>
@@ -29,18 +32,16 @@
                 <span>Ingredients</span>
                 <Badge>12</Badge>
             </div>
-            <Separator />
+                <Separator />
         </div>
     </div>
     <ScrollArea class="whitespace-nowrap pb-4 px-4" orientation="horizontal">
         <div class="flex w-max gap-x-1">
-            <Badge variant="secondary" class="text-muted-foreground">Spicy</Badge>
-            <Badge variant="secondary" class="text-muted-foreground">Mediterranean</Badge>
-            <Badge variant="secondary" class="text-muted-foreground">Lunch</Badge>
-            <Badge variant="secondary" class="text-muted-foreground">Pasta</Badge>
-            <Badge variant="secondary" class="text-muted-foreground">Organic</Badge>
-            <Badge variant="secondary" class="text-muted-foreground">Healthy</Badge>
-            <Badge variant="secondary" class="text-muted-foreground">Quick</Badge>
+            {#each recipe.tags as tag}
+                <Badge variant="secondary" class="text-muted-foreground">
+                    {tag}
+                </Badge>
+            {/each}
         </div>
     </ScrollArea>
 </div>

@@ -9,6 +9,12 @@ CREATE TABLE recipes
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE tags
+(
+    id   INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
 CREATE TABLE units
 (
     id   INTEGER PRIMARY KEY,
@@ -62,6 +68,13 @@ CREATE TABLE user_reputation
     recipe_id  INTEGER   NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
     action_id  INTEGER   NOT NULL REFERENCES actions (id) ON DELETE CASCADE,
     awarded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE recipe_tags
+(
+    recipe_id INTEGER NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
+    tag_id    INTEGER NOT NULL REFERENCES tags (id) ON DELETE CASCADE,
+    PRIMARY KEY (recipe_id, tag_id)
 );
 
 CREATE TABLE recipe_votes
