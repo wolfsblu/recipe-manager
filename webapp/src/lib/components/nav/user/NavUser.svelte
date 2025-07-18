@@ -9,7 +9,7 @@
     import CreditCardIcon from "@lucide/svelte/icons/credit-card";
     import LogOutIcon from "@lucide/svelte/icons/log-out";
     import SparklesIcon from "@lucide/svelte/icons/sparkles";
-    import {logout, user} from "$lib/auth/user.svelte.js";
+    import {logout, user} from "$lib/api/auth/user.svelte.js";
     import avatarFallback from "$lib/components/nav/user/avatar.png";
     import {toast} from "svelte-sonner";
     import {goto} from "$app/navigation";

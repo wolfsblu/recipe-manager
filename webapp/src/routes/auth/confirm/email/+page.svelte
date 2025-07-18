@@ -2,7 +2,7 @@
     import { Button } from "$lib/components/ui/button/index.js";
     import * as Alert from "$lib/components/ui/alert/index.js";
     import SuccessIcon from "@lucide/svelte/icons/check-circle-2";
-    import {confirmEmail} from "$lib/auth/user.svelte";
+    import {confirmEmail} from "$lib/api/auth/user.svelte";
     import {goto} from "$app/navigation";
     import {onDestroy, onMount} from "svelte";
     import {toast} from "svelte-sonner";

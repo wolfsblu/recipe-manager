@@ -13,7 +13,7 @@
     import SettingsIcon from "@lucide/svelte/icons/settings";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import * as Sidebar from "$lib/components/ui/sidebar/index";
-    import {isAuthenticated, logout, user} from "$lib/auth/user.svelte";
+    import {isAuthenticated, logout, user} from "$lib/api/auth/user.svelte";
     import {toast} from "svelte-sonner";
     import NavUser from "$lib/components/nav/user/NavUser.svelte";
 

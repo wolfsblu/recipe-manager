@@ -4,7 +4,7 @@
     import * as Form from "$lib/components/ui/form/index.js";
     import { formSchema, type FormSchema } from "./schema";
     import { Input } from "$lib/components/ui/input/index.js";
-    import {login} from "$lib/auth/user.svelte";
+    import {login} from "$lib/api/auth/user.svelte";
     import {goto} from "$app/navigation";
     import { toast } from "svelte-sonner";
     import {

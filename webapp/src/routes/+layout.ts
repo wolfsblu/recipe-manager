@@ -1,4 +1,4 @@
-import { getProfile } from "$lib/auth/user.svelte";
+import { getProfile } from "$lib/api/auth/user.svelte";
 import type { LayoutLoad } from './$types';
 import {client} from "$lib/api/client";
 
