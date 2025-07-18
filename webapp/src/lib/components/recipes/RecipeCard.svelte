@@ -32,7 +32,9 @@
                 <span>Ingredients</span>
                 <Badge>12</Badge>
             </div>
+            {#if recipe.tags}
                 <Separator />
+            {/if}
         </div>
     </div>
     <ScrollArea class="whitespace-nowrap pb-4 px-4" orientation="horizontal">
