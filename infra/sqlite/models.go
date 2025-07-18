@@ -52,6 +52,14 @@ type Recipe struct {
 	CreatedAt   time.Time
 }
 
+type RecipeImage struct {
+	ID        int64
+	RecipeID  int64
+	Path      string
+	SortOrder int64
+	CreatedAt time.Time
+}
+
 type RecipeTag struct {
 	RecipeID int64
 	TagID    int64

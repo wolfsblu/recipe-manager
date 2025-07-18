@@ -70,6 +70,15 @@ CREATE TABLE user_reputation
     awarded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE recipe_images
+(
+    id         INTEGER PRIMARY KEY,
+    recipe_id  INTEGER   NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
+    path       TEXT      NOT NULL,
+    sort_order INTEGER   NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE recipe_tags
 (
     recipe_id INTEGER NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
