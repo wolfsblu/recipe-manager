@@ -28,10 +28,18 @@ WHERE user_id = ?
     AND meal_plan.date <= sqlc.arg(until_date)
 ORDER BY meal_plan.date, meal_plan.sort_order;
 
+-- name: GetImagesForRecipes :many
+SELECT url, recipe_id
+FROM recipe_images
+WHERE recipe_id IN (
+    sqlc.slice(recipe_ids)
+    )
+ORDER BY sort_order;
+
 -- name: GetTagsForRecipes :many
 SELECT tags.id, tags.name, recipe_tags.recipe_id
 FROM tags
-    INNER JOIN recipe_tags ON tags.id = recipe_tags.tag_id
+     INNER JOIN recipe_tags ON tags.id = recipe_tags.tag_id
 WHERE recipe_tags.recipe_id IN (
     sqlc.slice(recipe_ids)
 )

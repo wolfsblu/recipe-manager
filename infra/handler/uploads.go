@@ -14,8 +14,8 @@ import (
 )
 
 func NewUploadHandler(recipes *domain.RecipeService) (*tusd.Handler, error) {
-	store := filestore.New(env.MustGet("UPLOAD_FOLDER"))
-	locker := filelocker.New(env.MustGet("UPLOAD_FOLDER"))
+	store := filestore.New(env.MustGet("UPLOAD_PATH"))
+	locker := filelocker.New(env.MustGet("UPLOAD_PATH"))
 
 	composer := tusd.NewStoreComposer()
 	store.UseIn(composer)

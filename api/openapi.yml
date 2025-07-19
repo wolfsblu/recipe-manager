@@ -287,11 +287,6 @@ components:
           type: string
       required:
         - message
-    Image:
-        type: string
-        format: uri
-        examples:
-          - https://example.com/recipe/1/thumb.jpg
     RecipeStatus:
       type: string
       description: Recipe status in the store
@@ -337,7 +332,10 @@ components:
         images:
           type: array
           items:
-            $ref: '#/components/schemas/Image'
+            type: string
+            format: uri
+            examples:
+              - https://example.com/spaghetti-carbonara.jpg
       encoding:
         images:
           contentType: image/jpeg, image/png

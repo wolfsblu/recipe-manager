@@ -97,6 +97,7 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error
 			Servings:    recipe.Servings,
 			Minutes:     recipe.Minutes,
 			ID:          recipe.ID,
+			Images:      recipe.Images,
 			Tags:        recipe.Tags,
 		})
 	}
