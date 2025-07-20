@@ -2,18 +2,22 @@ package handler
 
 import (
 	"context"
+	"time"
+
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
-	"time"
+	"github.com/wolfsblu/go-chef/infra/urlbuilder"
 )
 
 type RecipeHandler struct {
-	Recipes *domain.RecipeService
+	Recipes    *domain.RecipeService
+	URLBuilder *urlbuilder.Builder
 }
 
-func NewRecipeHandler(service *domain.RecipeService) *RecipeHandler {
+func NewRecipeHandler(service *domain.RecipeService, urlBuilder *urlbuilder.Builder) *RecipeHandler {
 	return &RecipeHandler{
-		Recipes: service,
+		Recipes:    service,
+		URLBuilder: urlBuilder,
 	}
 }
 
@@ -92,7 +96,7 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error
 
 	response := make([]api.ReadRecipe, len(recipes))
 	for i, recipe := range recipes {
-		images, err := buildRecipeImageUrls(recipe.Images)
+		images, err := h.URLBuilder.BuildRecipeImageURLs(recipe.Images)
 		if err != nil {
 			return nil, err
 		}
