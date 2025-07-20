@@ -93,7 +93,7 @@ func (q *Queries) DeleteRecipe(ctx context.Context, id int64) error {
 }
 
 const getImagesForRecipes = `-- name: GetImagesForRecipes :many
-SELECT url, recipe_id
+SELECT id, path, sort_order, recipe_id
 FROM recipe_images
 WHERE recipe_id IN (
     /*SLICE:recipe_ids*/?
@@ -102,8 +102,10 @@ ORDER BY sort_order
 `
 
 type GetImagesForRecipesRow struct {
-	Url      string
-	RecipeID int64
+	ID        int64
+	Path      string
+	SortOrder int64
+	RecipeID  int64
 }
 
 func (q *Queries) GetImagesForRecipes(ctx context.Context, recipeIds []int64) ([]GetImagesForRecipesRow, error) {
@@ -125,7 +127,12 @@ func (q *Queries) GetImagesForRecipes(ctx context.Context, recipeIds []int64) ([
 	var items []GetImagesForRecipesRow
 	for rows.Next() {
 		var i GetImagesForRecipesRow
-		if err := rows.Scan(&i.Url, &i.RecipeID); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Path,
+			&i.SortOrder,
+			&i.RecipeID,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

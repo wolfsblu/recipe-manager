@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"net/url"
 	"time"
 )
 
@@ -22,8 +21,14 @@ type RecipeDetails struct {
 type Recipe struct {
 	ID     int64
 	Tags   []string
-	Images []url.URL
+	Images []RecipeImage
 	RecipeDetails
+}
+
+type RecipeImage struct {
+	ID        int64
+	Path      string
+	SortOrder int64
 }
 
 type MealPlan struct {

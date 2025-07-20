@@ -74,7 +74,7 @@ CREATE TABLE recipe_images
 (
     id         INTEGER PRIMARY KEY,
     recipe_id  INTEGER   NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
-    url        TEXT      NOT NULL,
+    path       TEXT      NOT NULL,
     sort_order INTEGER   NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

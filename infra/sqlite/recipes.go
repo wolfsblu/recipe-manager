@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/wolfsblu/go-chef/domain"
 	_ "modernc.org/sqlite"
-	"net/url"
 	"time"
 )
 
@@ -106,13 +105,13 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipe
 		tagsByRecipe[tag.RecipeID] = append(tagsByRecipe[tag.RecipeID], tag.Name)
 	}
 
-	imagesByRecipe := make(map[int64][]url.URL)
+	imagesByRecipe := make(map[int64][]domain.RecipeImage)
 	for _, image := range images {
-		imageUrl, err := url.Parse(image.Url)
-		if err != nil {
-			return nil, err
-		}
-		imagesByRecipe[image.RecipeID] = append(imagesByRecipe[image.RecipeID], *imageUrl)
+		imagesByRecipe[image.RecipeID] = append(imagesByRecipe[image.RecipeID], domain.RecipeImage{
+			ID:        image.ID,
+			Path:      image.Path,
+			SortOrder: image.SortOrder,
+		})
 	}
 
 	recipes = make([]domain.Recipe, len(result))

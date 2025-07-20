@@ -55,7 +55,7 @@ type Recipe struct {
 type RecipeImage struct {
 	ID        int64
 	RecipeID  int64
-	Url       string
+	Path      string
 	SortOrder int64
 	CreatedAt time.Time
 }

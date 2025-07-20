@@ -29,7 +29,7 @@ WHERE user_id = ?
 ORDER BY meal_plan.date, meal_plan.sort_order;
 
 -- name: GetImagesForRecipes :many
-SELECT url, recipe_id
+SELECT id, path, sort_order, recipe_id
 FROM recipe_images
 WHERE recipe_id IN (
     sqlc.slice(recipe_ids)

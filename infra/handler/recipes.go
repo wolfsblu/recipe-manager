@@ -89,18 +89,25 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error
 	if err != nil {
 		return nil, err
 	}
-	var response []api.ReadRecipe
-	for _, recipe := range recipes {
-		response = append(response, api.ReadRecipe{
+
+	response := make([]api.ReadRecipe, len(recipes))
+	for i, recipe := range recipes {
+		images, err := buildRecipeImageUrls(recipe.Images)
+		if err != nil {
+			return nil, err
+		}
+
+		response[i] = api.ReadRecipe{
 			Name:        recipe.Name,
 			Description: recipe.Description,
 			Servings:    recipe.Servings,
 			Minutes:     recipe.Minutes,
 			ID:          recipe.ID,
-			Images:      recipe.Images,
+			Images:      images,
 			Tags:        recipe.Tags,
-		})
+		}
 	}
+
 	return response, nil
 }
 
