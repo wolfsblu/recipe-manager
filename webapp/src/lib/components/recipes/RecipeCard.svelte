@@ -14,9 +14,9 @@
             <ClockIcon /> {recipe.minutes}m
         </Badge>
         {#if recipe.images && recipe.images.length > 0}
-            <img src={recipe.images[0]} alt="Recipe" class="w-full h-52 object-cover" />
+            <img loading="lazy" src={recipe.images[0]} alt="Recipe" class="w-full h-52 object-cover" />
         {:else}
-            <img src={fruits} alt="Fruits" class="w-full h-52 object-cover" />
+            <img loading="lazy" src={fruits} alt="Fruits" class="w-full h-52 object-cover" />
         {/if}
     </a>
     <div class="pt-3 px-4 pb-2 space-y-2">
