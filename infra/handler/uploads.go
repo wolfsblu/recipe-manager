@@ -6,6 +6,7 @@ import (
 	"github.com/tus/tusd/v2/pkg/filestore"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
 	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/go-chef/infra/config"
 	"github.com/wolfsblu/go-chef/infra/env"
 	"golang.org/x/exp/slog"
 	"net/http"
@@ -25,7 +26,7 @@ func NewUploadHandler(recipes *domain.RecipeService) (*tusd.Handler, error) {
 	logger := slog.New(logHandler)
 
 	handler, err := tusd.NewHandler(tusd.Config{
-		BasePath:                "/api/uploads/",
+		BasePath:                config.UploadPathPrefix + "/",
 		StoreComposer:           composer,
 		NotifyCreatedUploads:    true,
 		NotifyCompleteUploads:   true,
