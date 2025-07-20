@@ -1,12 +1,9 @@
 <script lang="ts">
     import fruits from './fruits.jpg'
     import ClockIcon from '@lucide/svelte/icons/clock'
-    import TagIcon from "@lucide/svelte/icons/tag";
-    import PlusIcon from "@lucide/svelte/icons/plus";
     import { Badge } from "$lib/components/ui/badge/index.js";
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
-    import Button from '../ui/button/button.svelte';
 
     let { recipe } = $props()
 </script>
@@ -16,7 +13,11 @@
         <Badge variant="secondary" class="absolute top-2 left-2">
             <ClockIcon /> {recipe.minutes}m
         </Badge>
-        <img src={fruits} alt="fruits" class="w-full h-52 object-cover" />
+        {#if recipe.images && recipe.images.length > 0}
+            <img src={recipe.images[0]} alt="Recipe" class="w-full h-52 object-cover" />
+        {:else}
+            <img src={fruits} alt="Fruits" class="w-full h-52 object-cover" />
+        {/if}
     </a>
     <div class="pt-3 px-4 pb-2 space-y-2">
         <a href="/recipes/1" class="inline-block font-semibold text-base">
