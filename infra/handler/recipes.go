@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/wolfsblu/go-chef/infra/mapper"
 	"time"
 
 	"github.com/wolfsblu/go-chef/api"
@@ -10,12 +11,14 @@ import (
 )
 
 type RecipeHandler struct {
+	Mapper     *mapper.RecipeMapper
 	Recipes    *domain.RecipeService
 	URLBuilder *urlbuilder.Builder
 }
 
-func NewRecipeHandler(service *domain.RecipeService, urlBuilder *urlbuilder.Builder) *RecipeHandler {
+func NewRecipeHandler(service *domain.RecipeService, mapper *mapper.RecipeMapper, urlBuilder *urlbuilder.Builder) *RecipeHandler {
 	return &RecipeHandler{
+		Mapper:     mapper,
 		Recipes:    service,
 		URLBuilder: urlBuilder,
 	}
@@ -70,21 +73,7 @@ func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanP
 	if err != nil {
 		return nil, err
 	}
-	var response []api.ReadMealPlan
-	for _, item := range mealplan {
-		var recipes []api.ReadRecipe
-		for _, recipe := range item.Recipes {
-			recipes = append(recipes, api.ReadRecipe{
-				ID:   recipe.ID,
-				Name: recipe.Name,
-			})
-		}
-		response = append(response, api.ReadMealPlan{
-			Date:    item.Date.Format(time.DateOnly),
-			Recipes: recipes,
-		})
-	}
-	return response, nil
+	return h.Mapper.ToReadMealPlanList(mealplan)
 }
 
 func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
@@ -93,26 +82,7 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error
 	if err != nil {
 		return nil, err
 	}
-
-	response := make([]api.ReadRecipe, len(recipes))
-	for i, recipe := range recipes {
-		images, err := h.URLBuilder.BuildRecipeImageURLs(recipe.Images)
-		if err != nil {
-			return nil, err
-		}
-
-		response[i] = api.ReadRecipe{
-			Name:        recipe.Name,
-			Description: recipe.Description,
-			Servings:    recipe.Servings,
-			Minutes:     recipe.Minutes,
-			ID:          recipe.ID,
-			Images:      images,
-			Tags:        recipe.Tags,
-		}
-	}
-
-	return response, nil
+	return h.Mapper.ToRecipeListResponse(recipes)
 }
 
 func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeByIdParams) (*api.ReadRecipe, error) {
