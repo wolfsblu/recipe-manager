@@ -1,4 +1,4 @@
-package mapper
+package handler
 
 import (
 	"time"
@@ -8,18 +8,18 @@ import (
 	"github.com/wolfsblu/go-chef/infra/urlbuilder"
 )
 
-type RecipeMapper struct {
-	URLBuilder *urlbuilder.Builder
+type responseMapper struct {
+	urlBuilder *urlbuilder.Builder
 }
 
-func NewRecipeMapper(urlBuilder *urlbuilder.Builder) *RecipeMapper {
-	return &RecipeMapper{
-		URLBuilder: urlBuilder,
+func newResponseMapper(urlBuilder *urlbuilder.Builder) *responseMapper {
+	return &responseMapper{
+		urlBuilder: urlBuilder,
 	}
 }
 
-func (m *RecipeMapper) ToRecipeResponse(recipe domain.Recipe) (*api.ReadRecipe, error) {
-	images, err := m.URLBuilder.BuildRecipeImageURLs(recipe.Images)
+func (m *responseMapper) toRecipeResponse(recipe domain.Recipe) (*api.ReadRecipe, error) {
+	images, err := m.urlBuilder.BuildRecipeImageURLs(recipe.Images)
 	if err != nil {
 		return nil, err
 	}
@@ -35,10 +35,10 @@ func (m *RecipeMapper) ToRecipeResponse(recipe domain.Recipe) (*api.ReadRecipe, 
 	}, nil
 }
 
-func (m *RecipeMapper) ToRecipeListResponse(recipes []domain.Recipe) ([]api.ReadRecipe, error) {
+func (m *responseMapper) toRecipeListResponse(recipes []domain.Recipe) ([]api.ReadRecipe, error) {
 	result := make([]api.ReadRecipe, len(recipes))
 	for i, recipe := range recipes {
-		mapped, err := m.ToRecipeResponse(recipe)
+		mapped, err := m.toRecipeResponse(recipe)
 		if err != nil {
 			return nil, err
 		}
@@ -47,10 +47,10 @@ func (m *RecipeMapper) ToRecipeListResponse(recipes []domain.Recipe) ([]api.Read
 	return result, nil
 }
 
-func (m *RecipeMapper) ToMealPlanResponse(mealPlan domain.MealPlan) (api.ReadMealPlan, error) {
+func (m *responseMapper) toMealPlanResponse(mealPlan domain.MealPlan) (api.ReadMealPlan, error) {
 	recipes := make([]api.ReadRecipe, len(mealPlan.Recipes))
 	for i, recipe := range mealPlan.Recipes {
-		response, err := m.ToRecipeResponse(recipe)
+		response, err := m.toRecipeResponse(recipe)
 		if err != nil {
 			return api.ReadMealPlan{}, err
 		}
@@ -63,10 +63,10 @@ func (m *RecipeMapper) ToMealPlanResponse(mealPlan domain.MealPlan) (api.ReadMea
 	}, nil
 }
 
-func (m *RecipeMapper) ToReadMealPlanList(mealPlans []domain.MealPlan) ([]api.ReadMealPlan, error) {
+func (m *responseMapper) toReadMealPlanList(mealPlans []domain.MealPlan) ([]api.ReadMealPlan, error) {
 	result := make([]api.ReadMealPlan, len(mealPlans))
 	for i, mealPlan := range mealPlans {
-		response, err := m.ToMealPlanResponse(mealPlan)
+		response, err := m.toMealPlanResponse(mealPlan)
 		if err != nil {
 			return nil, err
 		}

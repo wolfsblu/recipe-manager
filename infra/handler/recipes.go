@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"github.com/wolfsblu/go-chef/infra/mapper"
 	"time"
 
 	"github.com/wolfsblu/go-chef/api"
@@ -11,14 +10,14 @@ import (
 )
 
 type RecipeHandler struct {
-	Mapper     *mapper.RecipeMapper
+	mapper     *responseMapper
 	Recipes    *domain.RecipeService
 	URLBuilder *urlbuilder.Builder
 }
 
-func NewRecipeHandler(service *domain.RecipeService, mapper *mapper.RecipeMapper, urlBuilder *urlbuilder.Builder) *RecipeHandler {
+func NewRecipeHandler(service *domain.RecipeService, urlBuilder *urlbuilder.Builder) *RecipeHandler {
 	return &RecipeHandler{
-		Mapper:     mapper,
+		mapper:     newResponseMapper(urlBuilder),
 		Recipes:    service,
 		URLBuilder: urlBuilder,
 	}
@@ -73,7 +72,7 @@ func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanP
 	if err != nil {
 		return nil, err
 	}
-	return h.Mapper.ToReadMealPlanList(mealplan)
+	return h.mapper.toReadMealPlanList(mealplan)
 }
 
 func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
@@ -82,7 +81,7 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error
 	if err != nil {
 		return nil, err
 	}
-	return h.Mapper.ToRecipeListResponse(recipes)
+	return h.mapper.toRecipeListResponse(recipes)
 }
 
 func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeByIdParams) (*api.ReadRecipe, error) {
