@@ -113,15 +113,15 @@ func TestComparePasswordAndHash(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := ComparePasswordAndHash(tt.password, tt.hash)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ComparePasswordAndHash() error = %v, wantErr %v", err, tt.wantErr)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := ComparePasswordAndHash(tc.password, tc.hash)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("ComparePasswordAndHash() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
-			if got != tt.want {
-				t.Errorf("ComparePasswordAndHash() = %v, want %v", got, tt.want)
+			if got != tc.want {
+				t.Errorf("ComparePasswordAndHash() = %v, want %v", got, tc.want)
 			}
 		})
 	}
@@ -167,11 +167,11 @@ func TestDecodeHash(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			params, salt, key, err := DecodeHash(tt.hash)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("DecodeHash() error = %v, wantErr %v", err, tt.wantErr)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			params, salt, key, err := DecodeHash(tc.hash)
+			if (err != nil) != tc.wantErr {
+				t.Errorf("DecodeHash() error = %v, wantErr %v", err, tc.wantErr)
 				return
 			}
 
