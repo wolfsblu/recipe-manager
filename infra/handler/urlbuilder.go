@@ -1,4 +1,4 @@
-package urlbuilder
+package handler
 
 import (
 	"github.com/wolfsblu/go-chef/infra/env"
@@ -8,18 +8,18 @@ import (
 	"github.com/wolfsblu/go-chef/infra/config"
 )
 
-type Builder struct {
+type urlBuilder struct {
 	baseURL string
 }
 
-func NewURLBuilder() *Builder {
-	return &Builder{
+func newURLBuilder() *urlBuilder {
+	return &urlBuilder{
 		baseURL: env.MustGet("BASE_URL"),
 	}
 }
 
-// BuildImageURL constructs a full URL for an image path
-func (b *Builder) BuildImageURL(imagePath string) (*url.URL, error) {
+// buildImageURL constructs a full URL for an image path
+func (b *urlBuilder) buildImageURL(imagePath string) (*url.URL, error) {
 	path, err := url.JoinPath(b.baseURL, config.ImagesPathPrefix, imagePath)
 	if err != nil {
 		return nil, err
@@ -27,11 +27,11 @@ func (b *Builder) BuildImageURL(imagePath string) (*url.URL, error) {
 	return url.Parse(path)
 }
 
-// BuildRecipeImageURLs constructs URLs for all recipe images
-func (b *Builder) BuildRecipeImageURLs(images []domain.RecipeImage) ([]url.URL, error) {
+// buildRecipeImageURLs constructs URLs for all recipe images
+func (b *urlBuilder) buildRecipeImageURLs(images []domain.RecipeImage) ([]url.URL, error) {
 	urls := make([]url.URL, len(images))
 	for i, image := range images {
-		imageURL, err := b.BuildImageURL(image.Path)
+		imageURL, err := b.buildImageURL(image.Path)
 		if err != nil {
 			return nil, err
 		}
@@ -40,8 +40,8 @@ func (b *Builder) BuildRecipeImageURLs(images []domain.RecipeImage) ([]url.URL, 
 	return urls, nil
 }
 
-// BuildAPIURL constructs API endpoint URLs
-func (b *Builder) BuildAPIURL(endpoint string) (*url.URL, error) {
+// buildAPIURL constructs API endpoint URLs
+func (b *urlBuilder) buildAPIURL(endpoint string) (*url.URL, error) {
 	path, err := url.JoinPath(b.baseURL, config.APIPathPrefix, endpoint)
 	if err != nil {
 		return nil, err

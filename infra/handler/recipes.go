@@ -6,20 +6,17 @@ import (
 
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/infra/urlbuilder"
 )
 
 type RecipeHandler struct {
-	mapper     *responseMapper
-	Recipes    *domain.RecipeService
-	URLBuilder *urlbuilder.Builder
+	mapper  *responseMapper
+	Recipes *domain.RecipeService
 }
 
-func NewRecipeHandler(service *domain.RecipeService, urlBuilder *urlbuilder.Builder) *RecipeHandler {
+func NewRecipeHandler(service *domain.RecipeService) *RecipeHandler {
 	return &RecipeHandler{
-		mapper:     newResponseMapper(urlBuilder),
-		Recipes:    service,
-		URLBuilder: urlBuilder,
+		mapper:  newResponseMapper(newURLBuilder()),
+		Recipes: service,
 	}
 }
 

@@ -14,7 +14,6 @@ import (
 	"github.com/wolfsblu/go-chef/infra/routing"
 	"github.com/wolfsblu/go-chef/infra/smtp"
 	"github.com/wolfsblu/go-chef/infra/sqlite"
-	"github.com/wolfsblu/go-chef/infra/urlbuilder"
 	"net/http"
 )
 
@@ -31,8 +30,7 @@ func InitializeRecipeService() (*domain.RecipeService, error) {
 }
 
 func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) {
-	builder := urlbuilder.NewURLBuilder()
-	recipeHandler := handler.NewRecipeHandler(service, builder)
+	recipeHandler := handler.NewRecipeHandler(service)
 	securityHandler := handler.NewSecurityHandler(service)
 	server, err := api.NewAPIServer(recipeHandler, securityHandler)
 	if err != nil {

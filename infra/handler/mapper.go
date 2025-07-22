@@ -5,21 +5,20 @@ import (
 
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/infra/urlbuilder"
 )
 
 type responseMapper struct {
-	urlBuilder *urlbuilder.Builder
+	urlBuilder *urlBuilder
 }
 
-func newResponseMapper(urlBuilder *urlbuilder.Builder) *responseMapper {
+func newResponseMapper(urlBuilder *urlBuilder) *responseMapper {
 	return &responseMapper{
 		urlBuilder: urlBuilder,
 	}
 }
 
 func (m *responseMapper) toRecipeResponse(recipe domain.Recipe) (*api.ReadRecipe, error) {
-	images, err := m.urlBuilder.BuildRecipeImageURLs(recipe.Images)
+	images, err := m.urlBuilder.buildRecipeImageURLs(recipe.Images)
 	if err != nil {
 		return nil, err
 	}
