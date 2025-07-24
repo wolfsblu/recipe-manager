@@ -7,3 +7,13 @@ export const getRecipes = async () => {
     }
     return response.data
 }
+
+export const addRecipe = async (recipe) => {
+    const response = await client.POST("/recipes", {
+        body: recipe
+    })
+    if (response.error) {
+        throw response.error
+    }
+    return response.data
+}

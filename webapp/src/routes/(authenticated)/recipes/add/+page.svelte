@@ -4,8 +4,13 @@
     import {Button} from "$lib/components/ui/button/index.js";
     import {Textarea} from "$lib/components/ui/textarea/index.js";
     import {formSchema, type FormSchema} from "./schema";
-    import {type Infer, superForm, type SuperValidated,} from "sveltekit-superforms";
+    import {type Infer, setMessage, superForm, type SuperValidated,} from "sveltekit-superforms";
     import {zodClient} from "sveltekit-superforms/adapters";
+    import {login} from "$lib/api/auth/user.svelte";
+    import {toast} from "svelte-sonner";
+    import {goto} from "$app/navigation";
+    import {addRecipe} from "$lib/api/recipes/recipes.svelte";
+    import RecipeImages from "$lib/components/recipes/RecipeImages.svelte";
 
     let {data}: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
     const form = superForm(data.form, {
@@ -14,7 +19,14 @@
         validators: zodClient(formSchema),
         async onUpdate({form}) {
             if (form.valid) {
-
+                try {
+                    await addRecipe(form.data)
+                    toast.success("Recipe added successfully")
+                    await goto("/recipes")
+                } catch (error) {
+                    toast.error("Failed to save recipe")
+                }
+                setMessage(form, "Recipe added successfully");
             }
         }
     })
@@ -24,14 +36,12 @@
 <form class="flex flex-col flex-grow p-6" method="POST" use:enhance>
     <div class="flex-grow flex flex-col lg:flex-row gap-6">
         <div class="w-full flex flex-col gap-3">
-            <p>
-                Images
-            </p>
-            <Form.Field {form} name="title">
+            <RecipeImages />
+            <Form.Field {form} name="name">
                 <Form.Control>
                     {#snippet children({props})}
-                        <Form.Label>Title</Form.Label>
-                        <Input {...props} bind:value={$formData.title} placeholder="My super tasty recipe"/>
+                        <Form.Label>Name</Form.Label>
+                        <Input {...props} bind:value={$formData.name} placeholder="My super tasty recipe"/>
                     {/snippet}
                 </Form.Control>
                 <Form.Description/>
@@ -51,7 +61,7 @@
                 <Form.Field {form} name="minutes">
                     <Form.Control>
                         {#snippet children({props})}
-                            <Form.Label>Cooking Time (min)</Form.Label>
+                            <Form.Label>Time (min.)</Form.Label>
                             <Input {...props} bind:value={$formData.minutes} type="number" placeholder="4"/>
                         {/snippet}
                     </Form.Control>
@@ -82,5 +92,4 @@
         </Form.Field>
     </div>
     <Button class="w-full" type="submit">Create</Button>
-
 </form>

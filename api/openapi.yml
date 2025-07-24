@@ -412,7 +412,7 @@ components:
       description: Recipe object and related images
       required: true
       content:
-        multipart/form-data:
+        application/json:
           schema:
             $ref: '#/components/schemas/WriteRecipe'
     UpdatePassword:

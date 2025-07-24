@@ -21,9 +21,9 @@ func (s *Store) BrowseRecipes(ctx context.Context) (recipes []domain.Recipe, err
 func (s *Store) CreateRecipe(ctx context.Context, r domain.RecipeDetails) (recipe domain.Recipe, _ error) {
 	payload := CreateRecipeParams{
 		Name:        r.Name,
-		Servings:    0,
-		Minutes:     0,
-		Description: "",
+		Servings:    r.Servings,
+		Minutes:     r.Minutes,
+		Description: r.Description,
 		CreatedBy:   r.CreatedBy.ID,
 	}
 

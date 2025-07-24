@@ -20,7 +20,7 @@ func NewRecipeHandler(service *domain.RecipeService) *RecipeHandler {
 	}
 }
 
-func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipeMultipart) (*api.ReadRecipe, error) {
+func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipe) (*api.ReadRecipe, error) {
 	user := ctx.Value(ctxKeyUser).(*domain.User)
 	recipe, err := h.Recipes.Add(ctx, domain.RecipeDetails{
 		Name:        req.Name,
@@ -92,7 +92,7 @@ func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeB
 	}, nil
 }
 
-func (h *RecipeHandler) UpdateRecipe(_ context.Context, _ *api.WriteRecipeMultipart, _ api.UpdateRecipeParams) (*api.ReadRecipe, error) {
+func (h *RecipeHandler) UpdateRecipe(_ context.Context, _ *api.WriteRecipe, _ api.UpdateRecipeParams) (*api.ReadRecipe, error) {
 	// TODO: Implement
 	return &api.ReadRecipe{}, nil
 }
