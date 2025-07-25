@@ -69,7 +69,7 @@
     });
 </script>
 
-<div class="flex w-full flex-col gap-2 p-6">
+<div class="flex w-full flex-col gap-2">
     <FileDropZone
             {onUpload}
             {onFileRejected}

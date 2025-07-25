@@ -49,10 +49,8 @@
 </script>
 
 <form class="flex flex-col flex-grow p-6" method="POST" use:enhance>
-
     <ImageUpload />
-
-    <div class="flex-grow flex flex-col lg:flex-row gap-6">
+    <div class="flex-grow flex flex-col lg:flex-row gap-6 mt-3">
         <div class="w-full flex flex-col gap-3">
             <Form.Field {form} name="name">
                 <Form.Control>
@@ -143,7 +141,7 @@
                     />
                 {/snippet}
             </Form.Control>
-            <Form.Description/>
+            <Form.Description class="sr-only">Test</Form.Description>
             <Form.FieldErrors/>
         </Form.Field>
     </div>
