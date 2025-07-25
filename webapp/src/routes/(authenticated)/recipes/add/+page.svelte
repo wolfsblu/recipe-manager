@@ -16,6 +16,7 @@
     import UnitCombobox from "$lib/components/recipes/UnitCombobox.svelte";
     import PlusIcon from "@lucide/svelte/icons/plus";
     import TrashIcon from "@lucide/svelte/icons/trash";
+    import IngredientCombobox from "$lib/components/recipes/IngredientCombobox.svelte";
 
     let {data}: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
     const form = superForm(data.form, {
@@ -91,8 +92,10 @@
                     <Form.ElementField {form} name="ingredients[{i}]">
                         <Form.Control>
                             {#snippet children({props})}
-                                <div class="flex gap-1">
-                                    <Input {...props} bind:value={$formData.ingredients[i]} />
+                                <div class="flex flex-col md:flex-row gap-1">
+                                    <Input {...props} class="w-auto" type="number" bind:value={$formData.ingredients[i]} placeholder="1" />
+                                    <UnitCombobox />
+                                    <IngredientCombobox class="flex-grow" />
                                     {#if i === $formData.ingredients.length - 1}
                                         <Button onclick={addIngredient} type="button">
                                             <PlusIcon />

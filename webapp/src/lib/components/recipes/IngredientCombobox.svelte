@@ -9,30 +9,35 @@
 
     const frameworks = [
         {
-            value: "tbsp",
-            label: "Tbsp"
+            value: "greensalad",
+            label: "Green Salad"
         },
         {
-            value: "kg",
-            label: "kg"
+            value: "carrots",
+            label: "Carrots"
         },
         {
-            value: "litre",
-            label: "L"
+            value: "chicken",
+            label: "Chicken"
         },
         {
-            value: "pinch",
-            label: "Pinch"
+            value: "salt",
+            label: "Salt"
         },
         {
-            value: "mg",
-            label: "mg"
+            value: "pepper",
+            label: "Pepper"
         }
     ];
 
     let open = $state(false);
     let value = $state("");
     let triggerRef = $state<HTMLButtonElement>(null!);
+
+
+    let {
+        class: className
+    } = $props()
 
     const selectedValue = $derived(
         frameworks.find((f) => f.value === value)?.label
@@ -55,11 +60,11 @@
             <Button
                     {...props}
                     variant="outline"
-                    class="w-[200px] justify-between"
+                    class={cn("w-[200px] justify-between", className)}
                     role="combobox"
                     aria-expanded={open}
             >
-                {selectedValue || "Select a unit..."}
+                {selectedValue || "Select an ingredient..."}
                 <ChevronsUpDownIcon class="opacity-50" />
             </Button>
         {/snippet}
