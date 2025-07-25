@@ -13,6 +13,7 @@
     import RecipeImages from "$lib/components/recipes/RecipeImages.svelte";
     import { TagsInput } from '$lib/components/ui/tags-input';
     import ImageUpload from "$lib/components/recipes/ImageUpload.svelte";
+    import UnitCombobox from "$lib/components/recipes/UnitCombobox.svelte";
 
     let {data}: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
     const form = superForm(data.form, {
@@ -33,6 +34,15 @@
         }
     })
     const {form: formData, enhance} = form;
+
+
+    const removeIngredientByIndex = (index: number) => {
+        $formData.ingredients = $formData.ingredients.filter((_, i) => i !== index);
+    }
+
+    const addIngredient = () => {
+        $formData.ingredients = [...$formData.ingredients, ""];
+    }
 </script>
 
 <form class="flex flex-col flex-grow p-6" method="POST" use:enhance>
@@ -73,9 +83,29 @@
                     <Form.FieldErrors/>
                 </Form.Field>
             </div>
-            <p>
-                Ingredients
-            </p>
+            <Form.Fieldset {form} name="ingredients">
+                <Form.Legend>Ingredients</Form.Legend>
+                {#each $formData.ingredients as _, i}
+                    <Form.ElementField {form} name="ingredients[{i}]">
+                        <Form.Control>
+                            {#snippet children({props})}
+                                <Form.Label>Ingredient {i + 1}</Form.Label>
+                                <Input {...props} bind:value={$formData.ingredients[i]} />
+                                <Button onclick={() => removeIngredientByIndex(i)} type="button">
+                                    Remove
+                                </Button>
+                            {/snippet}
+                        </Form.Control>
+                        <Form.Description/>
+                        <Form.FieldErrors/>
+                    </Form.ElementField>
+                {/each}
+                <Form.Description/>
+                <Form.FieldErrors/>
+                <Button onclick={addIngredient} type="button">
+                    Add Recipe
+                </Button>
+            </Form.Fieldset>
             <Form.Field {form} name="tags">
                 <Form.Control>
                     {#snippet children({props})}

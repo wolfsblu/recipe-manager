@@ -6,6 +6,7 @@ export const formSchema = z.object({
     minutes: z.number().positive(),
     tags: z.array(z.string().nonempty()),
     description: z.string().nonempty(),
+    ingredients: z.array(z.string().nonempty()),
 });
 
 export type FormSchema = typeof formSchema;
