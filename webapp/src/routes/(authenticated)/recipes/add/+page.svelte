@@ -11,6 +11,8 @@
     import {goto} from "$app/navigation";
     import {addRecipe} from "$lib/api/recipes/recipes.svelte";
     import RecipeImages from "$lib/components/recipes/RecipeImages.svelte";
+    import { TagsInput } from '$lib/components/ui/tags-input';
+    import ImageUpload from "$lib/components/recipes/ImageUpload.svelte";
 
     let {data}: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
     const form = superForm(data.form, {
@@ -34,9 +36,11 @@
 </script>
 
 <form class="flex flex-col flex-grow p-6" method="POST" use:enhance>
+
+    <ImageUpload />
+
     <div class="flex-grow flex flex-col lg:flex-row gap-6">
         <div class="w-full flex flex-col gap-3">
-            <RecipeImages />
             <Form.Field {form} name="name">
                 <Form.Control>
                     {#snippet children({props})}
@@ -72,9 +76,16 @@
             <p>
                 Ingredients
             </p>
-            <p>
-                Tags
-            </p>
+            <Form.Field {form} name="tags">
+                <Form.Control>
+                    {#snippet children({props})}
+                        <Form.Label>Tags</Form.Label>
+                        <TagsInput {...props} bind:value={$formData.tags} placeholder="Add a tag" />
+                    {/snippet}
+                </Form.Control>
+                <Form.Description/>
+                <Form.FieldErrors/>
+            </Form.Field>
         </div>
         <Form.Field class="w-full flex-grow flex flex-col" {form} name="description">
             <Form.Control>
