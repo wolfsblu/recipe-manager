@@ -14,6 +14,8 @@
     import { TagsInput } from '$lib/components/ui/tags-input';
     import ImageUpload from "$lib/components/recipes/ImageUpload.svelte";
     import UnitCombobox from "$lib/components/recipes/UnitCombobox.svelte";
+    import PlusIcon from "@lucide/svelte/icons/plus";
+    import TrashIcon from "@lucide/svelte/icons/trash";
 
     let {data}: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
     const form = superForm(data.form, {
@@ -89,11 +91,18 @@
                     <Form.ElementField {form} name="ingredients[{i}]">
                         <Form.Control>
                             {#snippet children({props})}
-                                <Form.Label>Ingredient {i + 1}</Form.Label>
-                                <Input {...props} bind:value={$formData.ingredients[i]} />
-                                <Button onclick={() => removeIngredientByIndex(i)} type="button">
-                                    Remove
-                                </Button>
+                                <div class="flex gap-1">
+                                    <Input {...props} bind:value={$formData.ingredients[i]} />
+                                    {#if i === $formData.ingredients.length - 1}
+                                        <Button onclick={addIngredient} type="button">
+                                            <PlusIcon />
+                                        </Button>
+                                    {:else}
+                                        <Button variant="destructive" onclick={() => removeIngredientByIndex(i)} type="button">
+                                            <TrashIcon />
+                                        </Button>
+                                    {/if}
+                                </div>
                             {/snippet}
                         </Form.Control>
                         <Form.Description/>
@@ -102,9 +111,12 @@
                 {/each}
                 <Form.Description/>
                 <Form.FieldErrors/>
-                <Button onclick={addIngredient} type="button">
-                    Add Recipe
-                </Button>
+                {#if $formData.ingredients.length === 0}
+                    <Button onclick={addIngredient} type="button">
+                        <PlusIcon />
+                        Add
+                    </Button>
+                {/if}
             </Form.Fieldset>
             <Form.Field {form} name="tags">
                 <Form.Control>
