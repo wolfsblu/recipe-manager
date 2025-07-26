@@ -47,6 +47,10 @@
             triggerRef.focus();
         });
     }
+
+    let {
+        class: className
+    } = $props()
 </script>
 
 <Popover.Root bind:open>
@@ -55,7 +59,7 @@
             <Button
                     {...props}
                     variant="outline"
-                    class="w-[200px] justify-between"
+                    class={cn("w-[200px] justify-between", className)}
                     role="combobox"
                     aria-expanded={open}
             >
@@ -64,7 +68,7 @@
             </Button>
         {/snippet}
     </Popover.Trigger>
-    <Popover.Content class="w-[200px] p-0">
+    <Popover.Content class="w-[var(--bits-popover-anchor-width)] min-w-[var(--bits-popover-anchor-width)] p-0">
         <Command.Root>
             <Command.Input placeholder="Search framework..." />
             <Command.List>

@@ -34,7 +34,6 @@
     let value = $state("");
     let triggerRef = $state<HTMLButtonElement>(null!);
 
-
     let {
         class: className
     } = $props()
@@ -69,7 +68,7 @@
             </Button>
         {/snippet}
     </Popover.Trigger>
-    <Popover.Content class="w-[200px] p-0">
+    <Popover.Content class="w-[var(--bits-popover-anchor-width)] min-w-[var(--bits-popover-anchor-width)] p-0">
         <Command.Root>
             <Command.Input placeholder="Search framework..." />
             <Command.List>

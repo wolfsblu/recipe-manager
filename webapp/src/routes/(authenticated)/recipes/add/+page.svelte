@@ -106,7 +106,7 @@
                                 </div>
                             {/snippet}
                         </Form.Control>
-                        <Form.Description/>
+                        <Form.Description class="sr-only" />
                         <Form.FieldErrors/>
                     </Form.ElementField>
                 {/each}
