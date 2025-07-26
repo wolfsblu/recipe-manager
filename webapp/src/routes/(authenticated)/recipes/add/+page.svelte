@@ -104,7 +104,7 @@
                     <Textarea {...props}
                               class="flex-grow resize-none"
                               bind:value={$formData.description}
-                              placeholder="Grandma's original pasta recipe."
+                              placeholder="Grandma's original pasta recipe handed down for generations."
                     />
                 {/snippet}
             </Form.Control>
