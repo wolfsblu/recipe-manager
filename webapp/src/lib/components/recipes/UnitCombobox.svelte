@@ -49,7 +49,7 @@
     }
 
     let {
-        class: className
+        class: className = ""
     } = $props()
 </script>
 

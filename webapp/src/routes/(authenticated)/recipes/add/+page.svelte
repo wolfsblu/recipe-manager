@@ -14,6 +14,7 @@
     import { TagsInput } from '$lib/components/ui/tags-input';
     import ImageUpload from "$lib/components/recipes/ImageUpload.svelte";
     import UnitCombobox from "$lib/components/recipes/UnitCombobox.svelte";
+    import { Separator } from "$lib/components/ui/separator/index.js";
     import PlusIcon from "@lucide/svelte/icons/plus";
     import TrashIcon from "@lucide/svelte/icons/trash";
     import IngredientCombobox from "$lib/components/recipes/IngredientCombobox.svelte";
@@ -48,9 +49,9 @@
     }
 </script>
 
-<form class="flex flex-col flex-grow p-6" method="POST" use:enhance>
+<form class="p-6" method="POST" use:enhance>
     <ImageUpload />
-    <div class="flex-grow flex flex-col lg:flex-row gap-6 mt-3">
+    <div class="flex flex-col lg:flex-row gap-x-6 gap-y-3 mt-3">
         <div class="w-full flex flex-col gap-3">
             <Form.Field {form} name="name">
                 <Form.Control>
@@ -77,48 +78,13 @@
                     <Form.Control>
                         {#snippet children({props})}
                             <Form.Label>Time (min.)</Form.Label>
-                            <Input {...props} bind:value={$formData.minutes} type="number" placeholder="4"/>
+                            <Input {...props} bind:value={$formData.minutes} type="number" placeholder="45"/>
                         {/snippet}
                     </Form.Control>
                     <Form.Description/>
                     <Form.FieldErrors/>
                 </Form.Field>
             </div>
-            <Form.Fieldset {form} name="ingredients">
-                <Form.Legend>Ingredients</Form.Legend>
-                {#each $formData.ingredients as _, i}
-                    <Form.ElementField {form} name="ingredients[{i}]">
-                        <Form.Control>
-                            {#snippet children({props})}
-                                <div class="flex flex-col md:flex-row gap-1">
-                                    <Input {...props} class="w-auto" type="number" bind:value={$formData.ingredients[i]} placeholder="1" />
-                                    <UnitCombobox />
-                                    <IngredientCombobox class="flex-grow" />
-                                    {#if i === $formData.ingredients.length - 1}
-                                        <Button onclick={addIngredient} type="button">
-                                            <PlusIcon />
-                                        </Button>
-                                    {:else}
-                                        <Button variant="destructive" onclick={() => removeIngredientByIndex(i)} type="button">
-                                            <TrashIcon />
-                                        </Button>
-                                    {/if}
-                                </div>
-                            {/snippet}
-                        </Form.Control>
-                        <Form.Description class="sr-only" />
-                        <Form.FieldErrors/>
-                    </Form.ElementField>
-                {/each}
-                <Form.Description/>
-                <Form.FieldErrors/>
-                {#if $formData.ingredients.length === 0}
-                    <Button onclick={addIngredient} type="button">
-                        <PlusIcon />
-                        Add
-                    </Button>
-                {/if}
-            </Form.Fieldset>
             <Form.Field {form} name="tags">
                 <Form.Control>
                     {#snippet children({props})}
@@ -130,14 +96,15 @@
                 <Form.FieldErrors/>
             </Form.Field>
         </div>
-        <Form.Field class="w-full flex-grow flex flex-col" {form} name="description">
+
+        <Form.Field class="w-full flex flex-col" {form} name="description">
             <Form.Control>
                 {#snippet children({props})}
                     <Form.Label>Description</Form.Label>
                     <Textarea {...props}
                               class="flex-grow resize-none"
                               bind:value={$formData.description}
-                              placeholder="Type your message here."
+                              placeholder="Grandma's original pasta recipe."
                     />
                 {/snippet}
             </Form.Control>
@@ -145,5 +112,45 @@
             <Form.FieldErrors/>
         </Form.Field>
     </div>
+
+    <Separator class="my-3" orientation="horizontal" />
+
+    <h1>Steps</h1>
+    <Form.Fieldset {form} name="ingredients">
+        <Form.Legend>Ingredients</Form.Legend>
+        {#each $formData.ingredients as _, i}
+            <Form.ElementField {form} name="ingredients[{i}]">
+                <Form.Control>
+                    {#snippet children({props})}
+                        <div class="flex flex-col md:flex-row gap-1">
+                            <Input {...props} class="w-auto" type="number" bind:value={$formData.ingredients[i]} placeholder="1" />
+                            <UnitCombobox />
+                            <IngredientCombobox class="flex-grow" />
+                            {#if i === $formData.ingredients.length - 1}
+                                <Button onclick={addIngredient} type="button">
+                                    <PlusIcon />
+                                </Button>
+                            {:else}
+                                <Button variant="destructive" onclick={() => removeIngredientByIndex(i)} type="button">
+                                    <TrashIcon />
+                                </Button>
+                            {/if}
+                        </div>
+                    {/snippet}
+                </Form.Control>
+                <Form.Description class="sr-only" />
+                <Form.FieldErrors/>
+            </Form.ElementField>
+        {/each}
+        <Form.Description/>
+        <Form.FieldErrors/>
+        {#if $formData.ingredients.length === 0}
+            <Button onclick={addIngredient} type="button">
+                <PlusIcon />
+                Add
+            </Button>
+        {/if}
+    </Form.Fieldset>
+
     <Button class="w-full" type="submit">Create</Button>
 </form>

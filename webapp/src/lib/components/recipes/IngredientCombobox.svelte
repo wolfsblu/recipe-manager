@@ -34,10 +34,6 @@
     let value = $state("");
     let triggerRef = $state<HTMLButtonElement>(null!);
 
-    let {
-        class: className
-    } = $props()
-
     const selectedValue = $derived(
         frameworks.find((f) => f.value === value)?.label
     );
@@ -51,6 +47,10 @@
             triggerRef.focus();
         });
     }
+
+    let {
+        class: className = ""
+    } = $props()
 </script>
 
 <Popover.Root bind:open>
