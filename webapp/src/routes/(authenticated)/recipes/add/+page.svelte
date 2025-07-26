@@ -6,11 +6,9 @@
     import {formSchema, type FormSchema} from "./schema";
     import {type Infer, setMessage, superForm, type SuperValidated,} from "sveltekit-superforms";
     import {zodClient} from "sveltekit-superforms/adapters";
-    import {login} from "$lib/api/auth/user.svelte";
     import {toast} from "svelte-sonner";
     import {goto} from "$app/navigation";
     import {addRecipe} from "$lib/api/recipes/recipes.svelte";
-    import RecipeImages from "$lib/components/recipes/RecipeImages.svelte";
     import { TagsInput } from '$lib/components/ui/tags-input';
     import ImageUpload from "$lib/components/recipes/ImageUpload.svelte";
     import UnitCombobox from "$lib/components/recipes/UnitCombobox.svelte";
