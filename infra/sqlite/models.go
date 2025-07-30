@@ -8,24 +8,9 @@ import (
 	"time"
 )
 
-type Action struct {
-	ID     int64
-	Name   string
-	Points int64
-}
-
-type Award struct {
-	ID          int64
-	Name        string
-	Description string
-}
-
 type Ingredient struct {
-	ID       int64
-	RecipeID int64
-	UnitID   int64
-	Name     string
-	Amount   float64
+	ID   int64
+	Name string
 }
 
 type MealPlan struct {
@@ -60,16 +45,25 @@ type RecipeImage struct {
 	CreatedAt time.Time
 }
 
+type RecipeIngredient struct {
+	ID           int64
+	StepID       int64
+	IngredientID int64
+	UnitID       int64
+	Amount       float64
+	SortOrder    int64
+}
+
+type RecipeStep struct {
+	ID           int64
+	RecipeID     int64
+	Instructions string
+	SortOrder    int64
+}
+
 type RecipeTag struct {
 	RecipeID int64
 	TagID    int64
-}
-
-type RecipeVote struct {
-	RecipeID int64
-	UserID   int64
-	Vote     int64
-	VotedAt  time.Time
 }
 
 type Tag struct {
@@ -91,22 +85,8 @@ type User struct {
 	CreatedAt    time.Time
 }
 
-type UserAward struct {
-	UserID    int64
-	RecipeID  int64
-	AwardID   int64
-	AwardedAt time.Time
-}
-
 type UserRegistration struct {
 	UserID    int64
 	Token     string
 	CreatedAt time.Time
-}
-
-type UserReputation struct {
-	UserID    int64
-	RecipeID  int64
-	ActionID  int64
-	AwardedAt time.Time
 }

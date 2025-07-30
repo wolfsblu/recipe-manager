@@ -45,6 +45,9 @@
     const addIngredient = () => {
         $formData.ingredients = [...$formData.ingredients, ""];
     }
+    const addStep = () => {
+        $formData.steps = [...$formData.steps, ""];
+    }
 </script>
 
 <form class="p-6" method="POST" use:enhance>
@@ -114,26 +117,46 @@
     <Separator class="my-3" orientation="horizontal" />
 
     <h1>Steps</h1>
-    <Form.Fieldset {form} name="ingredients">
-        <Form.Legend>Ingredients</Form.Legend>
-        {#each $formData.ingredients as _, i}
-            <Form.ElementField {form} name="ingredients[{i}]">
+    <Form.Fieldset {form} name="steps">
+        {#each $formData.steps as _, stepIndex}
+            <Form.ElementField {form} name="steps[{stepIndex}]">
                 <Form.Control>
                     {#snippet children({props})}
-                        <div class="flex flex-col md:flex-row gap-1">
-                            <Input {...props} class="w-auto" type="number" bind:value={$formData.ingredients[i]} placeholder="1" />
-                            <UnitCombobox />
-                            <IngredientCombobox class="flex-grow" />
-                            {#if i === $formData.ingredients.length - 1}
+                        <Form.Fieldset {form} name="ingredients">
+                            <Form.Legend>Ingredients</Form.Legend>
+                            {#each $formData.ingredients as _, i}
+                                <Form.ElementField {form} name="ingredients[{i}]">
+                                    <Form.Control>
+                                        {#snippet children({props})}
+                                            <div class="flex flex-col md:flex-row gap-1">
+                                                <Input {...props} class="w-auto" type="number" bind:value={$formData.ingredients[i]} placeholder="1" />
+                                                <UnitCombobox />
+                                                <IngredientCombobox class="flex-grow" />
+                                                {#if i === $formData.ingredients.length - 1}
+                                                    <Button onclick={addIngredient} type="button">
+                                                        <PlusIcon />
+                                                    </Button>
+                                                {:else}
+                                                    <Button variant="destructive" onclick={() => removeIngredientByIndex(i)} type="button">
+                                                        <TrashIcon />
+                                                    </Button>
+                                                {/if}
+                                            </div>
+                                        {/snippet}
+                                    </Form.Control>
+                                    <Form.Description class="sr-only" />
+                                    <Form.FieldErrors/>
+                                </Form.ElementField>
+                            {/each}
+                            <Form.Description/>
+                            <Form.FieldErrors/>
+                            {#if $formData.ingredients.length === 0}
                                 <Button onclick={addIngredient} type="button">
                                     <PlusIcon />
-                                </Button>
-                            {:else}
-                                <Button variant="destructive" onclick={() => removeIngredientByIndex(i)} type="button">
-                                    <TrashIcon />
+                                    Add
                                 </Button>
                             {/if}
-                        </div>
+                        </Form.Fieldset>
                     {/snippet}
                 </Form.Control>
                 <Form.Description class="sr-only" />
@@ -142,13 +165,10 @@
         {/each}
         <Form.Description/>
         <Form.FieldErrors/>
-        {#if $formData.ingredients.length === 0}
-            <Button onclick={addIngredient} type="button">
-                <PlusIcon />
-                Add
-            </Button>
-        {/if}
     </Form.Fieldset>
 
-    <Button class="w-full" type="submit">Create</Button>
+    <div class="flex justify-between">
+        <Button type="button" onclick={addStep}>Add Step</Button>
+        <Button type="submit">Create</Button>
+    </div>
 </form>

@@ -24,11 +24,8 @@ CREATE TABLE units
 
 CREATE TABLE ingredients
 (
-    id        INTEGER PRIMARY KEY,
-    recipe_id INTEGER NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
-    unit_id   INTEGER NOT NULL REFERENCES units (id) ON DELETE RESTRICT,
-    name      TEXT    NOT NULL,
-    amount    REAL    NOT NULL
+    id   INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
 );
 
 CREATE TABLE users
@@ -54,22 +51,6 @@ CREATE TABLE password_resets
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE user_awards
-(
-    user_id    INTEGER   NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    recipe_id  INTEGER   NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
-    award_id   INTEGER   NOT NULL REFERENCES awards (id) ON DELETE CASCADE,
-    awarded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE user_reputation
-(
-    user_id    INTEGER   NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    recipe_id  INTEGER   NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
-    action_id  INTEGER   NOT NULL REFERENCES actions (id) ON DELETE CASCADE,
-    awarded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE recipe_images
 (
     id         INTEGER PRIMARY KEY,
@@ -79,33 +60,32 @@ CREATE TABLE recipe_images
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE recipe_ingredients
+(
+    id            INTEGER PRIMARY KEY,
+    step_id       INTEGER NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
+    ingredient_id INTEGER NOT NULL REFERENCES ingredients (id) ON DELETE CASCADE,
+    unit_id       INTEGER NOT NULL REFERENCES units (id) ON DELETE RESTRICT,
+    amount        REAL    NOT NULL,
+    sort_order    INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (step_id, ingredient_id),
+    UNIQUE (step_id, sort_order)
+);
+
+CREATE TABLE recipe_steps
+(
+    id           INTEGER PRIMARY KEY,
+    recipe_id    INTEGER NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
+    instructions TEXT    NOT NULL,
+    sort_order   INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (recipe_id, sort_order)
+);
+
 CREATE TABLE recipe_tags
 (
     recipe_id INTEGER NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
     tag_id    INTEGER NOT NULL REFERENCES tags (id) ON DELETE CASCADE,
     PRIMARY KEY (recipe_id, tag_id)
-);
-
-CREATE TABLE recipe_votes
-(
-    recipe_id INTEGER   NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
-    user_id   INTEGER   NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    vote      INTEGER   NOT NULL DEFAULT 1,
-    voted_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE actions
-(
-    id     INTEGER PRIMARY KEY,
-    name   TEXT    NOT NULL,
-    points INTEGER NOT NULL DEFAULT 0
-);
-
-CREATE TABLE awards
-(
-    id          INTEGER PRIMARY KEY,
-    name        TEXT NOT NULL,
-    description TEXT NOT NULL
 );
 
 CREATE TABLE meal_plan
@@ -114,5 +94,10 @@ CREATE TABLE meal_plan
     date       TEXT    NOT NULL DEFAULT CURRENT_DATE,
     user_id    INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     recipe_id  INTEGER NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
-    sort_order INTEGER NOT NULL DEFAULT 0
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (date, sort_order)
 );
+
+CREATE INDEX idx_meal_plan_sort_order ON meal_plan (sort_order);
+CREATE INDEX idx_recipe_ingredients_sort_order ON recipe_ingredients (sort_order);
+CREATE INDEX idx_recipe_steps_sort_order ON recipe_steps (sort_order);
