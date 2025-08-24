@@ -21,9 +21,11 @@
     let {data}: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
     const form = superForm(data.form, {
         SPA: true,
+        dataType: 'json',
         resetForm: false,
         validators: zodClient(formSchema),
         async onUpdate({form}) {
+            console.log(form)
             if (form.valid) {
                 try {
                     await addRecipe(form.data)
@@ -120,7 +122,13 @@
         </Form.Field>
     </div>
 
-
+    {#if $formData.steps.length > 0}
+        <ul>
+        {#each $formData.steps[0].ingredients as ingredient}
+            <li>{ingredient.name}</li>
+        {/each}
+        </ul>
+    {/if}
     {#each $formData.steps as _, stepIndex}
         <h1>Step {stepIndex + 1}</h1>
         <Separator class="my-1" orientation="horizontal" />
@@ -130,7 +138,7 @@
                 <Form.Legend>Ingredients</Form.Legend>
                     {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
                         <div class="flex flex-grow gap-x-2">
-                            <Ingredient {form} path="steps[{stepIndex}].ingredients" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex]} />
+                            <Ingredient {form} {stepIndex} {ingredientIndex} />
                             {#if ingredientIndex === $formData.steps[stepIndex].ingredients.length - 1}
                                 <Button onclick={() => addIngredient(stepIndex)} type="button">
                                     <PlusIcon />

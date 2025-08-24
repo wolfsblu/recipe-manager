@@ -4,38 +4,42 @@
 
     const {
         form,
-        value = $bindable(),
-        path
+        stepIndex,
+        ingredientIndex,
     } = $props();
+
+    const { form: formData } = form;
+
+    const basePath = `steps[${stepIndex}].ingredients[${ingredientIndex}]`;
 </script>
 
-<Form.ElementField class="space-y-0" {form} name="{path}.amount">
+<Form.ElementField class="space-y-0" {form} name="{basePath}.amount">
     <Form.Control>
         {#snippet children({props})}
             <div class="flex flex-col md:flex-row gap-1">
-                <Input {...props} class="w-auto" type="number" bind:value={value.amount} placeholder="1" />
+                <Input {...props} class="w-auto" type="number" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].amount} placeholder="1" />
             </div>
         {/snippet}
     </Form.Control>
     <Form.Description class="sr-only" />
     <Form.FieldErrors/>
 </Form.ElementField>
-<Form.ElementField class="space-y-0" {form} name="{path}.unit">
+<Form.ElementField class="space-y-0" {form} name="{basePath}.unit">
     <Form.Control>
         {#snippet children({props})}
             <div class="flex flex-col md:flex-row gap-1">
-                <Input {...props} class="w-auto" bind:value={value.unit} placeholder="kg" />
+                <Input {...props} class="w-auto" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].unit} placeholder="kg" />
             </div>
         {/snippet}
     </Form.Control>
     <Form.Description class="sr-only" />
     <Form.FieldErrors/>
 </Form.ElementField>
-<Form.ElementField class="space-y-0 w-full" {form} name="{path}.name">
+<Form.ElementField class="space-y-0 w-full" {form} name="{basePath}.name">
     <Form.Control>
         {#snippet children({props})}
             <div class="flex flex-col md:flex-row gap-1">
-                <Input {...props} class="w-full" bind:value={value.name} placeholder="Potatoes" />
+                <Input {...props} class="w-full" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].name} placeholder="Potatoes" />
             </div>
         {/snippet}
     </Form.Control>
