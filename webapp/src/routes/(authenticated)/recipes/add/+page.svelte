@@ -16,6 +16,7 @@
     import PlusIcon from "@lucide/svelte/icons/plus";
     import TrashIcon from "@lucide/svelte/icons/trash";
     import IngredientCombobox from "$lib/components/recipes/IngredientCombobox.svelte";
+    import Ingredient from "$lib/components/recipes/Ingredient.svelte";
 
     let {data}: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
     const form = superForm(data.form, {
@@ -39,12 +40,19 @@
 
     const addStep = () => {
         $formData.steps = [...$formData.steps, {
-            ingredients: [{
-                amount: 100,
-                unit: 'kg',
-                name: 'Potatoes',
-            }]
+            ingredients: [{name: '', unit: '', amount: ''}],
+            instructions: '',
         }];
+    }
+
+    const addIngredient = (stepIndex: number) => {
+        $formData.steps[stepIndex].ingredients = [
+            ...$formData.steps[stepIndex].ingredients,
+            {name: '', unit: '', amount: ''},
+        ]
+    }
+    const removeIngredientByIndex = (stepIndex: number, ingredientIndex: number) => {
+        $formData.steps[stepIndex].ingredients = $formData.steps[stepIndex].ingredients.filter((_, i) => i !== ingredientIndex)
     }
 </script>
 
@@ -112,52 +120,46 @@
         </Form.Field>
     </div>
 
-    <Separator class="my-3" orientation="horizontal" />
 
-    <h1>Steps</h1>
-        {#each $formData.steps as _, stepIndex}
+    {#each $formData.steps as _, stepIndex}
+        <h1>Step {stepIndex + 1}</h1>
+        <Separator class="my-1" orientation="horizontal" />
+
+        <div class="grid grid-cols-2 gap-x-6">
             <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
                 <Form.Legend>Ingredients</Form.Legend>
-                {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
-                    <Form.ElementField {form} name="steps[{stepIndex}].ingredients[{ingredientIndex}].amount">
-                        <Form.Control>
-                            {#snippet children({props})}
-                                <div class="flex flex-col md:flex-row gap-1">
-                                    <Input {...props} class="w-auto" type="number" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].amount} placeholder="1" />
-                                </div>
-                            {/snippet}
-                        </Form.Control>
-                        <Form.Description class="sr-only" />
-                        <Form.FieldErrors/>
-                    </Form.ElementField>
-                    <Form.ElementField {form} name="steps[{stepIndex}].ingredients[{ingredientIndex}].unit">
-                        <Form.Control>
-                            {#snippet children({props})}
-                                <div class="flex flex-col md:flex-row gap-1">
-                                    <Input {...props} class="w-auto" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].unit} placeholder="kg" />
-                                </div>
-                            {/snippet}
-                        </Form.Control>
-                        <Form.Description class="sr-only" />
-                        <Form.FieldErrors/>
-                    </Form.ElementField>
-                    <Form.ElementField {form} name="steps[{stepIndex}].ingredients[{ingredientIndex}].name">
-                        <Form.Control>
-                            {#snippet children({props})}
-                                <div class="flex flex-col md:flex-row gap-1">
-                                    <Input {...props} class="w-auto" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].name} placeholder="Potatoes" />
-                                </div>
-                            {/snippet}
-                        </Form.Control>
-                        <Form.Description class="sr-only" />
-                        <Form.FieldErrors/>
-                    </Form.ElementField>
-                {/each}
-                <Form.Description/>
+                    {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
+                        <div class="flex flex-grow gap-x-2">
+                            <Ingredient {form} path="steps[{stepIndex}].ingredients" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex]} />
+                            {#if ingredientIndex === $formData.steps[stepIndex].ingredients.length - 1}
+                                <Button onclick={() => addIngredient(stepIndex)} type="button">
+                                    <PlusIcon />
+                                </Button>
+                            {:else}
+                                <Button variant="destructive" onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
+                                    <TrashIcon />
+                                </Button>
+                            {/if}
+                        </div>
+                    {/each}
                 <Form.FieldErrors/>
             </Form.Fieldset>
-
-        {/each}
+            <Form.Fieldset {form} name="steps[{stepIndex}].instructions">
+                <Form.Control>
+                    {#snippet children({props})}
+                        <Form.Label>Instructions</Form.Label>
+                        <Textarea {...props}
+                                  class="resize-none"
+                                  bind:value={$formData.steps[stepIndex].instructions}
+                                  placeholder="Stir the potatoes."
+                        />
+                    {/snippet}
+                </Form.Control>
+                <Form.Description class="sr-only">Test</Form.Description>
+                <Form.FieldErrors/>
+            </Form.Fieldset>
+        </div>
+    {/each}
 
     <div class="flex justify-between">
         <Button type="button" onclick={addStep}>Add Step</Button>

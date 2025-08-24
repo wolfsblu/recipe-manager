@@ -11,7 +11,8 @@ export const formSchema = z.object({
             unit: z.string().nonempty(),
             name: z.string().nonempty(),
             amount: z.number().positive().or(z.literal('')).default(''),
-        })).nonempty(),
+        })),
+        instructions: z.string().nonempty()
     })).nonempty(),
 });
 
