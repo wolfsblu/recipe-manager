@@ -6,7 +6,7 @@ require (
 	ariga.io/atlas-go-sdk v0.7.2
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
-	github.com/google/wire v0.6.0
+	github.com/google/wire v0.7.0
 	github.com/gorilla/securecookie v1.1.2
 	github.com/joho/godotenv v1.5.1
 	github.com/ogen-go/ogen v1.14.0
@@ -15,8 +15,8 @@ require (
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/metric v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
-	golang.org/x/crypto v0.40.0
-	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
+	golang.org/x/crypto v0.41.0
+	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	modernc.org/sqlite v1.38.2
 )
@@ -33,7 +33,7 @@ require (
 	github.com/go-faster/yaml v0.4.6 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-openapi/inflect v0.21.2 // indirect
+	github.com/go-openapi/inflect v0.21.3 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.24.0 // indirect
@@ -45,21 +45,21 @@ require (
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/tus/lockfile v1.2.0 // indirect
 	github.com/vearutop/statigz v1.5.0 // indirect
-	github.com/zclconf/go-cty v1.16.3 // indirect
+	github.com/zclconf/go-cty v1.16.4 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
-	golang.org/x/mod v0.26.0 // indirect
-	golang.org/x/net v0.42.0 // indirect
+	golang.org/x/mod v0.27.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.34.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
-	golang.org/x/tools v0.35.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/tools v0.36.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	modernc.org/libc v1.66.6 // indirect
+	modernc.org/libc v1.66.7 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
