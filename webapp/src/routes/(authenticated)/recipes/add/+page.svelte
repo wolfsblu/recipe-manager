@@ -48,6 +48,22 @@
             instructions: '',
         }];
     }
+    const moveStepUp = (stepIndex: number) => {
+        if (stepIndex <= 0) {
+            return;
+        }
+        const newSteps = [...$formData.steps];
+        [newSteps[stepIndex - 1], newSteps[stepIndex]] = [newSteps[stepIndex], newSteps[stepIndex - 1]];
+        $formData.steps = newSteps;
+    }
+    const moveStepDown = (stepIndex: number) => {
+        if (stepIndex >= $formData.steps.length - 1) {
+            return;
+        }
+        const newSteps = [...$formData.steps];
+        [newSteps[stepIndex], newSteps[stepIndex + 1]] = [newSteps[stepIndex + 1], newSteps[stepIndex]];
+        $formData.steps = newSteps;
+    }
     const removeStepByIndex = (stepIndex: number) => {
         $formData.steps = $formData.steps.filter((_, i) => i !== stepIndex)
     }
@@ -131,10 +147,10 @@
         <div class="flex items-center justify-between">
             <h1>Step {stepIndex + 1}</h1>
             <div>
-                <Button variant="ghost" size="icon" class="size-8">
+                <Button variant="ghost" size="icon" class="size-8" onclick={() => moveStepUp(stepIndex)}>
                     <ArrowUpIcon />
                 </Button>
-                <Button variant="ghost" size="icon" class="size-8">
+                <Button variant="ghost" size="icon" class="size-8" onclick={() => moveStepDown(stepIndex)}>
                     <ArrowDownIcon />
                 </Button>
                 <Button variant="ghost" size="icon" class="size-8" onclick={() => removeStepByIndex(stepIndex)}>
