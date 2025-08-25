@@ -81,9 +81,9 @@
 
 <form class="p-6" method="POST" use:enhance>
     <ImageUpload />
-    <div class="flex flex-col lg:flex-row gap-x-6 gap-y-3 mt-3">
-        <div class="w-full flex flex-col gap-3">
-            <Form.Field {form} name="name">
+    <div class="flex flex-col lg:flex-row gap-3 mt-3">
+        <div class="w-full flex flex-col">
+            <Form.Field class="space-y-3" {form} name="name">
                 <Form.Control>
                     {#snippet children({props})}
                         <Form.Label>Name</Form.Label>
@@ -159,29 +159,21 @@
             </div>
         </div>
         <Separator class="mt-1 mb-2" orientation="horizontal" />
-        <div class="grid lg:grid-cols-2 gap-x-6">
+        <div class="grid lg:grid-cols-2 gap-x-3">
             <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
-                {#if $formData.steps[stepIndex].ingredients.length === 0}
-                    <Button onclick={() => addIngredient(stepIndex)}>
-                        Add Ingredients
-                    </Button>
-                {:else}
-                    <Form.Legend>Ingredients</Form.Legend>
-                {/if}
-                <div class="grid grid-cols-[1fr_2fr_3fr_max-content] gap-2">
+                <Form.Legend>Ingredients</Form.Legend>
+                <div class="grid grid-cols-[1fr_2fr_3fr_max-content] gap-1">
                 {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
                     <Ingredient {form} {stepIndex} {ingredientIndex} />
                     <div>
-                        <Button variant="secondary" onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
+                        <Button variant="outline" onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
                             <TrashIcon class="stroke-red-600 dark:stroke-red-400" />
                         </Button>
-                        {#if ingredientIndex === $formData.steps[stepIndex].ingredients.length - 1}
-                            <Button variant="secondary" onclick={() => addIngredient(stepIndex)} type="button">
-                                <PlusIcon />
-                            </Button>
-                        {/if}
                     </div>
                 {/each}
+                    <Button variant="outline" class="col-span-4" onclick={() => addIngredient(stepIndex)}>
+                        <PlusIcon/> Add Ingredient
+                    </Button>
                 </div>
                 <Form.FieldErrors/>
             </Form.Fieldset>
