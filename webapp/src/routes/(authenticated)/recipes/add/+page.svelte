@@ -131,8 +131,7 @@
     {/if}
     {#each $formData.steps as _, stepIndex}
         <h1>Step {stepIndex + 1}</h1>
-        <Separator class="my-1" orientation="horizontal" />
-
+        <Separator class="mt-1 mb-2" orientation="horizontal" />
         <div class="grid grid-cols-2 gap-x-6">
             <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
                 <Form.Legend>Ingredients</Form.Legend>
@@ -152,12 +151,12 @@
                     {/each}
                 <Form.FieldErrors/>
             </Form.Fieldset>
-            <Form.Fieldset {form} name="steps[{stepIndex}].instructions">
+            <Form.Fieldset class="flex flex-col" {form} name="steps[{stepIndex}].instructions">
                 <Form.Control>
                     {#snippet children({props})}
                         <Form.Label>Instructions</Form.Label>
                         <Textarea {...props}
-                                  class="resize-none"
+                                  class="flex-grow"
                                   bind:value={$formData.steps[stepIndex].instructions}
                                   placeholder="Stir the potatoes."
                         />
