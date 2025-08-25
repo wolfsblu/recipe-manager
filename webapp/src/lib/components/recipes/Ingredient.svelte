@@ -13,7 +13,6 @@
     const basePath = `steps[${stepIndex}].ingredients[${ingredientIndex}]`;
 </script>
 
-<div class="flex-grow grid grid-cols-[1fr_2fr_3fr] gap-2">
 <Form.ElementField class="space-y-0" {form} name="{basePath}.amount">
     <Form.Control>
         {#snippet children({props})}
@@ -47,4 +46,3 @@
     <Form.Description class="sr-only" />
     <Form.FieldErrors/>
 </Form.ElementField>
-</div>

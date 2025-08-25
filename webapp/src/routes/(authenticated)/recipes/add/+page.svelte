@@ -44,7 +44,9 @@
 
     const addStep = () => {
         $formData.steps = [...$formData.steps, {
-            ingredients: [{name: '', unit: '', amount: ''}],
+            ingredients: [
+                {name: '', amount: '', unit: ''},
+            ],
             instructions: '',
         }];
     }
@@ -161,21 +163,28 @@
         <Separator class="mt-1 mb-2" orientation="horizontal" />
         <div class="grid lg:grid-cols-2 gap-x-6">
             <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
-                <Form.Legend>Ingredients</Form.Legend>
-                    {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
-                        <div class="flex flex-grow gap-x-2">
-                            <Ingredient {form} {stepIndex} {ingredientIndex} />
-                            {#if ingredientIndex === $formData.steps[stepIndex].ingredients.length - 1}
-                                <Button onclick={() => addIngredient(stepIndex)} type="button">
-                                    <PlusIcon />
-                                </Button>
-                            {:else}
-                                <Button variant="destructive" onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
-                                    <TrashIcon />
-                                </Button>
-                            {/if}
-                        </div>
-                    {/each}
+                {#if $formData.steps[stepIndex].ingredients.length === 0}
+                    <Button onclick={() => addIngredient(stepIndex)}>
+                        Add Ingredients
+                    </Button>
+                {:else}
+                    <Form.Legend>Ingredients</Form.Legend>
+                {/if}
+                <div class="grid grid-cols-[1fr_2fr_3fr_max-content] gap-2">
+                {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
+                    <Ingredient {form} {stepIndex} {ingredientIndex} />
+                    <div>
+                        <Button variant="destructive" onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
+                            <TrashIcon />
+                        </Button>
+                        {#if ingredientIndex === $formData.steps[stepIndex].ingredients.length - 1}
+                            <Button onclick={() => addIngredient(stepIndex)} type="button">
+                                <PlusIcon />
+                            </Button>
+                        {/if}
+                    </div>
+                {/each}
+                </div>
                 <Form.FieldErrors/>
             </Form.Fieldset>
             <Form.Fieldset class="flex flex-col" {form} name="steps[{stepIndex}].instructions">
