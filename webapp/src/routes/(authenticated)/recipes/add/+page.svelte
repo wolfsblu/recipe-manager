@@ -147,10 +147,10 @@
         <div class="flex items-center justify-between">
             <h1>Step {stepIndex + 1}</h1>
             <div>
-                <Button variant="ghost" size="icon" class="size-8" onclick={() => moveStepUp(stepIndex)}>
+                <Button disabled={stepIndex === 0} variant="ghost" size="icon" class="size-8" onclick={() => moveStepUp(stepIndex)}>
                     <ArrowUpIcon />
                 </Button>
-                <Button variant="ghost" size="icon" class="size-8" onclick={() => moveStepDown(stepIndex)}>
+                <Button disabled={stepIndex === $formData.steps.length - 1} variant="ghost" size="icon" class="size-8" onclick={() => moveStepDown(stepIndex)}>
                     <ArrowDownIcon />
                 </Button>
                 <Button variant="ghost" size="icon" class="size-8" onclick={() => removeStepByIndex(stepIndex)}>
