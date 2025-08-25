@@ -156,7 +156,7 @@
                     <ArrowDownIcon />
                 </Button>
                 <Button variant="ghost" size="icon" class="size-8" onclick={() => removeStepByIndex(stepIndex)}>
-                    <TrashIcon />
+                    <TrashIcon class="stroke-red-600 dark:stroke-red-400" />
                 </Button>
             </div>
         </div>
@@ -174,11 +174,11 @@
                 {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
                     <Ingredient {form} {stepIndex} {ingredientIndex} />
                     <div>
-                        <Button variant="destructive" onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
-                            <TrashIcon />
+                        <Button variant="secondary" onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
+                            <TrashIcon class="stroke-red-600 dark:stroke-red-400" />
                         </Button>
                         {#if ingredientIndex === $formData.steps[stepIndex].ingredients.length - 1}
-                            <Button onclick={() => addIngredient(stepIndex)} type="button">
+                            <Button variant="secondary" onclick={() => addIngredient(stepIndex)} type="button">
                                 <PlusIcon />
                             </Button>
                         {/if}
