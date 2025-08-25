@@ -13,11 +13,12 @@
     const basePath = `steps[${stepIndex}].ingredients[${ingredientIndex}]`;
 </script>
 
+<div class="flex-grow grid grid-cols-[1fr_2fr_3fr] gap-2">
 <Form.ElementField class="space-y-0" {form} name="{basePath}.amount">
     <Form.Control>
         {#snippet children({props})}
             <div class="flex flex-col md:flex-row gap-1">
-                <Input {...props} class="w-auto" type="number" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].amount} placeholder="1" />
+                <Input {...props} class="w-full" type="number" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].amount} placeholder="1" />
             </div>
         {/snippet}
     </Form.Control>
@@ -28,14 +29,14 @@
     <Form.Control>
         {#snippet children({props})}
             <div class="flex flex-col md:flex-row gap-1">
-                <Input {...props} class="w-auto" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].unit} placeholder="kg" />
+                <Input {...props} class="w-full" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].unit} placeholder="kg" />
             </div>
         {/snippet}
     </Form.Control>
     <Form.Description class="sr-only" />
     <Form.FieldErrors/>
 </Form.ElementField>
-<Form.ElementField class="space-y-0 w-full" {form} name="{basePath}.name">
+<Form.ElementField class="space-y-0" {form} name="{basePath}.name">
     <Form.Control>
         {#snippet children({props})}
             <div class="flex flex-col md:flex-row gap-1">
@@ -46,3 +47,4 @@
     <Form.Description class="sr-only" />
     <Form.FieldErrors/>
 </Form.ElementField>
+</div>

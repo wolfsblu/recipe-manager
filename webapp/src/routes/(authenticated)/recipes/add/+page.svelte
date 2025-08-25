@@ -143,7 +143,7 @@
             </div>
         </div>
         <Separator class="mt-1 mb-2" orientation="horizontal" />
-        <div class="grid grid-cols-2 gap-x-6">
+        <div class="grid lg:grid-cols-2 gap-x-6">
             <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
                 <Form.Legend>Ingredients</Form.Legend>
                     {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
