@@ -14,6 +14,8 @@
     import UnitCombobox from "$lib/components/recipes/UnitCombobox.svelte";
     import { Separator } from "$lib/components/ui/separator/index.js";
     import PlusIcon from "@lucide/svelte/icons/plus";
+    import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
+    import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
     import TrashIcon from "@lucide/svelte/icons/trash";
     import IngredientCombobox from "$lib/components/recipes/IngredientCombobox.svelte";
     import Ingredient from "$lib/components/recipes/Ingredient.svelte";
@@ -45,6 +47,9 @@
             ingredients: [{name: '', unit: '', amount: ''}],
             instructions: '',
         }];
+    }
+    const removeStepByIndex = (stepIndex: number) => {
+        $formData.steps = $formData.steps.filter((_, i) => i !== stepIndex)
     }
 
     const addIngredient = (stepIndex: number) => {
@@ -122,15 +127,21 @@
         </Form.Field>
     </div>
 
-    {#if $formData.steps.length > 0}
-        <ul>
-        {#each $formData.steps[0].ingredients as ingredient}
-            <li>{ingredient.name}</li>
-        {/each}
-        </ul>
-    {/if}
     {#each $formData.steps as _, stepIndex}
-        <h1>Step {stepIndex + 1}</h1>
+        <div class="flex items-center justify-between">
+            <h1>Step {stepIndex + 1}</h1>
+            <div>
+                <Button variant="ghost" size="icon" class="size-8">
+                    <ArrowUpIcon />
+                </Button>
+                <Button variant="ghost" size="icon" class="size-8">
+                    <ArrowDownIcon />
+                </Button>
+                <Button variant="ghost" size="icon" class="size-8" onclick={() => removeStepByIndex(stepIndex)}>
+                    <TrashIcon />
+                </Button>
+            </div>
+        </div>
         <Separator class="mt-1 mb-2" orientation="horizontal" />
         <div class="grid grid-cols-2 gap-x-6">
             <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
@@ -169,7 +180,12 @@
     {/each}
 
     <div class="flex justify-between">
-        <Button type="button" onclick={addStep}>Add Step</Button>
-        <Button type="submit">Create</Button>
+        <Button type="reset">Cancel</Button>
+        <div>
+            <Button type="button" onclick={addStep}>Add Step</Button>
+            {#if $formData.steps.length > 0}
+                <Button type="submit">Create</Button>
+            {/if}
+        </div>
     </div>
 </form>
