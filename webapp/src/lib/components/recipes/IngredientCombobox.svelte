@@ -3,11 +3,18 @@
     import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
     import { tick } from "svelte";
     import * as Command from "$lib/components/ui/command/index.js";
+    import * as Form from "$lib/components/ui/form/index.js";
     import * as Popover from "$lib/components/ui/popover/index.js";
     import { Button } from "$lib/components/ui/button/index.js";
+    import { buttonVariants } from "$lib/components/ui/button/index.js";
     import { cn } from "$lib/utils.js";
+    import { useId } from "bits-ui";
 
-    const frameworks = [
+    const {
+        form,
+    } = $props();
+
+    const ingredients = [
         {
             value: "greensalad",
             label: "Green Salad"
@@ -30,66 +37,69 @@
         }
     ];
 
-    let open = $state(false);
-    let value = $state("");
-    let triggerRef = $state<HTMLButtonElement>(null!);
+    const { form: formData } = form;
 
-    const selectedValue = $derived(
-        frameworks.find((f) => f.value === value)?.label
-    );
+    let open = $state(false);
 
     // We want to refocus the trigger button when the user selects
     // an item from the list so users can continue navigating the
     // rest of the form with the keyboard.
-    function closeAndFocusTrigger() {
+    function closeAndFocusTrigger(triggerId: string) {
         open = false;
         tick().then(() => {
-            triggerRef.focus();
+            document.getElementById(triggerId)?.focus();
         });
     }
-
-    let {
-        class: className = ""
-    } = $props()
+    const triggerId = useId();
 </script>
 
-<Popover.Root bind:open>
-    <Popover.Trigger bind:ref={triggerRef}>
-        {#snippet child({ props })}
-            <Button
-                    {...props}
-                    variant="outline"
-                    class={cn("w-[200px] justify-between", className)}
-                    role="combobox"
-                    aria-expanded={open}
-            >
-                {selectedValue || "Select an ingredient..."}
-                <ChevronsUpDownIcon class="opacity-50" />
-            </Button>
-        {/snippet}
-    </Popover.Trigger>
-    <Popover.Content class="w-[var(--bits-popover-anchor-width)] min-w-[var(--bits-popover-anchor-width)] p-0">
-        <Command.Root>
-            <Command.Input placeholder="Search framework..." />
-            <Command.List>
-                <Command.Empty>No framework found.</Command.Empty>
-                <Command.Group value="frameworks">
-                    {#each frameworks as framework (framework.value)}
+<Form.Field class="flex flex-col" {form} name="ingredient">
+    <Popover.Root bind:open>
+        <Form.Control id={triggerId}>
+            {#snippet children({ props })}
+                <Form.Label>Ingredient</Form.Label>
+                    <Popover.Trigger
+                            class={cn(
+                                buttonVariants({ variant: "outline" }),
+                                "w-[200px] justify-between",
+                                !$formData.ingredient && "text-muted-foreground"
+                            )}
+                            role="combobox"
+                            {...props}
+                    >
+                            <ChevronsUpDownIcon class="opacity-50" />
+                        {ingredients.find((f) => f.value === $formData.ingredient)?.label ?? "Select ingredient"}
+                    </Popover.Trigger>
+                    <input hidden value={$formData.ingredient} name={props.name} />
+            {/snippet}
+        </Form.Control>
+        <Popover.Content class="w-[var(--bits-popover-anchor-width)] min-w-[var(--bits-popover-anchor-width)] p-0">
+            <Command.Root>
+                <Command.Input
+                        autofocus
+                        placeholder="Search ingredient..."
+                        class="h-9"
+                />
+                <Command.Empty>No ingredient found.</Command.Empty>
+                <Command.Group value="ingredients">
+                    {#each ingredients as ingredient (ingredient.value)}
                         <Command.Item
-                                value={framework.value}
+                                value={ingredient.value}
                                 onSelect={() => {
-        value = framework.value;
-        closeAndFocusTrigger();
-       }}
+                                    $formData.ingredient = ingredient.value;
+                                    closeAndFocusTrigger(triggerId);
+                                }}
                         >
-                            <CheckIcon
-                                    class={cn(value !== framework.value && "text-transparent")}
-                            />
-                            {framework.label}
+                            <CheckIcon class={cn("ml-auto", ingredient.value !== $formData.ingredient && "text-transparent")}/>
+                            {ingredient.label}
                         </Command.Item>
                     {/each}
                 </Command.Group>
-            </Command.List>
-        </Command.Root>
-    </Popover.Content>
-</Popover.Root>
+            </Command.Root>
+        </Popover.Content>
+    </Popover.Root>
+    <Form.Description>
+        This is the ingredient that will be used for this recipe.
+    </Form.Description>
+    <Form.FieldErrors/>
+</Form.Field>
