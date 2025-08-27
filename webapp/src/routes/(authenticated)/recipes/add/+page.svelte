@@ -81,9 +81,9 @@
 
 <form class="p-6" method="POST" use:enhance>
     <ImageUpload />
-    <div class="flex flex-col lg:flex-row gap-3 mt-3">
+    <div class="flex flex-col lg:flex-row gap-1 mt-3">
         <div class="w-full flex flex-col">
-            <Form.Field class="space-y-3" {form} name="name">
+            <Form.Field {form} name="name">
                 <Form.Control>
                     {#snippet children({props})}
                         <Form.Label>Name</Form.Label>
