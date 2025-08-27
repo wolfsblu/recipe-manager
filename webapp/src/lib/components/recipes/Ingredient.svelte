@@ -1,8 +1,9 @@
 <script>
     import * as Form from '$lib/components/ui/form/index.js'
     import {Input} from "$lib/components/ui/input/index.js";
+    import IngredientCombobox from "$lib/components/recipes/IngredientCombobox.svelte";
 
-    const {
+    let {
         form,
         stepIndex,
         ingredientIndex,
@@ -39,7 +40,7 @@
     <Form.Control>
         {#snippet children({props})}
             <div class="flex flex-col md:flex-row gap-1">
-                <Input {...props} class="w-full" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].name} placeholder="Potatoes" />
+                <IngredientCombobox {...props} bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].name} />
             </div>
         {/snippet}
     </Form.Control>
