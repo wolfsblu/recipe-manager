@@ -17,7 +17,6 @@
     import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
     import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
     import TrashIcon from "@lucide/svelte/icons/trash";
-    import IngredientCombobox from "$lib/components/recipes/IngredientCombobox.svelte";
     import Ingredient from "$lib/components/recipes/Ingredient.svelte";
 
     let {data}: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
@@ -81,7 +80,7 @@
 
 <form class="p-6" method="POST" use:enhance>
     <ImageUpload />
-    <div class="flex flex-col lg:flex-row gap-1 mt-3">
+    <div class="flex flex-col lg:flex-row gap-x-3 gap-y-1 mt-3">
         <div class="w-full flex flex-col">
             <Form.Field {form} name="name">
                 <Form.Control>
