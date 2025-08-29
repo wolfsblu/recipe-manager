@@ -162,7 +162,7 @@
         <div class="grid lg:grid-cols-2 gap-x-3">
             <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
                 <Form.Legend>Ingredients</Form.Legend>
-                <div class="grid grid-cols-[1fr_2fr_3fr_max-content] gap-1">
+                <div class="grid grid-cols-[1fr_1fr_2fr_max-content] md:grid-cols-[1fr_2fr_3fr_max-content] gap-1">
                 {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
                     <Ingredient {form} {stepIndex} {ingredientIndex} />
                     <div>

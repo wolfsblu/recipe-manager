@@ -11,33 +11,14 @@
     import { useId } from "bits-ui";
 
     let {
+        empty = 'No results found.',
         form,
         name,
+        placeholder = 'Select option',
+        search = 'Search options...',
         value = $bindable(),
+        options,
     } = $props();
-
-    const ingredients = [
-        {
-            value: "greensalad",
-            label: "Green Salad"
-        },
-        {
-            value: "carrots",
-            label: "Carrots"
-        },
-        {
-            value: "chicken",
-            label: "Chicken"
-        },
-        {
-            value: "salt",
-            label: "Salt"
-        },
-        {
-            value: "pepper",
-            label: "Pepper"
-        }
-    ];
 
     let open = $state(false);
 
@@ -53,7 +34,7 @@
     const triggerId = useId();
 </script>
 
-<Form.Field {form} {name} class="w-full">
+<Form.Field {form} {name} class="space-y-0 w-full">
     <Popover.Root bind:open>
         <Form.Control id={triggerId}>
             {#snippet children({ props })}
@@ -66,8 +47,7 @@
                         role="combobox"
                         {...props}
                 >
-                    {ingredients.find((f) => f.value === value)?.label ??
-                    "Select ingredient"}
+                    {options.find((f) => f.value === value)?.label ?? placeholder}
                     <ChevronsUpDownIcon class="opacity-50" />
                 </Popover.Trigger>
                 <input hidden value={value} name={props.name} />
@@ -77,21 +57,23 @@
             <Command.Root>
                 <Command.Input
                         autofocus
-                        placeholder="Search ingredient..."
+                        placeholder={search}
                         class="h-9"
                 />
-                <Command.Empty>No ingredient found.</Command.Empty>
-                <Command.Group value="ingredients">
-                    {#each ingredients as ingredient (ingredient.value)}
+                <Command.Empty>
+                    {empty}
+                </Command.Empty>
+                <Command.Group value="items">
+                    {#each options as option (option.value)}
                         <Command.Item
-                                value={ingredient.value}
+                                value={option.value}
                                 onSelect={() => {
-                                    value = ingredient.value;
+                                    value = option.value;
                                     closeAndFocusTrigger(triggerId);
                                 }}
                         >
-                            {ingredient.label}
-                            <CheckIcon class={cn("ml-auto", ingredient.value !== value && "text-transparent")}/>
+                            {option.label}
+                            <CheckIcon class={cn("ml-auto", option.value !== value && "text-transparent")}/>
                         </Command.Item>
                     {/each}
                 </Command.Group>
