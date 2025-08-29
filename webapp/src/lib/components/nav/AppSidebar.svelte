@@ -69,9 +69,9 @@
                     <Sidebar.MenuItem>
                         <Sidebar.MenuButton>
                             {#snippet child({ props })}
-                                <a href="/measurements" {...props}>
+                                <a href="/units" {...props}>
                                     <RulerIcon />
-                                    <span>Measurements</span>
+                                    <span>Units</span>
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
