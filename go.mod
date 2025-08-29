@@ -1,6 +1,6 @@
 module github.com/wolfsblu/go-chef
 
-go 1.24.2
+go 1.25.0
 
 require (
 	ariga.io/atlas-go-sdk v0.7.2
