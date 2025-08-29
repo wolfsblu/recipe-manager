@@ -1,4 +1,4 @@
-FROM docker.io/node:lts-alpine as frontend
+FROM docker.io/node:lts-alpine AS frontend
 
 WORKDIR /webapp
 
@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/webapp/.npm \
     npm ci && \
     npm run build
 
-FROM docker.io/golang:alpine as backend
+FROM docker.io/golang:alpine AS backend
 
 RUN apk --no-cache add ca-certificates
 
