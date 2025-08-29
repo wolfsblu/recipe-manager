@@ -79,6 +79,13 @@
 </script>
 
 <form class="p-6" method="POST" use:enhance>
+    {#if $formData.steps.length > 0}
+    <ul>
+        {#each $formData.steps[0].ingredients as ingredient}
+            <li>{ingredient.name}</li>
+        {/each}
+    </ul>
+    {/if}
     <ImageUpload />
     <div class="flex flex-col lg:flex-row gap-x-3 gap-y-1 mt-3">
         <div class="w-full flex flex-col">

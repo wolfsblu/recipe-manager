@@ -50,7 +50,7 @@
                     {options.find((f) => f.value === value)?.label ?? placeholder}
                     <ChevronsUpDownIcon class="opacity-50" />
                 </Popover.Trigger>
-                <input hidden value={value} name={props.name} />
+                <input hidden bind:value={value} name={props.name} />
             {/snippet}
         </Form.Control>
         <Popover.Content class="w-[var(--bits-popover-anchor-width)] min-w-[var(--bits-popover-anchor-width)] p-0">
