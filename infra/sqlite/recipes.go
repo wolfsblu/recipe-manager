@@ -78,9 +78,10 @@ func (s *Store) GetIngredients(ctx context.Context) ([]domain.Ingredient, error)
 	}
 
 	ingredients := make([]domain.Ingredient, len(result))
-	for _, ingredient := range result {
-		ingredients = append(ingredients, ingredient.AsDomainModel())
+	for i, ingredient := range result {
+		ingredients[i] = ingredient.AsDomainModel()
 	}
+
 	return ingredients, nil
 }
 
