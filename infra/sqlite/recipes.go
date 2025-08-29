@@ -2,9 +2,10 @@ package sqlite
 
 import (
 	"context"
+	"time"
+
 	"github.com/wolfsblu/go-chef/domain"
 	_ "modernc.org/sqlite"
-	"time"
 )
 
 func (s *Store) BrowseRecipes(ctx context.Context) (recipes []domain.Recipe, err error) {
@@ -68,6 +69,19 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 		i++
 	}
 	return mealplan, nil
+}
+
+func (s *Store) GetIngredients(ctx context.Context) ([]domain.Ingredient, error) {
+	result, err := s.query().GetIngredients(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	ingredients := make([]domain.Ingredient, len(result))
+	for _, ingredient := range result {
+		ingredients = append(ingredients, ingredient.AsDomainModel())
+	}
+	return ingredients, nil
 }
 
 func (s *Store) GetRecipeById(ctx context.Context, id int64) (recipe domain.Recipe, _ error) {

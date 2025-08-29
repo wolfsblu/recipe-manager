@@ -36,6 +36,11 @@ type MealPlan struct {
 	Recipes []Recipe
 }
 
+type Ingredient struct {
+	ID   int64
+	Name string
+}
+
 func (s *RecipeService) Add(ctx context.Context, r RecipeDetails) (Recipe, error) {
 	return s.store.CreateRecipe(ctx, r)
 }
@@ -58,4 +63,8 @@ func (s *RecipeService) GetByUser(ctx context.Context, user *User) ([]Recipe, er
 
 func (s *RecipeService) GetById(ctx context.Context, id int64) (Recipe, error) {
 	return s.store.GetRecipeById(ctx, id)
+}
+
+func (s *RecipeService) GetIngredients(ctx context.Context) ([]Ingredient, error) {
+	return s.store.GetIngredients(ctx)
 }

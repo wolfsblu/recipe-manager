@@ -17,7 +17,54 @@ func newResponseMapper(urlBuilder *urlBuilder) *responseMapper {
 	}
 }
 
-func (m *responseMapper) toRecipeResponse(recipe domain.Recipe) (*api.ReadRecipe, error) {
+func (m *responseMapper) toIngredient(ingredient domain.Ingredient) (*api.Ingredient, error) {
+	return &api.Ingredient{
+		ID:   ingredient.ID,
+		Name: ingredient.Name,
+	}, nil
+}
+
+func (m *responseMapper) toIngredients(ingredients []domain.Ingredient) ([]api.Ingredient, error) {
+	result := make([]api.Ingredient, len(ingredients))
+	for i, ingredient := range ingredients {
+		mapped, err := m.toIngredient(ingredient)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = *mapped
+	}
+	return result, nil
+}
+
+func (m *responseMapper) toMealPlan(mealPlan domain.MealPlan) (api.ReadMealPlan, error) {
+	recipes := make([]api.ReadRecipe, len(mealPlan.Recipes))
+	for i, recipe := range mealPlan.Recipes {
+		response, err := m.toRecipe(recipe)
+		if err != nil {
+			return api.ReadMealPlan{}, err
+		}
+		recipes[i] = *response
+	}
+
+	return api.ReadMealPlan{
+		Date:    mealPlan.Date.Format(time.DateOnly),
+		Recipes: recipes,
+	}, nil
+}
+
+func (m *responseMapper) toMealPlans(mealPlans []domain.MealPlan) ([]api.ReadMealPlan, error) {
+	result := make([]api.ReadMealPlan, len(mealPlans))
+	for i, mealPlan := range mealPlans {
+		response, err := m.toMealPlan(mealPlan)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = response
+	}
+	return result, nil
+}
+
+func (m *responseMapper) toRecipe(recipe domain.Recipe) (*api.ReadRecipe, error) {
 	images, err := m.urlBuilder.buildRecipeImageURLs(recipe.Images)
 	if err != nil {
 		return nil, err
@@ -34,42 +81,14 @@ func (m *responseMapper) toRecipeResponse(recipe domain.Recipe) (*api.ReadRecipe
 	}, nil
 }
 
-func (m *responseMapper) toRecipeListResponse(recipes []domain.Recipe) ([]api.ReadRecipe, error) {
+func (m *responseMapper) toRecipes(recipes []domain.Recipe) ([]api.ReadRecipe, error) {
 	result := make([]api.ReadRecipe, len(recipes))
 	for i, recipe := range recipes {
-		mapped, err := m.toRecipeResponse(recipe)
+		mapped, err := m.toRecipe(recipe)
 		if err != nil {
 			return nil, err
 		}
 		result[i] = *mapped
-	}
-	return result, nil
-}
-
-func (m *responseMapper) toMealPlanResponse(mealPlan domain.MealPlan) (api.ReadMealPlan, error) {
-	recipes := make([]api.ReadRecipe, len(mealPlan.Recipes))
-	for i, recipe := range mealPlan.Recipes {
-		response, err := m.toRecipeResponse(recipe)
-		if err != nil {
-			return api.ReadMealPlan{}, err
-		}
-		recipes[i] = *response
-	}
-
-	return api.ReadMealPlan{
-		Date:    mealPlan.Date.Format(time.DateOnly),
-		Recipes: recipes,
-	}, nil
-}
-
-func (m *responseMapper) toReadMealPlanList(mealPlans []domain.MealPlan) ([]api.ReadMealPlan, error) {
-	result := make([]api.ReadMealPlan, len(mealPlans))
-	for i, mealPlan := range mealPlans {
-		response, err := m.toMealPlanResponse(mealPlan)
-		if err != nil {
-			return nil, err
-		}
-		result[i] = response
 	}
 	return result, nil
 }

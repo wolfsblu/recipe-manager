@@ -11,6 +11,13 @@ func (t *PasswordReset) AsDomainModel() domain.PasswordResetToken {
 	}
 }
 
+func (r *Ingredient) AsDomainModel() domain.Ingredient {
+	return domain.Ingredient{
+		ID:   r.ID,
+		Name: r.Name,
+	}
+}
+
 func (r *Recipe) AsDomainModel() domain.Recipe {
 	return domain.Recipe{
 		ID: r.ID,

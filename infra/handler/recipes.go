@@ -69,7 +69,7 @@ func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanP
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.toReadMealPlanList(mealplan)
+	return h.mapper.toMealPlans(mealplan)
 }
 
 func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
@@ -78,7 +78,7 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.toRecipeListResponse(recipes)
+	return h.mapper.toRecipes(recipes)
 }
 
 func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeByIdParams) (*api.ReadRecipe, error) {
@@ -95,4 +95,12 @@ func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeB
 func (h *RecipeHandler) UpdateRecipe(_ context.Context, _ *api.WriteRecipe, _ api.UpdateRecipeParams) (*api.ReadRecipe, error) {
 	// TODO: Implement
 	return &api.ReadRecipe{}, nil
+}
+
+func (h *RecipeHandler) GetIngredients(ctx context.Context) ([]api.Ingredient, error) {
+	ingredients, err := h.Recipes.GetIngredients(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return h.mapper.toIngredients(ingredients)
 }

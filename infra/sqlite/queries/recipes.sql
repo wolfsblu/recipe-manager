@@ -47,6 +47,11 @@ WHERE recipe_steps.recipe_id IN (
     )
 ORDER BY recipe_ingredients.sort_order;
 
+-- name: GetIngredients :many
+SELECT *
+FROM ingredients
+ORDER BY name;
+
 -- name: GetStepsForRecipes :many
 SELECT id, instructions, sort_order, recipe_id
 FROM recipe_steps

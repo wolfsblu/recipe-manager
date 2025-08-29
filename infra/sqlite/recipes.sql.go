@@ -49,7 +49,7 @@ func (q *Queries) BrowseRecipes(ctx context.Context) ([]Recipe, error) {
 const createRecipe = `-- name: CreateRecipe :one
 INSERT INTO recipes (name, servings, minutes, description, created_by)
 VALUES (?, ?, ?, ?, ?)
-    RETURNING id, name, servings, minutes, description, created_by, created_at
+RETURNING id, name, servings, minutes, description, created_by, created_at
 `
 
 type CreateRecipeParams struct {
@@ -146,14 +146,102 @@ func (q *Queries) GetImagesForRecipes(ctx context.Context, recipeIds []int64) ([
 	return items, nil
 }
 
+const getIngredients = `-- name: GetIngredients :many
+SELECT id, name
+FROM ingredients
+ORDER BY name
+`
+
+func (q *Queries) GetIngredients(ctx context.Context) ([]Ingredient, error) {
+	rows, err := q.db.QueryContext(ctx, getIngredients)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Ingredient
+	for rows.Next() {
+		var i Ingredient
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getIngredientsForRecipes = `-- name: GetIngredientsForRecipes :many
+SELECT recipe_ingredients.id, ingredients.name, units.name, recipe_steps.id, recipe_ingredients.sort_order
+FROM recipe_ingredients
+         INNER JOIN recipe_steps ON recipe_ingredients.step_id = recipe_steps.id
+         INNER JOIN ingredients ON recipe_ingredients.ingredient_id = ingredients.id
+         INNER JOIN units ON recipe_ingredients.unit_id = units.id
+WHERE recipe_steps.recipe_id IN (
+    /*SLICE:recipe_ids*/?
+    )
+ORDER BY recipe_ingredients.sort_order
+`
+
+type GetIngredientsForRecipesRow struct {
+	ID        int64
+	Name      string
+	Name_2    string
+	ID_2      int64
+	SortOrder int64
+}
+
+func (q *Queries) GetIngredientsForRecipes(ctx context.Context, recipeIds []int64) ([]GetIngredientsForRecipesRow, error) {
+	query := getIngredientsForRecipes
+	var queryParams []interface{}
+	if len(recipeIds) > 0 {
+		for _, v := range recipeIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", strings.Repeat(",?", len(recipeIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetIngredientsForRecipesRow
+	for rows.Next() {
+		var i GetIngredientsForRecipesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Name_2,
+			&i.ID_2,
+			&i.SortOrder,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMealPlan = `-- name: GetMealPlan :many
 SELECT meal_plan.id, meal_plan.date, meal_plan.user_id, meal_plan.recipe_id, meal_plan.sort_order,
        recipes.id, recipes.name, recipes.servings, recipes.minutes, recipes.description, recipes.created_by, recipes.created_at
 FROM meal_plan
-    INNER JOIN recipes ON meal_plan.recipe_id = recipes.id
+         INNER JOIN recipes ON meal_plan.recipe_id = recipes.id
 WHERE user_id = ?
-    AND meal_plan.date >= ?2
-    AND meal_plan.date <= ?3
+  AND meal_plan.date >= ?2
+  AND meal_plan.date <= ?3
 ORDER BY meal_plan.date, meal_plan.sort_order
 `
 
@@ -226,13 +314,67 @@ func (q *Queries) GetRecipe(ctx context.Context, id int64) (Recipe, error) {
 	return i, err
 }
 
+const getStepsForRecipes = `-- name: GetStepsForRecipes :many
+SELECT id, instructions, sort_order, recipe_id
+FROM recipe_steps
+WHERE recipe_id IN (
+    /*SLICE:recipe_ids*/?
+    )
+ORDER BY sort_order
+`
+
+type GetStepsForRecipesRow struct {
+	ID           int64
+	Instructions string
+	SortOrder    int64
+	RecipeID     int64
+}
+
+func (q *Queries) GetStepsForRecipes(ctx context.Context, recipeIds []int64) ([]GetStepsForRecipesRow, error) {
+	query := getStepsForRecipes
+	var queryParams []interface{}
+	if len(recipeIds) > 0 {
+		for _, v := range recipeIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", strings.Repeat(",?", len(recipeIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetStepsForRecipesRow
+	for rows.Next() {
+		var i GetStepsForRecipesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Instructions,
+			&i.SortOrder,
+			&i.RecipeID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTagsForRecipes = `-- name: GetTagsForRecipes :many
 SELECT tags.id, tags.name, recipe_tags.recipe_id
 FROM tags
-     INNER JOIN recipe_tags ON tags.id = recipe_tags.tag_id
+         INNER JOIN recipe_tags ON tags.id = recipe_tags.tag_id
 WHERE recipe_tags.recipe_id IN (
     /*SLICE:recipe_ids*/?
-)
+    )
 ORDER BY tags.name
 `
 
