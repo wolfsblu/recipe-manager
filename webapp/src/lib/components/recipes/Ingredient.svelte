@@ -36,14 +36,7 @@
     <Form.Description class="sr-only" />
     <Form.FieldErrors/>
 </Form.ElementField>
-<Form.ElementField class="space-y-0" {form} name="{basePath}.name">
-    <Form.Control>
-        {#snippet children({props})}
-            <div class="flex flex-col md:flex-row gap-1">
-                <IngredientCombobox {...props} bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].name} />
-            </div>
-        {/snippet}
-    </Form.Control>
-    <Form.Description class="sr-only" />
-    <Form.FieldErrors/>
-</Form.ElementField>
+
+<div class="flex flex-col md:flex-row gap-1">
+    <IngredientCombobox {form} name="{basePath}.name" bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].name} />
+</div>

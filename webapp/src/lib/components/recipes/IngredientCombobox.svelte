@@ -11,6 +11,7 @@
     import { useId } from "bits-ui";
 
     let {
+        form,
         name,
         value = $bindable(),
     } = $props();
@@ -52,41 +53,50 @@
     const triggerId = useId();
 </script>
 
-<Popover.Root bind:open>
-    <Popover.Trigger
-            class={cn(
-                buttonVariants({ variant: "outline" }),
-                "w-full",
-                !value && "text-muted-foreground"
-            )}
-            role="combobox"
-    >
-            <ChevronsUpDownIcon class="opacity-50" />
-        {ingredients.find((f) => f.value === value)?.label ?? "Select ingredient"}
-    </Popover.Trigger>
-    <input hidden {value} {name} />
-    <Popover.Content class="w-[var(--bits-popover-anchor-width)] min-w-[var(--bits-popover-anchor-width)] p-0">
-        <Command.Root>
-            <Command.Input
-                    autofocus
-                    placeholder="Search ingredient..."
-                    class="h-9"
-            />
-            <Command.Empty>No ingredient found.</Command.Empty>
-            <Command.Group value="ingredients">
-                {#each ingredients as ingredient (ingredient.value)}
-                    <Command.Item
-                            value={ingredient.value}
-                            onSelect={() => {
-                                value = ingredient.value;
-                                closeAndFocusTrigger(triggerId);
-                            }}
-                    >
-                        <CheckIcon class={cn("ml-auto", ingredient.value !== value && "text-transparent")}/>
-                        {ingredient.label}
-                    </Command.Item>
-                {/each}
-            </Command.Group>
-        </Command.Root>
-    </Popover.Content>
-</Popover.Root>
+<Form.Field {form} {name} class="w-full">
+    <Popover.Root bind:open>
+        <Form.Control id={triggerId}>
+            {#snippet children({ props })}
+                <Popover.Trigger
+                        class={cn(
+                                buttonVariants({ variant: "outline" }),
+                                "w-full justify-between",
+                                !value && "text-muted-foreground"
+                            )}
+                        role="combobox"
+                        {...props}
+                >
+                    {ingredients.find((f) => f.value === value)?.label ??
+                    "Select ingredient"}
+                    <ChevronsUpDownIcon class="opacity-50" />
+                </Popover.Trigger>
+                <input hidden value={value} name={props.name} />
+            {/snippet}
+        </Form.Control>
+        <Popover.Content class="w-[var(--bits-popover-anchor-width)] min-w-[var(--bits-popover-anchor-width)] p-0">
+            <Command.Root>
+                <Command.Input
+                        autofocus
+                        placeholder="Search ingredient..."
+                        class="h-9"
+                />
+                <Command.Empty>No ingredient found.</Command.Empty>
+                <Command.Group value="ingredients">
+                    {#each ingredients as ingredient (ingredient.value)}
+                        <Command.Item
+                                value={ingredient.value}
+                                onSelect={() => {
+                                    value = ingredient.value;
+                                    closeAndFocusTrigger(triggerId);
+                                }}
+                        >
+                            {ingredient.label}
+                            <CheckIcon class={cn("ml-auto", ingredient.value !== value && "text-transparent")}/>
+                        </Command.Item>
+                    {/each}
+                </Command.Group>
+            </Command.Root>
+        </Popover.Content>
+    </Popover.Root>
+    <Form.FieldErrors />
+</Form.Field>
