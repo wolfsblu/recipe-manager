@@ -2,8 +2,9 @@ package domain
 
 import (
 	"context"
-	"github.com/wolfsblu/go-chef/domain/security"
 	"time"
+
+	"github.com/wolfsblu/go-chef/domain/security"
 )
 
 type Credentials struct {
@@ -14,6 +15,7 @@ type Credentials struct {
 type User struct {
 	ID        int64
 	Confirmed bool
+	Role      string
 	Credentials
 }
 

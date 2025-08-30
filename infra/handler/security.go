@@ -2,14 +2,10 @@ package handler
 
 import (
 	"context"
+
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
-)
-
-type contextKey string
-
-const (
-	ctxKeyUser = contextKey("User")
+	"github.com/wolfsblu/go-chef/infra/config"
 )
 
 type SecurityHandler struct {
@@ -31,5 +27,5 @@ func (h *SecurityHandler) HandleCookieAuth(ctx context.Context, _ string, t api.
 	if err != nil {
 		return nil, domain.WrapError(domain.ErrAuthentication, err)
 	}
-	return context.WithValue(ctx, ctxKeyUser, &user), nil
+	return context.WithValue(ctx, config.CtxKeyUser, &user), nil
 }

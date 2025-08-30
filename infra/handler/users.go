@@ -2,9 +2,11 @@ package handler
 
 import (
 	"context"
+
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/domain/security"
+	"github.com/wolfsblu/go-chef/infra/config"
 )
 
 func (h *RecipeHandler) ConfirmUser(ctx context.Context, req *api.Token) error {
@@ -12,7 +14,7 @@ func (h *RecipeHandler) ConfirmUser(ctx context.Context, req *api.Token) error {
 }
 
 func (h *RecipeHandler) GetUserProfile(ctx context.Context) (*api.ReadUser, error) {
-	user := ctx.Value(ctxKeyUser).(*domain.User)
+	user := ctx.Value(config.CtxKeyUser).(*domain.User)
 	return &api.ReadUser{
 		ID:    user.ID,
 		Email: user.Email,

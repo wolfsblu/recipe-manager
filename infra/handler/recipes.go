@@ -6,6 +6,7 @@ import (
 
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/go-chef/infra/config"
 )
 
 type RecipeHandler struct {
@@ -21,7 +22,7 @@ func NewRecipeHandler(service *domain.RecipeService) *RecipeHandler {
 }
 
 func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipe) (*api.ReadRecipe, error) {
-	user := ctx.Value(ctxKeyUser).(*domain.User)
+	user := ctx.Value(config.CtxKeyUser).(*domain.User)
 	recipe, err := h.Recipes.Add(ctx, domain.RecipeDetails{
 		Name:        req.Name,
 		Description: req.Description,
@@ -62,7 +63,7 @@ func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecip
 }
 
 func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanParams) ([]api.ReadMealPlan, error) {
-	user := ctx.Value(ctxKeyUser).(*domain.User)
+	user := ctx.Value(config.CtxKeyUser).(*domain.User)
 	from := params.From.Or(time.Now())
 	until := params.Until.Or(from.Add(7 * 24 * time.Hour))
 	mealplan, err := h.Recipes.GetMealPlan(ctx, user, from, until)
@@ -73,7 +74,7 @@ func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanP
 }
 
 func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
-	user := ctx.Value(ctxKeyUser).(*domain.User)
+	user := ctx.Value(config.CtxKeyUser).(*domain.User)
 	recipes, err := h.Recipes.GetByUser(ctx, user)
 	if err != nil {
 		return nil, err

@@ -3,14 +3,16 @@ package handler
 import (
 	"context"
 	"errors"
+	"net/http"
+
 	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
-	"net/http"
 )
 
 var errorStatusCodeMap = map[*domain.Error]int{
 	domain.ErrAuthentication:             http.StatusForbidden,
+	domain.ErrAuthorization:              http.StatusForbidden,
 	domain.ErrCommittingTransaction:      http.StatusInternalServerError,
 	domain.ErrCreatingPasswordResetToken: http.StatusInternalServerError,
 	domain.ErrCreatingRegistrationToken:  http.StatusInternalServerError,

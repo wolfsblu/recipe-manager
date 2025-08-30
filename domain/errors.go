@@ -7,6 +7,7 @@ type Error struct {
 
 var (
 	ErrAuthentication             = &Error{Message: "failed to authenticate user"}
+	ErrAuthorization              = &Error{Message: "failed to authorize user"}
 	ErrCommittingTransaction      = &Error{Message: "failed to commit transaction"}
 	ErrCreatingPasswordResetToken = &Error{Message: "failed to create password reset token"}
 	ErrCreatingRegistrationToken  = &Error{Message: "failed to create user registration token"}
