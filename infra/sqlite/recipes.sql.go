@@ -417,6 +417,35 @@ func (q *Queries) GetTagsForRecipes(ctx context.Context, recipeIds []int64) ([]G
 	return items, nil
 }
 
+const getUnits = `-- name: GetUnits :many
+SELECT id, code, name
+FROM units
+ORDER BY name
+`
+
+func (q *Queries) GetUnits(ctx context.Context) ([]Unit, error) {
+	rows, err := q.db.QueryContext(ctx, getUnits)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Unit
+	for rows.Next() {
+		var i Unit
+		if err := rows.Scan(&i.ID, &i.Code, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listRecipes = `-- name: ListRecipes :many
 SELECT id, name, servings, minutes, description, created_by, created_at
 FROM recipes

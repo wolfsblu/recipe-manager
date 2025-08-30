@@ -73,7 +73,7 @@ type Tag struct {
 
 type Unit struct {
 	ID   int64
-	Code interface{}
+	Code *string
 	Name string
 }
 

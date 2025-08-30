@@ -19,6 +19,7 @@ type RecipeStore interface {
 	DeleteRegistrationsBefore(ctx context.Context, before time.Time) error
 	GetMealPlan(ctx context.Context, user *User, from time.Time, until time.Time) ([]MealPlan, error)
 	GetIngredients(ctx context.Context) ([]Ingredient, error)
+	GetUnits(ctx context.Context) ([]Unit, error)
 	GetPasswordResetTokenByUser(ctx context.Context, user *User) (PasswordResetToken, error)
 	GetRecipeById(ctx context.Context, id int64) (Recipe, error)
 	GetRecipesByUser(ctx context.Context, user *User) ([]Recipe, error)

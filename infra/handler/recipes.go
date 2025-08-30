@@ -104,3 +104,11 @@ func (h *RecipeHandler) GetIngredients(ctx context.Context) ([]api.Ingredient, e
 	}
 	return h.mapper.toIngredients(ingredients)
 }
+
+func (h *RecipeHandler) GetUnits(ctx context.Context) ([]api.Unit, error) {
+	units, err := h.Recipes.GetUnits(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return h.mapper.toUnits(units)
+}

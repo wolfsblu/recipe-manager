@@ -52,6 +52,11 @@ SELECT *
 FROM ingredients
 ORDER BY name;
 
+-- name: GetUnits :many
+SELECT *
+FROM units
+ORDER BY name;
+
 -- name: GetStepsForRecipes :many
 SELECT id, instructions, sort_order, recipe_id
 FROM recipe_steps

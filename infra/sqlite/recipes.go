@@ -85,6 +85,20 @@ func (s *Store) GetIngredients(ctx context.Context) ([]domain.Ingredient, error)
 	return ingredients, nil
 }
 
+func (s *Store) GetUnits(ctx context.Context) ([]domain.Unit, error) {
+	result, err := s.query().GetUnits(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	units := make([]domain.Unit, len(result))
+	for i, unit := range result {
+		units[i] = unit.AsDomainModel()
+	}
+
+	return units, nil
+}
+
 func (s *Store) GetRecipeById(ctx context.Context, id int64) (recipe domain.Recipe, _ error) {
 	result, err := s.query().GetRecipe(ctx, id)
 	if err != nil {

@@ -267,6 +267,18 @@ paths:
           $ref: '#/components/responses/IngredientList'
         default:
           $ref: '#/components/responses/Error'
+  /units:
+    get:
+      tags:
+        - Units
+      summary: Get all units
+      operationId: getUnits
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/UnitList'
+        default:
+          $ref: '#/components/responses/Error'
 components:
   headers:
     SessionCookie:
@@ -318,6 +330,27 @@ components:
           type: string
           examples:
             - Flour
+    Unit:
+      type: object
+      required:
+        - id
+        - name
+        - code
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+            - 10
+        name:
+          type: string
+          examples:
+            - "gram"
+        code:
+          type: string
+          nullable: true
+          examples:
+            - "g"
     RecipeStatus:
       type: string
       description: Recipe status in the store
@@ -484,6 +517,14 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/Ingredient'
+    UnitList:
+      description: A list of units
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Unit'
     MealPlan:
       description: Meal plan for the user
       content:

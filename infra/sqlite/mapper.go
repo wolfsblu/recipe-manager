@@ -50,3 +50,11 @@ func (r *UserRegistration) AsDomainModel() domain.UserRegistration {
 		CreatedAt: r.CreatedAt,
 	}
 }
+
+func (u *Unit) AsDomainModel() domain.Unit {
+	return domain.Unit{
+		ID:   u.ID,
+		Name: u.Name,
+		Code: u.Code,
+	}
+}

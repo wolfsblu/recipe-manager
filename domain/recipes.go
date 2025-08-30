@@ -41,6 +41,12 @@ type Ingredient struct {
 	Name string
 }
 
+type Unit struct {
+	ID   int64
+	Name string
+	Code *string
+}
+
 func (s *RecipeService) Add(ctx context.Context, r RecipeDetails) (Recipe, error) {
 	return s.store.CreateRecipe(ctx, r)
 }
@@ -67,4 +73,8 @@ func (s *RecipeService) GetById(ctx context.Context, id int64) (Recipe, error) {
 
 func (s *RecipeService) GetIngredients(ctx context.Context) ([]Ingredient, error) {
 	return s.store.GetIngredients(ctx)
+}
+
+func (s *RecipeService) GetUnits(ctx context.Context) ([]Unit, error) {
+	return s.store.GetUnits(ctx)
 }

@@ -18,7 +18,7 @@ CREATE TABLE tags
 CREATE TABLE units
 (
     id   INTEGER PRIMARY KEY,
-    code TEXT NULL,
+    code TEXT,
     name TEXT NOT NULL
 );
 
