@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	ogenhttp "github.com/ogen-go/ogen/http"
-	"github.com/ogen-go/ogen/ogenerrors"
 	"net/http"
 	"strings"
+
+	ogenhttp "github.com/ogen-go/ogen/http"
+	"github.com/ogen-go/ogen/ogenerrors"
 )
 
 const (
