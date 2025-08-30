@@ -17,29 +17,31 @@ const (
 	JsonIndentationWidth  = 2
 )
 
-func CustomErrorHandler(_ context.Context, w http.ResponseWriter, _ *http.Request, err error) {
-	var (
-		code    int
-		message string
-		ogenErr ogenerrors.Error
-	)
+func CustomErrorHandler() ErrorHandler {
+	return func(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
+		var (
+			code    int
+			message string
+			ogenErr ogenerrors.Error
+		)
 
-	switch {
-	case errors.Is(err, ogenhttp.ErrNotImplemented):
-		code = http.StatusNotImplemented
-		message = http.StatusText(http.StatusNotImplemented)
-	case errors.As(err, &ogenErr):
-		code = ogenErr.Code()
-		message = ogenErr.Error()
-	default:
-		code = http.StatusInternalServerError
-		message = err.Error()
+		switch {
+		case errors.Is(err, ogenhttp.ErrNotImplemented):
+			code = http.StatusNotImplemented
+			message = http.StatusText(http.StatusNotImplemented)
+		case errors.As(err, &ogenErr):
+			code = ogenErr.Code()
+			message = ogenErr.Error()
+		default:
+			code = http.StatusInternalServerError
+			message = err.Error()
+		}
+
+		w.WriteHeader(code)
+		encoder := json.NewEncoder(w)
+		encoder.SetIndent(JsonIndentationPrefix, strings.Repeat(JsonIndentationChar, JsonIndentationWidth))
+		_ = encoder.Encode(Error{
+			Message: message,
+		})
 	}
-
-	w.WriteHeader(code)
-	encoder := json.NewEncoder(w)
-	encoder.SetIndent(JsonIndentationPrefix, strings.Repeat(JsonIndentationChar, JsonIndentationWidth))
-	_ = encoder.Encode(Error{
-		Message: message,
-	})
 }
