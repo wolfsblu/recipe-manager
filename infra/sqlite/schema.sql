@@ -64,12 +64,6 @@ CREATE TABLE user_registrations
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE user_roles
-(
-    user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    role_id INTEGER NOT NULL REFERENCES roles (id) ON DELETE CASCADE
-);
-
 CREATE TABLE password_resets
 (
     user_id    INTEGER PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
