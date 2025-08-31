@@ -14,11 +14,13 @@ type Credentials struct {
 }
 
 type Permission struct {
+	ID   int64
 	Name string
 	Slug permissions.Slug
 }
 
 type Role struct {
+	ID          int64
 	Name        string
 	Permissions []Permission
 }

@@ -29,18 +29,19 @@ func (q *Queries) CreatePasswordResetToken(ctx context.Context, arg CreatePasswo
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (email, password_hash)
-VALUES (?, ?)
+INSERT INTO users (email, password_hash, role_id)
+VALUES (?, ?, ?)
 RETURNING id, email, password_hash, is_confirmed, role_id, created_at
 `
 
 type CreateUserParams struct {
 	Email        string
 	PasswordHash string
+	RoleID       int64
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.PasswordHash)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.PasswordHash, arg.RoleID)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -159,16 +160,64 @@ func (q *Queries) GetPasswordResetTokenByUser(ctx context.Context, userID int64)
 	return i, err
 }
 
+const getPermissionsByRole = `-- name: GetPermissionsByRole :many
+SELECT permissions.id, permissions.name, permissions.slug
+FROM permissions
+INNER JOIN role_permissions ON permissions.id = role_permissions.permission_id
+WHERE role_permissions.role_id = ?
+`
+
+type GetPermissionsByRoleRow struct {
+	ID   int64
+	Name string
+	Slug string
+}
+
+func (q *Queries) GetPermissionsByRole(ctx context.Context, roleID int64) ([]GetPermissionsByRoleRow, error) {
+	rows, err := q.db.QueryContext(ctx, getPermissionsByRole, roleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetPermissionsByRoleRow
+	for rows.Next() {
+		var i GetPermissionsByRoleRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.Slug); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUser = `-- name: GetUser :one
-SELECT id, email, password_hash, is_confirmed, role_id, created_at
+SELECT users.id, users.email, users.password_hash, users.is_confirmed, users.role_id, users.created_at,
+       roles.name as role_name
 FROM users
-WHERE id = ?
+INNER JOIN roles ON users.role_id = roles.id
+WHERE users.id = ?
 LIMIT 1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
+type GetUserRow struct {
+	ID           int64
+	Email        string
+	PasswordHash string
+	IsConfirmed  bool
+	RoleID       int64
+	CreatedAt    time.Time
+	RoleName     string
+}
+
+func (q *Queries) GetUser(ctx context.Context, id int64) (GetUserRow, error) {
 	row := q.db.QueryRowContext(ctx, getUser, id)
-	var i User
+	var i GetUserRow
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
@@ -176,6 +225,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.IsConfirmed,
 		&i.RoleID,
 		&i.CreatedAt,
+		&i.RoleName,
 	)
 	return i, err
 }

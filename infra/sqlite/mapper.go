@@ -2,7 +2,31 @@ package sqlite
 
 import (
 	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/go-chef/domain/permissions"
 )
+
+func (r *GetPermissionsByRoleRow) AsDomainModel() domain.Permission {
+	return domain.Permission{
+		ID:   r.ID,
+		Name: r.Name,
+		Slug: permissions.Slug(r.Slug),
+	}
+}
+
+func (r *GetUserRow) AsDomainModel() domain.User {
+	return domain.User{
+		ID:        r.ID,
+		Confirmed: r.IsConfirmed,
+		Credentials: domain.Credentials{
+			Email:        r.Email,
+			PasswordHash: r.PasswordHash,
+		},
+		Role: domain.Role{
+			ID:   r.ID,
+			Name: r.RoleName,
+		},
+	}
+}
 
 func (t *PasswordReset) AsDomainModel() domain.PasswordResetToken {
 	return domain.PasswordResetToken{

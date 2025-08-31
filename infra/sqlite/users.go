@@ -2,9 +2,11 @@ package sqlite
 
 import (
 	"context"
-	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/domain/security"
 	"time"
+
+	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/go-chef/domain/roles"
+	"github.com/wolfsblu/go-chef/domain/security"
 )
 
 func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User) (token domain.PasswordResetToken, _ error) {
@@ -25,6 +27,7 @@ func (s *Store) CreateUser(ctx context.Context, credentials domain.Credentials) 
 	result, err := s.query().CreateUser(ctx, CreateUserParams{
 		Email:        credentials.Email,
 		PasswordHash: credentials.PasswordHash,
+		RoleID:       int64(roles.User),
 	})
 	if err != nil {
 		return user, domain.WrapError(domain.ErrCreatingUser, err)
@@ -96,7 +99,16 @@ func (s *Store) GetUserById(ctx context.Context, id int64) (user domain.User, _ 
 	if err != nil {
 		return user, domain.WrapError(domain.ErrUserNotFound, err)
 	}
-	return result.AsDomainModel(), nil
+	user = result.AsDomainModel()
+
+	permissionResult, err := s.query().GetPermissionsByRole(ctx, result.RoleID)
+	permissions := make([]domain.Permission, len(permissionResult))
+	for i, permissionRow := range permissionResult {
+		permissions[i] = permissionRow.AsDomainModel()
+	}
+	user.Role.Permissions = permissions
+
+	return user, nil
 }
 
 func (s *Store) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPassword string) error {

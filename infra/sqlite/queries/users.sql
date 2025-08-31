@@ -4,8 +4,8 @@ VALUES (?, ?)
 RETURNING *;
 
 -- name: CreateUser :one
-INSERT INTO users (email, password_hash)
-VALUES (?, ?)
+INSERT INTO users (email, password_hash, role_id)
+VALUES (?, ?, ?)
 RETURNING *;
 
 -- name: CreateUserRegistration :one
@@ -46,10 +46,18 @@ FROM password_resets
 WHERE user_id = ?
 LIMIT 1;
 
+-- name: GetPermissionsByRole :many
+SELECT permissions.id, permissions.name, permissions.slug
+FROM permissions
+INNER JOIN role_permissions ON permissions.id = role_permissions.permission_id
+WHERE role_permissions.role_id = ?;
+
 -- name: GetUser :one
-SELECT *
+SELECT users.*,
+       roles.name as role_name
 FROM users
-WHERE id = ?
+INNER JOIN roles ON users.role_id = roles.id
+WHERE users.id = ?
 LIMIT 1;
 
 -- name: GetUserByEmail :one

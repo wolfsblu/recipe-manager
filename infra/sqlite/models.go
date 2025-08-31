@@ -107,8 +107,3 @@ type UserRegistration struct {
 	Token     string
 	CreatedAt time.Time
 }
-
-type UserRole struct {
-	UserID int64
-	RoleID int64
-}

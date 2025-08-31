@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/wolfsblu/go-chef/api/operations"
@@ -17,8 +16,11 @@ var operationPermissions = map[operations.ID]permissions.Slug{
 
 func Authorize() middleware.Middleware {
 	return func(req middleware.Request, next middleware.Next) (middleware.Response, error) {
-		user := req.Context.Value(config.CtxKeyUser).(*domain.User)
-		log.Println(user.Role.Name)
+		user, ok := req.Context.Value(config.CtxKeyUser).(*domain.User)
+		if !ok {
+			return next(req)
+		}
+
 		if requiredPermission, ok := operationPermissions[operations.ID(req.OperationID)]; ok {
 			for _, permission := range user.Role.Permissions {
 				if permission.Slug == requiredPermission {
@@ -27,6 +29,7 @@ func Authorize() middleware.Middleware {
 			}
 			return middleware.Response{}, domain.WrapError(domain.ErrAuthorization, fmt.Errorf("operation %s requires role %s", req.OperationID, requiredPermission))
 		}
+
 		return next(req)
 	}
 }
