@@ -18,7 +18,7 @@ func Authorize() middleware.Middleware {
 	return func(req middleware.Request, next middleware.Next) (middleware.Response, error) {
 		user, ok := req.Context.Value(config.CtxKeyUser).(*domain.User)
 		if !ok {
-			return middleware.Response{}, domain.ErrAuthentication
+			return next(req)
 		}
 
 		if requiredPermission, ok := operationPermissions[operations.ID(req.OperationID)]; ok {
