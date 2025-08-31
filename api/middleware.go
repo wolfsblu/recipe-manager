@@ -2,29 +2,30 @@ package api
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/ogen-go/ogen/middleware"
+	"github.com/wolfsblu/go-chef/api/operations"
 	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/go-chef/domain/permissions"
 	"github.com/wolfsblu/go-chef/infra/config"
 )
 
-var operationRoles = map[string]string{
-	/*
-		"addIngredient": "admin",
-		"addUnit":       "admin",
-		"getUnits":      "admin",
-	*/
+var operationPermissions = map[operations.ID]permissions.Slug{
+	operations.GetUnits: permissions.ViewUnit,
 }
 
 func Authorize() middleware.Middleware {
 	return func(req middleware.Request, next middleware.Next) (middleware.Response, error) {
 		user := req.Context.Value(config.CtxKeyUser).(*domain.User)
-		if requiredRole, ok := operationRoles[req.OperationID]; ok {
-			if requiredRole == user.Role {
-				return next(req)
-			} else {
-				return middleware.Response{}, domain.WrapError(domain.ErrAuthorization, fmt.Errorf("operation %s requires role %s", req.OperationID, requiredRole))
+		log.Println(user.Role.Name)
+		if requiredPermission, ok := operationPermissions[operations.ID(req.OperationID)]; ok {
+			for _, permission := range user.Role.Permissions {
+				if permission.Slug == requiredPermission {
+					return next(req)
+				}
 			}
+			return middleware.Response{}, domain.WrapError(domain.ErrAuthorization, fmt.Errorf("operation %s requires role %s", req.OperationID, requiredPermission))
 		}
 		return next(req)
 	}

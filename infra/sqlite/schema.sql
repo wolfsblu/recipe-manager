@@ -1,3 +1,16 @@
+CREATE TABLE ingredients
+(
+    id   INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE permissions
+(
+    id   INTEGER PRIMARY KEY,
+    slug TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL
+);
+
 CREATE TABLE recipes
 (
     id          INTEGER PRIMARY KEY,
@@ -7,6 +20,18 @@ CREATE TABLE recipes
     description TEXT      NOT NULL,
     created_by  INTEGER   NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE roles
+(
+    id   INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE role_permissions
+(
+    role_id       INTEGER NOT NULL REFERENCES roles (id) ON DELETE CASCADE,
+    permission_id INTEGER NOT NULL REFERENCES permissions (id) ON DELETE CASCADE
 );
 
 CREATE TABLE tags
@@ -22,18 +47,13 @@ CREATE TABLE units
     name TEXT NOT NULL
 );
 
-CREATE TABLE ingredients
-(
-    id   INTEGER PRIMARY KEY,
-    name TEXT NOT NULL
-);
-
 CREATE TABLE users
 (
     id            INTEGER PRIMARY KEY,
     email         TEXT      NOT NULL UNIQUE,
     password_hash TEXT      NOT NULL,
     is_confirmed  BOOLEAN   NOT NULL DEFAULT 0,
+    role_id       INTEGER   NOT NULL REFERENCES roles (id) ON DELETE CASCADE,
     created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -42,6 +62,12 @@ CREATE TABLE user_registrations
     user_id    INTEGER PRIMARY KEY REFERENCES users (id) ON DELETE CASCADE,
     token      TEXT      NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_roles
+(
+    user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    role_id INTEGER NOT NULL REFERENCES roles (id) ON DELETE CASCADE
 );
 
 CREATE TABLE password_resets

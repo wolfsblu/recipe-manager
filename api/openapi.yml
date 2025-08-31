@@ -98,7 +98,7 @@ paths:
       summary: Modify a user's password based on a reset token
       operationId: updatePassword
       requestBody:
-        $ref: '#/components/requestBodies/UpdatePassword'
+        $ref: '#/components/requestBodies/PasswordReset'
       responses:
         '204':
           description: Successful operation
@@ -453,7 +453,7 @@ components:
           type: string
           examples:
             - abd87ec862b6b8ecc2cf45c170d887d21e835a35f8537ea35ff1af102faa5920
-    UpdatePassword:
+    PasswordReset:
       allOf:
         - $ref: '#/components/schemas/Token'
         - type: object
@@ -479,13 +479,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/WriteRecipe'
-    UpdatePassword:
+    PasswordReset:
       description: The user's new password as well as the required reset token
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/UpdatePassword'
+            $ref: '#/components/schemas/PasswordReset'
     ConfirmUser:
       description: The user's new password as well as the required reset token
       required: true

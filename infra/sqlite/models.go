@@ -27,6 +27,12 @@ type PasswordReset struct {
 	CreatedAt time.Time
 }
 
+type Permission struct {
+	ID   int64
+	Slug string
+	Name string
+}
+
 type Recipe struct {
 	ID          int64
 	Name        string
@@ -66,6 +72,16 @@ type RecipeTag struct {
 	TagID    int64
 }
 
+type Role struct {
+	ID   int64
+	Name string
+}
+
+type RolePermission struct {
+	RoleID       int64
+	PermissionID int64
+}
+
 type Tag struct {
 	ID   int64
 	Name string
@@ -82,6 +98,7 @@ type User struct {
 	Email        string
 	PasswordHash string
 	IsConfirmed  bool
+	RoleID       int64
 	CreatedAt    time.Time
 }
 
@@ -89,4 +106,9 @@ type UserRegistration struct {
 	UserID    int64
 	Token     string
 	CreatedAt time.Time
+}
+
+type UserRole struct {
+	UserID int64
+	RoleID int64
 }

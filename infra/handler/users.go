@@ -75,7 +75,7 @@ func (h *RecipeHandler) ResetPassword(ctx context.Context, req *api.ResetPasswor
 	return h.Recipes.ResetPasswordByEmail(ctx, req.Email)
 }
 
-func (h *RecipeHandler) UpdatePassword(ctx context.Context, req *api.UpdatePassword) error {
+func (h *RecipeHandler) UpdatePassword(ctx context.Context, req *api.PasswordReset) error {
 	hashedPassword, err := security.CreateHash(req.Password, security.DefaultHashParams)
 	if err != nil {
 		return err

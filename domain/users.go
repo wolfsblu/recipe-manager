@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/wolfsblu/go-chef/domain/permissions"
 	"github.com/wolfsblu/go-chef/domain/security"
 )
 
@@ -12,10 +13,20 @@ type Credentials struct {
 	PasswordHash string
 }
 
+type Permission struct {
+	Name string
+	Slug permissions.Slug
+}
+
+type Role struct {
+	Name        string
+	Permissions []Permission
+}
+
 type User struct {
 	ID        int64
 	Confirmed bool
-	Role      string
+	Role      Role
 	Credentials
 }
 

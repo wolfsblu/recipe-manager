@@ -31,7 +31,7 @@ func (q *Queries) CreatePasswordResetToken(ctx context.Context, arg CreatePasswo
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (email, password_hash)
 VALUES (?, ?)
-RETURNING id, email, password_hash, is_confirmed, created_at
+RETURNING id, email, password_hash, is_confirmed, role_id, created_at
 `
 
 type CreateUserParams struct {
@@ -47,6 +47,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Email,
 		&i.PasswordHash,
 		&i.IsConfirmed,
+		&i.RoleID,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -115,7 +116,7 @@ func (q *Queries) DeleteRegistrationsBefore(ctx context.Context, createdAt time.
 }
 
 const getPasswordResetToken = `-- name: GetPasswordResetToken :one
-SELECT password_resets.user_id, password_resets.token, password_resets.created_at, users.id, users.email, users.password_hash, users.is_confirmed, users.created_at
+SELECT password_resets.user_id, password_resets.token, password_resets.created_at, users.id, users.email, users.password_hash, users.is_confirmed, users.role_id, users.created_at
 FROM password_resets
          INNER JOIN users ON users.id = password_resets.user_id
 WHERE token = ?
@@ -138,6 +139,7 @@ func (q *Queries) GetPasswordResetToken(ctx context.Context, token string) (GetP
 		&i.User.Email,
 		&i.User.PasswordHash,
 		&i.User.IsConfirmed,
+		&i.User.RoleID,
 		&i.User.CreatedAt,
 	)
 	return i, err
@@ -158,7 +160,7 @@ func (q *Queries) GetPasswordResetTokenByUser(ctx context.Context, userID int64)
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, email, password_hash, is_confirmed, created_at
+SELECT id, email, password_hash, is_confirmed, role_id, created_at
 FROM users
 WHERE id = ?
 LIMIT 1
@@ -172,13 +174,14 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.Email,
 		&i.PasswordHash,
 		&i.IsConfirmed,
+		&i.RoleID,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password_hash, is_confirmed, created_at
+SELECT id, email, password_hash, is_confirmed, role_id, created_at
 FROM users
 WHERE email = ?
 LIMIT 1
@@ -192,13 +195,14 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Email,
 		&i.PasswordHash,
 		&i.IsConfirmed,
+		&i.RoleID,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getUserRegistration = `-- name: GetUserRegistration :one
-SELECT user_registrations.user_id, user_registrations.token, user_registrations.created_at, users.id, users.email, users.password_hash, users.is_confirmed, users.created_at
+SELECT user_registrations.user_id, user_registrations.token, user_registrations.created_at, users.id, users.email, users.password_hash, users.is_confirmed, users.role_id, users.created_at
 FROM user_registrations
          INNER JOIN users ON users.id = user_registrations.user_id
 WHERE token = ?
@@ -221,6 +225,7 @@ func (q *Queries) GetUserRegistration(ctx context.Context, token string) (GetUse
 		&i.User.Email,
 		&i.User.PasswordHash,
 		&i.User.IsConfirmed,
+		&i.User.RoleID,
 		&i.User.CreatedAt,
 	)
 	return i, err
