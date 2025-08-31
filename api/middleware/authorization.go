@@ -11,7 +11,11 @@ import (
 )
 
 var operationPermissions = map[operations.ID]permissions.Slug{
-	operations.GetUnits: permissions.ViewUnit,
+	operations.AddRecipe:     permissions.CreateRecipe,
+	operations.DeleteRecipe:  permissions.DeleteRecipe,
+	operations.UpdateRecipe:  permissions.UpdateRecipe,
+	operations.GetRecipes:    permissions.ViewRecipe,
+	operations.GetRecipeById: permissions.ViewRecipe,
 }
 
 func Authorize() middleware.Middleware {
