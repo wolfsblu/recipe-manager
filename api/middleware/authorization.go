@@ -14,7 +14,7 @@ var operationPermissions = map[operations.ID]permissions.Slug{
 	operations.AddRecipe:     permissions.CreateRecipe,
 	operations.DeleteRecipe:  permissions.DeleteRecipe,
 	operations.UpdateRecipe:  permissions.UpdateRecipe,
-	operations.GetRecipes:    permissions.ViewRecipe,
+	operations.GetRecipes:    permissions.ListRecipes,
 	operations.GetRecipeById: permissions.ViewRecipe,
 }
 
