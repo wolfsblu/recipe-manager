@@ -93,16 +93,16 @@ func (m *responseMapper) toRecipes(recipes []domain.Recipe) ([]api.ReadRecipe, e
 	return result, nil
 }
 
-func (m *responseMapper) toUnit(unit domain.Unit) (api.Unit, error) {
-	return api.Unit{
+func (m *responseMapper) toUnit(unit domain.Unit) (api.ReadUnit, error) {
+	return api.ReadUnit{
 		ID:   unit.ID,
 		Name: unit.Name,
 		Code: toNilString(unit.Code),
 	}, nil
 }
 
-func (m *responseMapper) toUnits(units []domain.Unit) ([]api.Unit, error) {
-	result := make([]api.Unit, len(units))
+func (m *responseMapper) toUnits(units []domain.Unit) ([]api.ReadUnit, error) {
+	result := make([]api.ReadUnit, len(units))
 	for i, unit := range units {
 		mapped, err := m.toUnit(unit)
 		if err != nil {

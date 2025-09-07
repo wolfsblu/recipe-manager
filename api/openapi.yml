@@ -330,7 +330,44 @@ components:
           type: string
           examples:
             - Flour
-    Unit:
+    PasswordReset:
+      allOf:
+        - $ref: '#/components/schemas/Token'
+        - type: object
+          required:
+            - password
+          properties:
+            password:
+              type: string
+              examples:
+                - my new password
+    ReadMealPlan:
+      type: object
+      required:
+        - date
+      properties:
+        date:
+          type: string
+          description: When are these recipes planned
+          examples:
+            - 2006-06-01
+        recipes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadRecipe'
+    ReadRecipe:
+      allOf:
+        - $ref: '#/components/schemas/WriteRecipe'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              format: int64
+              examples:
+                - 10
+    ReadUnit:
       type: object
       required:
         - id
@@ -345,12 +382,27 @@ components:
         name:
           type: string
           examples:
-            - "gram"
+            - Kilogram
         code:
           type: string
           nullable: true
           examples:
-            - "g"
+            - kg
+    ReadUser:
+      type: object
+      required:
+        - id
+        - email
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+            - 10
+        email:
+          type: string
+          examples:
+            - user@example.com
     RecipeStatus:
       type: string
       description: Recipe status in the store
@@ -358,6 +410,45 @@ components:
         - available
         - pending
         - sold
+    WriteRecipeStep:
+      type: object
+      required:
+        - instructions
+      properties:
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/WriteStepIngredient'
+        instructions:
+          type: string
+          description: Textual instructions for this step
+          examples:
+            - "Put chicken into pan and cook on medium heat."
+    WriteStepIngredient:
+      type: object
+      properties:
+        ingredientId:
+          type: integer
+          format: int64
+          examples:
+            - 3
+        unitId:
+          type: integer
+          format: int64
+          examples:
+            - 4
+        amount:
+          type: number
+          format: float
+    Token:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          examples:
+            - abd87ec862b6b8ecc2cf45c170d887d21e835a35f8537ea35ff1af102faa5920
     WriteRecipe:
       type: object
       required:
@@ -365,6 +456,7 @@ components:
         - minutes
         - name
         - servings
+        - steps
       properties:
         name:
           type: string
@@ -393,6 +485,10 @@ components:
             type: string
             examples:
               - Spicy
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WriteRecipeStep'
         images:
           type: array
           items:
@@ -403,67 +499,8 @@ components:
       encoding:
         images:
           contentType: image/jpeg, image/png
-    ReadMealPlan:
-      type: object
-      required:
-        - date
-      properties:
-        date:
-          type: string
-          description: When are these recipes planned
-          examples:
-            - 2006-06-01
-        recipes:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReadRecipe'
-    ReadRecipe:
-      allOf:
-        - $ref: '#/components/schemas/WriteRecipe'
-        - type: object
-          required:
-            - id
-          properties:
-            id:
-              type: integer
-              format: int64
-              examples:
-                - 10
-    ReadUser:
-      type: object
-      required:
-        - id
-        - email
-      properties:
-        id:
-          type: integer
-          format: int64
-          examples:
-            - 10
-        email:
-          type: string
-          examples:
-            - user@example.com
-    Token:
-      type: object
-      required:
-        - token
-      properties:
-        token:
-          type: string
-          examples:
-            - abd87ec862b6b8ecc2cf45c170d887d21e835a35f8537ea35ff1af102faa5920
-    PasswordReset:
-      allOf:
-        - $ref: '#/components/schemas/Token'
-        - type: object
-          required:
-            - password
-          properties:
-            password:
-              type: string
-              examples:
-                - my new password
+    WriteUnit:
+
   requestBodies:
     Credentials:
       description: User credentials
@@ -524,7 +561,7 @@ components:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/Unit'
+              $ref: '#/components/schemas/ReadUnit'
     MealPlan:
       description: Meal plan for the user
       content:

@@ -106,7 +106,7 @@ func (h *RecipeHandler) GetIngredients(ctx context.Context) ([]api.Ingredient, e
 	return h.mapper.toIngredients(ingredients)
 }
 
-func (h *RecipeHandler) GetUnits(ctx context.Context) ([]api.Unit, error) {
+func (h *RecipeHandler) GetUnits(ctx context.Context) ([]api.ReadUnit, error) {
 	units, err := h.Recipes.GetUnits(ctx)
 	if err != nil {
 		return nil, err
