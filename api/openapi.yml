@@ -426,6 +426,10 @@ components:
             - "Put chicken into pan and cook on medium heat."
     WriteStepIngredient:
       type: object
+      required:
+        - amount
+        - ingredientId
+        - unitId
       properties:
         ingredientId:
           type: integer
@@ -439,7 +443,9 @@ components:
             - 4
         amount:
           type: number
-          format: float
+          format: float64
+          examples:
+            - 3.5
     Token:
       type: object
       required:

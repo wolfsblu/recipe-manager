@@ -19,7 +19,7 @@ func (s *Store) BrowseRecipes(ctx context.Context) (recipes []domain.Recipe, err
 	return recipes, err
 }
 
-func (s *Store) CreateRecipe(ctx context.Context, r domain.RecipeDetails) (recipe domain.Recipe, _ error) {
+func (s *Store) CreateRecipe(ctx context.Context, r domain.Recipe) (recipe domain.Recipe, _ error) {
 	payload := CreateRecipeParams{
 		Name:        r.Name,
 		Servings:    r.Servings,
@@ -33,7 +33,45 @@ func (s *Store) CreateRecipe(ctx context.Context, r domain.RecipeDetails) (recip
 		return recipe, err
 	}
 
-	return result.AsDomainModel(), nil
+	recipe = result.AsDomainModel()
+	recipe.Steps = make([]domain.RecipeStep, len(r.Steps))
+	for i, step := range r.Steps {
+		stepResult, err := s.query().CreateRecipeStep(ctx, CreateRecipeStepParams{
+			RecipeID:     result.ID,
+			Instructions: step.Instructions,
+		})
+		if err != nil {
+			return recipe, err
+		}
+		recipe.Steps[i] = domain.RecipeStep{
+			ID:           stepResult.ID,
+			Instructions: stepResult.Instructions,
+		}
+
+		recipe.Steps[i].Ingredients = make([]domain.StepIngredient, len(step.Ingredients))
+		for j, ingredient := range step.Ingredients {
+			ingredientResult, err := s.query().CreateStepIngredient(ctx, CreateStepIngredientParams{
+				StepID:       stepResult.ID,
+				IngredientID: ingredient.Ingredient.ID,
+				UnitID:       ingredient.Unit.ID,
+				Amount:       ingredient.Amount,
+			})
+			if err != nil {
+				return recipe, err
+			}
+
+			recipe.Steps[i].Ingredients[j] = domain.StepIngredient{
+				Unit: domain.Unit{
+					ID: ingredientResult.UnitID,
+				},
+				Amount: ingredientResult.Amount,
+				Ingredient: domain.Ingredient{
+					ID: ingredientResult.IngredientID,
+				},
+			}
+		}
+	}
+	return recipe, nil
 }
 
 func (s *Store) DeleteRecipe(ctx context.Context, id int64) error {

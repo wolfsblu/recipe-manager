@@ -18,10 +18,23 @@ type RecipeDetails struct {
 	Minutes     int64
 }
 
+type StepIngredient struct {
+	Unit       Unit
+	Amount     float64
+	Ingredient Ingredient
+}
+
+type RecipeStep struct {
+	ID           int64
+	Instructions string
+	Ingredients  []StepIngredient
+}
+
 type Recipe struct {
 	ID     int64
 	Tags   []string
 	Images []RecipeImage
+	Steps  []RecipeStep
 	RecipeDetails
 }
 
@@ -47,7 +60,7 @@ type Unit struct {
 	Code *string
 }
 
-func (s *RecipeService) Add(ctx context.Context, r RecipeDetails) (Recipe, error) {
+func (s *RecipeService) Add(ctx context.Context, r Recipe) (Recipe, error) {
 	return s.store.CreateRecipe(ctx, r)
 }
 

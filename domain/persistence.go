@@ -9,7 +9,7 @@ type RecipeStore interface {
 	Begin(ctx context.Context) error
 	BrowseRecipes(ctx context.Context) ([]Recipe, error)
 	Commit() error
-	CreateRecipe(ctx context.Context, recipe RecipeDetails) (Recipe, error)
+	CreateRecipe(ctx context.Context, recipe Recipe) (Recipe, error)
 	CreatePasswordResetToken(ctx context.Context, user *User) (PasswordResetToken, error)
 	CreateUser(ctx context.Context, credentials Credentials) (User, error)
 	CreateUserRegistration(ctx context.Context, user *User) (UserRegistration, error)

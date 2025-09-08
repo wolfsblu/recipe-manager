@@ -7,6 +7,16 @@ INSERT INTO recipes (name, servings, minutes, description, created_by)
 VALUES (?, ?, ?, ?, ?)
 RETURNING *;
 
+-- name: CreateRecipeStep :one
+INSERT INTO recipe_steps (recipe_id, instructions)
+VALUES (?, ?)
+RETURNING *;
+
+-- name: CreateStepIngredient :one
+INSERT INTO recipe_ingredients (step_id, ingredient_id, unit_id, amount)
+VALUES (?, ?, ?, ?)
+RETURNING *;
+
 -- name: DeleteRecipe :exec
 DELETE
 FROM recipes

@@ -7,36 +7,33 @@ import (
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/config"
+	"github.com/wolfsblu/go-chef/infra/env"
+	"github.com/wolfsblu/go-chef/infra/handler/mapper"
 )
 
 type RecipeHandler struct {
-	mapper  *responseMapper
+	mapper  *mapper.APIMapper
 	Recipes *domain.RecipeService
 }
 
 func NewRecipeHandler(service *domain.RecipeService) *RecipeHandler {
 	return &RecipeHandler{
-		mapper:  newResponseMapper(newURLBuilder()),
+		mapper:  mapper.NewAPIMapper(env.MustGet("BASE_URL")),
 		Recipes: service,
 	}
 }
 
 func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipe) (*api.ReadRecipe, error) {
 	user := ctx.Value(config.CtxKeyUser).(*domain.User)
-	recipe, err := h.Recipes.Add(ctx, domain.RecipeDetails{
-		Name:        req.Name,
-		Description: req.Description,
-		CreatedBy:   user,
-		Servings:    req.Servings,
-		Minutes:     req.Minutes,
-	})
+	recipe := h.mapper.FromWriteRecipe(req)
+	recipe.CreatedBy = user
+
+	result, err := h.Recipes.Add(ctx, recipe)
 	if err != nil {
 		return nil, err
 	}
-	return &api.ReadRecipe{
-		ID:   recipe.ID,
-		Name: recipe.Name,
-	}, nil
+
+	return h.mapper.ToRecipe(result)
 }
 
 func (h *RecipeHandler) BrowseRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
@@ -70,7 +67,7 @@ func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanP
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.toMealPlans(mealplan)
+	return h.mapper.ToMealPlans(mealplan)
 }
 
 func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
@@ -79,7 +76,7 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.toRecipes(recipes)
+	return h.mapper.ToRecipes(recipes)
 }
 
 func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeByIdParams) (*api.ReadRecipe, error) {
@@ -103,7 +100,7 @@ func (h *RecipeHandler) GetIngredients(ctx context.Context) ([]api.Ingredient, e
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.toIngredients(ingredients)
+	return h.mapper.ToIngredients(ingredients)
 }
 
 func (h *RecipeHandler) GetUnits(ctx context.Context) ([]api.ReadUnit, error) {
@@ -111,5 +108,5 @@ func (h *RecipeHandler) GetUnits(ctx context.Context) ([]api.ReadUnit, error) {
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.toUnits(units)
+	return h.mapper.ToUnits(units)
 }

@@ -81,6 +81,61 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Rec
 	return i, err
 }
 
+const createRecipeStep = `-- name: CreateRecipeStep :one
+INSERT INTO recipe_steps (recipe_id, instructions)
+VALUES (?, ?)
+RETURNING id, recipe_id, instructions, sort_order
+`
+
+type CreateRecipeStepParams struct {
+	RecipeID     int64
+	Instructions string
+}
+
+func (q *Queries) CreateRecipeStep(ctx context.Context, arg CreateRecipeStepParams) (RecipeStep, error) {
+	row := q.db.QueryRowContext(ctx, createRecipeStep, arg.RecipeID, arg.Instructions)
+	var i RecipeStep
+	err := row.Scan(
+		&i.ID,
+		&i.RecipeID,
+		&i.Instructions,
+		&i.SortOrder,
+	)
+	return i, err
+}
+
+const createStepIngredient = `-- name: CreateStepIngredient :one
+INSERT INTO recipe_ingredients (step_id, ingredient_id, unit_id, amount)
+VALUES (?, ?, ?, ?)
+RETURNING id, step_id, ingredient_id, unit_id, amount, sort_order
+`
+
+type CreateStepIngredientParams struct {
+	StepID       int64
+	IngredientID int64
+	UnitID       int64
+	Amount       float64
+}
+
+func (q *Queries) CreateStepIngredient(ctx context.Context, arg CreateStepIngredientParams) (RecipeIngredient, error) {
+	row := q.db.QueryRowContext(ctx, createStepIngredient,
+		arg.StepID,
+		arg.IngredientID,
+		arg.UnitID,
+		arg.Amount,
+	)
+	var i RecipeIngredient
+	err := row.Scan(
+		&i.ID,
+		&i.StepID,
+		&i.IngredientID,
+		&i.UnitID,
+		&i.Amount,
+		&i.SortOrder,
+	)
+	return i, err
+}
+
 const deleteRecipe = `-- name: DeleteRecipe :exec
 DELETE
 FROM recipes
