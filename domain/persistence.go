@@ -5,7 +5,14 @@ import (
 	"time"
 )
 
+type Transactioner interface {
+	Begin(ctx context.Context) error
+	Commit() error
+	Rollback()
+}
+
 type RecipeStore interface {
+	Transactioner
 	BrowseRecipes(ctx context.Context) ([]Recipe, error)
 	CreateRecipe(ctx context.Context, recipe Recipe) (Recipe, error)
 	DeleteRecipe(ctx context.Context, id int64) error
@@ -17,9 +24,7 @@ type RecipeStore interface {
 }
 
 type UserStore interface {
-	Begin(ctx context.Context) error
-	Commit() error
-	Rollback()
+	Transactioner
 	CreatePasswordResetToken(ctx context.Context, user *User) (PasswordResetToken, error)
 	CreateUser(ctx context.Context, credentials Credentials) (User, error)
 	CreateUserRegistration(ctx context.Context, user *User) (UserRegistration, error)
