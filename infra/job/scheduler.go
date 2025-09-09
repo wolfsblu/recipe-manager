@@ -8,7 +8,7 @@ import (
 
 type Scheduler struct {
 	quit    chan struct{}
-	service *domain.RecipeService
+	service *domain.UserService
 }
 
 func (s *Scheduler) Start() {

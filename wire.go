@@ -25,18 +25,28 @@ func InitializeRecipeService() (*domain.RecipeService, error) {
 	))
 }
 
-func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) {
+func InitializeUserService() (*domain.UserService, error) {
+	panic(wire.Build(
+		domain.NewUserService,
+		smtp.NewSMTPMailer,
+		sqlite.NewSqliteStore,
+		wire.Bind(new(domain.NotificationSender), new(*smtp.Mailer)),
+		wire.Bind(new(domain.UserStore), new(*sqlite.Store)),
+	))
+}
+
+func InitializeWebServer(recipeService *domain.RecipeService, userService *domain.UserService) (*http.ServeMux, error) {
 	panic(wire.Build(
 		api.NewAPIServer,
-		handler.NewRecipeHandler,
+		handler.NewServer,
 		handler.NewSecurityHandler,
 		handler.NewUploadHandler,
 		routing.NewServeMux,
-		wire.Bind(new(api.Handler), new(*handler.RecipeHandler)),
+		wire.Bind(new(api.Handler), new(*handler.Server)),
 		wire.Bind(new(api.SecurityHandler), new(*handler.SecurityHandler)),
 	))
 }
 
-func InitializeScheduler(service *domain.RecipeService) *job.Scheduler {
+func InitializeScheduler(userService *domain.UserService) *job.Scheduler {
 	panic(wire.Build(job.NewScheduler))
 }

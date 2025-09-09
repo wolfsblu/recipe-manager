@@ -9,12 +9,12 @@ import (
 )
 
 type SecurityHandler struct {
-	Recipes *domain.RecipeService
+	Users *domain.UserService
 }
 
-func NewSecurityHandler(service *domain.RecipeService) *SecurityHandler {
+func NewSecurityHandler(service *domain.UserService) *SecurityHandler {
 	return &SecurityHandler{
-		Recipes: service,
+		Users: service,
 	}
 }
 
@@ -23,7 +23,7 @@ func (h *SecurityHandler) HandleCookieAuth(ctx context.Context, _ string, t api.
 	if err != nil {
 		return nil, domain.WrapError(domain.ErrAuthentication, err)
 	}
-	user, err := h.Recipes.GetUserById(ctx, userId)
+	user, err := h.Users.GetUserById(ctx, userId)
 	if err != nil {
 		return nil, domain.WrapError(domain.ErrAuthentication, err)
 	}

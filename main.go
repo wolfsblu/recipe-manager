@@ -14,10 +14,15 @@ func main() {
 		log.Fatal("failed to initialize recipe service: ", err)
 	}
 
-	scheduler := InitializeScheduler(recipeService)
+	userService, err := InitializeUserService()
+	if err != nil {
+		log.Fatal("failed to initialize user service: ", err)
+	}
+
+	scheduler := InitializeScheduler(userService)
 	defer scheduler.Quit()
 
-	mux, err := InitializeWebServer(recipeService)
+	mux, err := InitializeWebServer(recipeService, userService)
 	if err != nil {
 		log.Fatal("failed to initialize web server: ", err)
 	}

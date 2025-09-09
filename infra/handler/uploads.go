@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-func NewUploadHandler(recipes *domain.RecipeService) (*tusd.Handler, error) {
+func NewUploadHandler(users *domain.UserService) (*tusd.Handler, error) {
 	store := filestore.New(env.MustGet("UPLOAD_PATH"))
 	locker := filelocker.New(env.MustGet("UPLOAD_PATH"))
 
@@ -34,7 +34,7 @@ func NewUploadHandler(recipes *domain.RecipeService) (*tusd.Handler, error) {
 		RespectForwardedHeaders: true,
 	})
 
-	go registerEventListeners(handler, recipes)
+	go registerEventListeners(handler, users)
 
 	if err != nil {
 		return nil, err
@@ -42,25 +42,25 @@ func NewUploadHandler(recipes *domain.RecipeService) (*tusd.Handler, error) {
 	return handler, nil
 }
 
-func registerEventListeners(handler *tusd.Handler, recipes *domain.RecipeService) {
+func registerEventListeners(handler *tusd.Handler, users *domain.UserService) {
 	for {
 		select {
 		case event := <-handler.CompleteUploads:
-			onUploadCompleted(recipes, event)
+			onUploadCompleted(users, event)
 		case event := <-handler.CreatedUploads:
-			onUploadCreated(recipes, event)
+			onUploadCreated(users, event)
 		}
 	}
 }
 
-func onUploadCreated(recipes *domain.RecipeService, event tusd.HookEvent) {
+func onUploadCreated(users *domain.UserService, event tusd.HookEvent) {
 	_, err := getUserIdFromUpload(event.HTTPRequest)
 	if err != nil {
 		event.Upload.StopUpload(newForbiddenResponse())
 	}
 }
 
-func onUploadCompleted(recipes *domain.RecipeService, event tusd.HookEvent) {
+func onUploadCompleted(users *domain.UserService, event tusd.HookEvent) {
 	// Move file to correct location
 }
 

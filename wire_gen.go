@@ -29,22 +29,32 @@ func InitializeRecipeService() (*domain.RecipeService, error) {
 	return recipeService, nil
 }
 
-func InitializeWebServer(service *domain.RecipeService) (*http.ServeMux, error) {
-	recipeHandler := handler.NewRecipeHandler(service)
-	securityHandler := handler.NewSecurityHandler(service)
-	server, err := api.NewAPIServer(recipeHandler, securityHandler)
+func InitializeUserService() (*domain.UserService, error) {
+	mailer := smtp.NewSMTPMailer()
+	store, err := sqlite.NewSqliteStore()
 	if err != nil {
 		return nil, err
 	}
-	handlerHandler, err := handler.NewUploadHandler(service)
+	userService := domain.NewUserService(mailer, store)
+	return userService, nil
+}
+
+func InitializeWebServer(recipeService *domain.RecipeService, userService *domain.UserService) (*http.ServeMux, error) {
+	server := handler.NewServer(recipeService, userService)
+	securityHandler := handler.NewSecurityHandler(userService)
+	apiServer, err := api.NewAPIServer(server, securityHandler)
 	if err != nil {
 		return nil, err
 	}
-	serveMux := routing.NewServeMux(server, handlerHandler)
+	handlerHandler, err := handler.NewUploadHandler(userService)
+	if err != nil {
+		return nil, err
+	}
+	serveMux := routing.NewServeMux(apiServer, handlerHandler)
 	return serveMux, nil
 }
 
-func InitializeScheduler(service *domain.RecipeService) *job.Scheduler {
-	scheduler := job.NewScheduler(service)
+func InitializeScheduler(userService *domain.UserService) *job.Scheduler {
+	scheduler := job.NewScheduler(userService)
 	return scheduler
 }

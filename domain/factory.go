@@ -6,3 +6,10 @@ func NewRecipeService(notifier NotificationSender, store RecipeStore) *RecipeSer
 		sender: notifier,
 	}
 }
+
+func NewUserService(notifier NotificationSender, store UserStore) *UserService {
+	return &UserService{
+		store:  store,
+		sender: notifier,
+	}
+}
