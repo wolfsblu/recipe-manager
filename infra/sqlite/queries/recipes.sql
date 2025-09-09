@@ -5,17 +5,17 @@ FROM recipes;
 -- name: CreateRecipe :one
 INSERT INTO recipes (name, servings, minutes, description, created_by)
 VALUES (?, ?, ?, ?, ?)
-RETURNING *;
+RETURNING id;
 
 -- name: CreateRecipeStep :one
 INSERT INTO recipe_steps (recipe_id, instructions)
 VALUES (?, ?)
-RETURNING *;
+RETURNING id;
 
 -- name: CreateStepIngredient :one
 INSERT INTO recipe_ingredients (step_id, ingredient_id, unit_id, amount)
 VALUES (?, ?, ?, ?)
-RETURNING *;
+RETURNING id;
 
 -- name: DeleteRecipe :exec
 DELETE

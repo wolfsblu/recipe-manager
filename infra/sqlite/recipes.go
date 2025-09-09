@@ -25,7 +25,7 @@ func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 	}
 	defer s.Rollback()
 
-	dbRecipe, err := s.query().CreateRecipe(ctx, CreateRecipeParams{
+	recipeId, err := s.query().CreateRecipe(ctx, CreateRecipeParams{
 		Name:        recipe.Name,
 		Servings:    recipe.Servings,
 		Minutes:     recipe.Minutes,
@@ -35,64 +35,45 @@ func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 	if err != nil {
 		return domain.Recipe{}, err
 	}
-
-	result := dbRecipe.AsDomainModel()
-	if result.Steps, err = s.createRecipeSteps(ctx, dbRecipe.ID, recipe.Steps); err != nil {
+	if err = s.createRecipeSteps(ctx, recipeId, recipe.Steps); err != nil {
 		return domain.Recipe{}, err
 	}
-
 	if err = s.Commit(); err != nil {
 		return domain.Recipe{}, err
 	}
-
-	return result, nil
+	return s.GetRecipeById(ctx, recipeId)
 }
 
-func (s *Store) createRecipeSteps(ctx context.Context, recipeID int64, steps []domain.RecipeStep) ([]domain.RecipeStep, error) {
-	for i, step := range steps {
-		stepResult, err := s.query().CreateRecipeStep(ctx, CreateRecipeStepParams{
+func (s *Store) createRecipeSteps(ctx context.Context, recipeID int64, steps []domain.RecipeStep) error {
+	for _, step := range steps {
+		stepId, err := s.query().CreateRecipeStep(ctx, CreateRecipeStepParams{
 			RecipeID:     recipeID,
 			Instructions: step.Instructions,
 		})
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		steps[i] = domain.RecipeStep{
-			ID:           stepResult.ID,
-			Instructions: stepResult.Instructions,
-		}
-
-		if steps[i].Ingredients, err = s.createStepIngredients(ctx, stepResult.ID, step.Ingredients); err != nil {
-			return nil, err
+		if err = s.createStepIngredients(ctx, stepId, step.Ingredients); err != nil {
+			return err
 		}
 	}
-	return steps, nil
+	return nil
 }
 
-func (s *Store) createStepIngredients(ctx context.Context, stepID int64, ingredients []domain.StepIngredient) ([]domain.StepIngredient, error) {
-	for i, ingredient := range ingredients {
-		ingredientResult, err := s.query().CreateStepIngredient(ctx, CreateStepIngredientParams{
+func (s *Store) createStepIngredients(ctx context.Context, stepID int64, ingredients []domain.StepIngredient) error {
+	for _, ingredient := range ingredients {
+		_, err := s.query().CreateStepIngredient(ctx, CreateStepIngredientParams{
 			StepID:       stepID,
 			IngredientID: ingredient.Ingredient.ID,
 			UnitID:       ingredient.Unit.ID,
 			Amount:       ingredient.Amount,
 		})
 		if err != nil {
-			return nil, err
-		}
-
-		ingredients[i] = domain.StepIngredient{
-			Unit: domain.Unit{
-				ID: ingredientResult.UnitID,
-			},
-			Amount: ingredientResult.Amount,
-			Ingredient: domain.Ingredient{
-				ID: ingredientResult.IngredientID,
-			},
+			return err
 		}
 	}
-	return ingredients, nil
+	return nil
 }
 
 func (s *Store) DeleteRecipe(ctx context.Context, id int64) error {

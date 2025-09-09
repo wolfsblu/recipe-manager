@@ -73,6 +73,7 @@ func (m *APIMapper) ToRecipe(recipe domain.Recipe) (*api.ReadRecipe, error) {
 			}
 		}
 		steps[i] = api.WriteRecipeStep{
+			Ingredients:  ingredients,
 			Instructions: step.Instructions,
 		}
 	}
