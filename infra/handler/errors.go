@@ -3,6 +3,8 @@ package handler
 import (
 	"context"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -39,6 +41,7 @@ func (h *RecipeHandler) NewError(_ context.Context, err error) (r *api.ErrorStat
 	if errors.As(err, &securityError) {
 		domainErr = domain.ErrAuthentication
 	} else if !errors.As(err, &domainErr) {
+		log.Println(fmt.Errorf("unhandled error: %w", err))
 		domainErr = domain.ErrUnhandled
 	}
 
