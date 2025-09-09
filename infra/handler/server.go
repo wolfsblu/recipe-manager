@@ -1,14 +1,16 @@
 package handler
 
-import "github.com/wolfsblu/go-chef/domain"
+import (
+	"github.com/wolfsblu/go-chef/domain"
+)
 
-type Server struct {
+type APIHandler struct {
 	*RecipeHandler
 	*UserHandler
 }
 
-func NewServer(recipes *domain.RecipeService, users *domain.UserService) *Server {
-	return &Server{
+func NewAPIHandler(recipes *domain.RecipeService, users *domain.UserService) *APIHandler {
+	return &APIHandler{
 		RecipeHandler: NewRecipeHandler(recipes),
 		UserHandler:   NewUserHandler(users),
 	}

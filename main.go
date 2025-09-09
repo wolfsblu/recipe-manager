@@ -4,28 +4,42 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/wolfsblu/go-chef/api"
+	"github.com/wolfsblu/go-chef/domain"
 	"github.com/wolfsblu/go-chef/infra/env"
+	"github.com/wolfsblu/go-chef/infra/handler"
+	"github.com/wolfsblu/go-chef/infra/job"
+	"github.com/wolfsblu/go-chef/infra/routing"
+	"github.com/wolfsblu/go-chef/infra/smtp"
+	"github.com/wolfsblu/go-chef/infra/sqlite"
 )
 
 func main() {
 	env.Load()
-	recipeService, err := InitializeRecipeService()
+
+	mailer := smtp.NewSMTPMailer()
+	sqliteStore, err := sqlite.NewSqliteStore()
 	if err != nil {
-		log.Fatal("failed to initialize recipe service: ", err)
+		log.Fatal("failed to initialize sqlite store: ", err)
 	}
 
-	userService, err := InitializeUserService()
+	recipeService := domain.NewRecipeService(mailer, sqliteStore)
+	userService := domain.NewUserService(mailer, sqliteStore)
+
+	securityHandler := handler.NewSecurityHandler(userService)
+	apiHandler := handler.NewAPIHandler(recipeService, userService)
+	uploadHandler, err := handler.NewUploadHandler(userService)
 	if err != nil {
-		log.Fatal("failed to initialize user service: ", err)
+		log.Fatal("failed to initialize upload handler: ", err)
+	}
+	apiServer, err := api.NewAPIServer(apiHandler, securityHandler)
+	if err != nil {
+		log.Fatal("failed to initialize API server: ", err)
 	}
 
-	scheduler := InitializeScheduler(userService)
+	mux := routing.NewServeMux(apiServer, uploadHandler)
+	scheduler := job.NewScheduler(userService)
 	defer scheduler.Quit()
-
-	mux, err := InitializeWebServer(recipeService, userService)
-	if err != nil {
-		log.Fatal("failed to initialize web server: ", err)
-	}
 
 	host := env.MustGet("HOST")
 	err = http.ListenAndServe(host, mux)
