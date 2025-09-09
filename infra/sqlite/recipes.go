@@ -115,19 +115,19 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 	}
 
 	i := 0
-	mealplan := make([]domain.MealPlan, len(grouped))
+	mealPlan := make([]domain.MealPlan, len(grouped))
 	for key, recipes := range grouped {
 		date, err := time.Parse(time.DateOnly, key)
 		if err != nil {
 			return []domain.MealPlan{}, err
 		}
-		mealplan[i] = domain.MealPlan{
+		mealPlan[i] = domain.MealPlan{
 			Date:    date,
 			Recipes: recipes,
 		}
 		i++
 	}
-	return mealplan, nil
+	return mealPlan, nil
 }
 
 func (s *Store) GetIngredients(ctx context.Context) ([]domain.Ingredient, error) {
