@@ -11,6 +11,9 @@ type RecipeService struct {
 }
 
 func (s *RecipeService) Add(ctx context.Context, r Recipe) (Recipe, error) {
+	if err := s.validateRecipe(ctx, r); err != nil {
+		return Recipe{}, err
+	}
 	return s.store.CreateRecipe(ctx, r)
 }
 
