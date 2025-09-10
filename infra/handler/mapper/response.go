@@ -16,6 +16,41 @@ func (m *APIMapper) ToIngredient(ingredient domain.Ingredient) (api.Ingredient, 
 	}, nil
 }
 
+func (m *APIMapper) ToReadStepIngredient(ingredient domain.StepIngredient) (api.ReadStepIngredient, error) {
+	unit, err := m.ToUnit(ingredient.Unit)
+	if err != nil {
+		return api.ReadStepIngredient{}, err
+	}
+
+	apiIngredient, err := m.ToIngredient(ingredient.Ingredient)
+	if err != nil {
+		return api.ReadStepIngredient{}, err
+	}
+
+	return api.ReadStepIngredient{
+		Ingredient: apiIngredient,
+		Unit:       unit,
+		Amount:     ingredient.Amount,
+	}, nil
+}
+
+func (m *APIMapper) ToReadRecipeStep(step domain.RecipeStep) (api.ReadRecipeStep, error) {
+	ingredients := make([]api.ReadStepIngredient, len(step.Ingredients))
+	for i, ingredient := range step.Ingredients {
+		apiIngredient, err := m.ToReadStepIngredient(ingredient)
+		if err != nil {
+			return api.ReadRecipeStep{}, err
+		}
+		ingredients[i] = apiIngredient
+	}
+
+	return api.ReadRecipeStep{
+		ID:           step.ID,
+		Ingredients:  ingredients,
+		Instructions: step.Instructions,
+	}, nil
+}
+
 func (m *APIMapper) ToIngredients(ingredients []domain.Ingredient) ([]api.Ingredient, error) {
 	result := make([]api.Ingredient, len(ingredients))
 	for i, ingredient := range ingredients {
@@ -31,7 +66,7 @@ func (m *APIMapper) ToIngredients(ingredients []domain.Ingredient) ([]api.Ingred
 func (m *APIMapper) ToMealPlan(mealPlan domain.MealPlan) (api.ReadMealPlan, error) {
 	recipes := make([]api.ReadRecipe, len(mealPlan.Recipes))
 	for i, recipe := range mealPlan.Recipes {
-		response, err := m.ToRecipe(recipe)
+		response, err := m.ToReadRecipe(recipe)
 		if err != nil {
 			return api.ReadMealPlan{}, err
 		}
@@ -56,27 +91,21 @@ func (m *APIMapper) ToMealPlans(mealPlans []domain.MealPlan) ([]api.ReadMealPlan
 	return result, nil
 }
 
-func (m *APIMapper) ToRecipe(recipe domain.Recipe) (*api.ReadRecipe, error) {
+func (m *APIMapper) ToReadRecipe(recipe domain.Recipe) (*api.ReadRecipe, error) {
 	images, err := m.ToRecipeImageURLs(recipe.Images)
 	if err != nil {
 		return nil, err
 	}
 
-	steps := make([]api.WriteRecipeStep, len(recipe.Steps))
+	steps := make([]api.ReadRecipeStep, len(recipe.Steps))
 	for i, step := range recipe.Steps {
-		ingredients := make([]api.WriteStepIngredient, len(step.Ingredients))
-		for j, ingredient := range step.Ingredients {
-			ingredients[j] = api.WriteStepIngredient{
-				IngredientId: ingredient.Ingredient.ID,
-				UnitId:       ingredient.Unit.ID,
-				Amount:       ingredient.Amount,
-			}
+		readStep, err := m.ToReadRecipeStep(step)
+		if err != nil {
+			return nil, err
 		}
-		steps[i] = api.WriteRecipeStep{
-			Ingredients:  ingredients,
-			Instructions: step.Instructions,
-		}
+		steps[i] = readStep
 	}
+
 	return &api.ReadRecipe{
 		ID:          recipe.ID,
 		Name:        recipe.Name,
@@ -92,7 +121,7 @@ func (m *APIMapper) ToRecipe(recipe domain.Recipe) (*api.ReadRecipe, error) {
 func (m *APIMapper) ToRecipes(recipes []domain.Recipe) ([]api.ReadRecipe, error) {
 	result := make([]api.ReadRecipe, len(recipes))
 	for i, recipe := range recipes {
-		mapped, err := m.ToRecipe(recipe)
+		mapped, err := m.ToReadRecipe(recipe)
 		if err != nil {
 			return nil, err
 		}

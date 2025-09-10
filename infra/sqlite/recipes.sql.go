@@ -211,7 +211,15 @@ func (q *Queries) GetIngredients(ctx context.Context) ([]Ingredient, error) {
 }
 
 const getIngredientsForRecipes = `-- name: GetIngredientsForRecipes :many
-SELECT recipe_ingredients.id, ingredients.name, units.name, recipe_steps.id, recipe_ingredients.sort_order
+SELECT recipe_ingredients.id as recipe_ingredient_id, 
+       ingredients.id as ingredient_id, 
+       ingredients.name as ingredient_name, 
+       units.id as unit_id, 
+       units.name as unit_name, 
+       units.code as unit_code, 
+       recipe_steps.id as step_id, 
+       recipe_ingredients.amount, 
+       recipe_ingredients.sort_order
 FROM recipe_ingredients
          INNER JOIN recipe_steps ON recipe_ingredients.step_id = recipe_steps.id
          INNER JOIN ingredients ON recipe_ingredients.ingredient_id = ingredients.id
@@ -223,11 +231,15 @@ ORDER BY recipe_ingredients.sort_order
 `
 
 type GetIngredientsForRecipesRow struct {
-	ID        int64
-	Name      string
-	Name_2    string
-	ID_2      int64
-	SortOrder int64
+	RecipeIngredientID int64
+	IngredientID       int64
+	IngredientName     string
+	UnitID             int64
+	UnitName           string
+	UnitCode           *string
+	StepID             int64
+	Amount             float64
+	SortOrder          int64
 }
 
 func (q *Queries) GetIngredientsForRecipes(ctx context.Context, recipeIds []int64) ([]GetIngredientsForRecipesRow, error) {
@@ -250,10 +262,14 @@ func (q *Queries) GetIngredientsForRecipes(ctx context.Context, recipeIds []int6
 	for rows.Next() {
 		var i GetIngredientsForRecipesRow
 		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Name_2,
-			&i.ID_2,
+			&i.RecipeIngredientID,
+			&i.IngredientID,
+			&i.IngredientName,
+			&i.UnitID,
+			&i.UnitName,
+			&i.UnitCode,
+			&i.StepID,
+			&i.Amount,
 			&i.SortOrder,
 		); err != nil {
 			return nil, err

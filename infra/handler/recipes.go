@@ -33,7 +33,7 @@ func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipe) (*a
 		return nil, err
 	}
 
-	return h.mapper.ToRecipe(result)
+	return h.mapper.ToReadRecipe(result)
 }
 
 func (h *RecipeHandler) BrowseRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
@@ -41,14 +41,7 @@ func (h *RecipeHandler) BrowseRecipes(ctx context.Context) ([]api.ReadRecipe, er
 	if err != nil {
 		return nil, err
 	}
-	result := make([]api.ReadRecipe, len(recipes))
-	for i, r := range recipes {
-		result[i] = api.ReadRecipe{
-			ID:   r.ID,
-			Name: r.Name,
-		}
-	}
-	return result, nil
+	return h.mapper.ToRecipes(recipes)
 }
 
 func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecipeParams) error {
@@ -84,10 +77,7 @@ func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeB
 	if err != nil {
 		return nil, domain.ErrRecipeNotFound
 	}
-	return &api.ReadRecipe{
-		ID:   recipe.ID,
-		Name: recipe.Name,
-	}, nil
+	return h.mapper.ToReadRecipe(recipe)
 }
 
 func (h *RecipeHandler) UpdateRecipe(_ context.Context, _ *api.WriteRecipe, _ api.UpdateRecipeParams) (*api.ReadRecipe, error) {

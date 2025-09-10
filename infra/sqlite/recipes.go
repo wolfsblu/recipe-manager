@@ -144,7 +144,52 @@ func (s *Store) GetRecipeById(ctx context.Context, id int64) (recipe domain.Reci
 	if err != nil {
 		return recipe, err
 	}
-	return result.AsDomainModel(), nil
+
+	recipe = result.AsDomainModel()
+	recipeIds := []int64{id}
+	steps, err := s.query().GetStepsForRecipes(ctx, recipeIds)
+	if err != nil {
+		return recipe, err
+	}
+	ingredients, err := s.query().GetIngredientsForRecipes(ctx, recipeIds)
+	if err != nil {
+		return recipe, err
+	}
+	tags, err := s.query().GetTagsForRecipes(ctx, recipeIds)
+	if err != nil {
+		return recipe, err
+	}
+	images, err := s.query().GetImagesForRecipes(ctx, recipeIds)
+	if err != nil {
+		return recipe, err
+	}
+
+	ingredientsByStep := make(map[int64][]domain.StepIngredient)
+	for _, ing := range ingredients {
+		ingredientsByStep[ing.StepID] = append(ingredientsByStep[ing.StepID], ing.AsDomainModel())
+	}
+
+	recipeSteps := make([]domain.RecipeStep, len(steps))
+	for i, step := range steps {
+		recipeStep := step.AsDomainModel()
+		recipeStep.Ingredients = ingredientsByStep[step.ID]
+		recipeSteps[i] = recipeStep
+	}
+
+	recipeTags := make([]string, len(tags))
+	for i, tag := range tags {
+		recipeTags[i] = tag.AsDomainModel()
+	}
+
+	recipeImages := make([]domain.RecipeImage, len(images))
+	for i, image := range images {
+		recipeImages[i] = image.AsDomainModel()
+	}
+
+	recipe.Steps = recipeSteps
+	recipe.Tags = recipeTags
+	recipe.Images = recipeImages
+	return recipe, nil
 }
 
 func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipes []domain.Recipe, _ error) {

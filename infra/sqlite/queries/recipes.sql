@@ -47,7 +47,15 @@ WHERE recipe_id IN (
 ORDER BY sort_order;
 
 -- name: GetIngredientsForRecipes :many
-SELECT recipe_ingredients.id, ingredients.name, units.name, recipe_steps.id, recipe_ingredients.sort_order
+SELECT recipe_ingredients.id as recipe_ingredient_id, 
+       ingredients.id as ingredient_id, 
+       ingredients.name as ingredient_name, 
+       units.id as unit_id, 
+       units.name as unit_name, 
+       units.code as unit_code, 
+       recipe_steps.id as step_id, 
+       recipe_ingredients.amount, 
+       recipe_ingredients.sort_order
 FROM recipe_ingredients
          INNER JOIN recipe_steps ON recipe_ingredients.step_id = recipe_steps.id
          INNER JOIN ingredients ON recipe_ingredients.ingredient_id = ingredients.id

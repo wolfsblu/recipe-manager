@@ -357,16 +357,21 @@ components:
             $ref: '#/components/schemas/ReadRecipe'
     ReadRecipe:
       allOf:
-        - $ref: '#/components/schemas/WriteRecipe'
+        - $ref: '#/components/schemas/BaseRecipe'
         - type: object
           required:
             - id
+            - steps
           properties:
             id:
               type: integer
               format: int64
               examples:
                 - 10
+            steps:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReadRecipeStep'
     ReadUnit:
       type: object
       required:
@@ -424,6 +429,26 @@ components:
           description: Textual instructions for this step
           examples:
             - "Put chicken into pan and cook on medium heat."
+    ReadRecipeStep:
+      type: object
+      required:
+        - id
+        - instructions
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+            - 10
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadStepIngredient'
+        instructions:
+          type: string
+          description: Textual instructions for this step
+          examples:
+            - "Put chicken into pan and cook on medium heat."
     WriteStepIngredient:
       type: object
       required:
@@ -446,6 +471,22 @@ components:
           format: float64
           examples:
             - 3.5
+    ReadStepIngredient:
+      type: object
+      required:
+        - amount
+        - ingredient
+        - unit
+      properties:
+        ingredient:
+          $ref: '#/components/schemas/Ingredient'
+        unit:
+          $ref: '#/components/schemas/ReadUnit'
+        amount:
+          type: number
+          format: float64
+          examples:
+            - 3.5
     Token:
       type: object
       required:
@@ -455,14 +496,13 @@ components:
           type: string
           examples:
             - abd87ec862b6b8ecc2cf45c170d887d21e835a35f8537ea35ff1af102faa5920
-    WriteRecipe:
+    BaseRecipe:
       type: object
       required:
         - description
         - minutes
         - name
         - servings
-        - steps
       properties:
         name:
           type: string
@@ -491,10 +531,6 @@ components:
             type: string
             examples:
               - Spicy
-        steps:
-          type: array
-          items:
-            $ref: '#/components/schemas/WriteRecipeStep'
         images:
           type: array
           items:
@@ -505,7 +541,17 @@ components:
       encoding:
         images:
           contentType: image/jpeg, image/png
-    WriteUnit:
+    WriteRecipe:
+      allOf:
+        - $ref: '#/components/schemas/BaseRecipe'
+        - type: object
+          required:
+            - steps
+          properties:
+            steps:
+              type: array
+              items:
+                $ref: '#/components/schemas/WriteRecipeStep'
 
   requestBodies:
     Credentials:

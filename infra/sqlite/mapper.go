@@ -82,3 +82,38 @@ func (u *Unit) AsDomainModel() domain.Unit {
 		Code: u.Code,
 	}
 }
+
+func (r *GetStepsForRecipesRow) AsDomainModel() domain.RecipeStep {
+	return domain.RecipeStep{
+		ID:           r.ID,
+		Instructions: r.Instructions,
+		Ingredients:  []domain.StepIngredient{}, // Will be populated separately
+	}
+}
+
+func (r *GetIngredientsForRecipesRow) AsDomainModel() domain.StepIngredient {
+	return domain.StepIngredient{
+		Unit: domain.Unit{
+			ID:   r.UnitID,
+			Name: r.UnitName,
+			Code: r.UnitCode,
+		},
+		Ingredient: domain.Ingredient{
+			ID:   r.IngredientID,
+			Name: r.IngredientName,
+		},
+		Amount: r.Amount,
+	}
+}
+
+func (r *GetTagsForRecipesRow) AsDomainModel() string {
+	return r.Name
+}
+
+func (r *GetImagesForRecipesRow) AsDomainModel() domain.RecipeImage {
+	return domain.RecipeImage{
+		ID:        r.ID,
+		Path:      r.Path,
+		SortOrder: r.SortOrder,
+	}
+}
