@@ -13,8 +13,8 @@ VALUES (?, ?)
 RETURNING id;
 
 -- name: CreateStepIngredient :one
-INSERT INTO recipe_ingredients (step_id, ingredient_id, unit_id, amount)
-VALUES (?, ?, ?, ?)
+INSERT INTO recipe_ingredients (step_id, ingredient_id, unit_id, amount, sort_order)
+VALUES (?, ?, ?, ?, ?)
 RETURNING id;
 
 -- name: DeleteRecipe :exec

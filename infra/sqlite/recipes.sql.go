@@ -92,8 +92,8 @@ func (q *Queries) CreateRecipeStep(ctx context.Context, arg CreateRecipeStepPara
 }
 
 const createStepIngredient = `-- name: CreateStepIngredient :one
-INSERT INTO recipe_ingredients (step_id, ingredient_id, unit_id, amount)
-VALUES (?, ?, ?, ?)
+INSERT INTO recipe_ingredients (step_id, ingredient_id, unit_id, amount, sort_order)
+VALUES (?, ?, ?, ?, ?)
 RETURNING id
 `
 
@@ -102,6 +102,7 @@ type CreateStepIngredientParams struct {
 	IngredientID int64
 	UnitID       int64
 	Amount       float64
+	SortOrder    int64
 }
 
 func (q *Queries) CreateStepIngredient(ctx context.Context, arg CreateStepIngredientParams) (int64, error) {
@@ -110,6 +111,7 @@ func (q *Queries) CreateStepIngredient(ctx context.Context, arg CreateStepIngred
 		arg.IngredientID,
 		arg.UnitID,
 		arg.Amount,
+		arg.SortOrder,
 	)
 	var id int64
 	err := row.Scan(&id)

@@ -62,12 +62,13 @@ func (s *Store) createRecipeSteps(ctx context.Context, recipeID int64, steps []d
 }
 
 func (s *Store) createStepIngredients(ctx context.Context, stepID int64, ingredients []domain.StepIngredient) error {
-	for _, ingredient := range ingredients {
+	for i, ingredient := range ingredients {
 		_, err := s.query().CreateStepIngredient(ctx, CreateStepIngredientParams{
 			StepID:       stepID,
 			IngredientID: ingredient.Ingredient.ID,
 			UnitID:       ingredient.Unit.ID,
 			Amount:       ingredient.Amount,
+			SortOrder:    int64(i),
 		})
 		if err != nil {
 			return err
