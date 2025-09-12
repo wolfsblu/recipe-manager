@@ -8,8 +8,8 @@ export const formSchema = z.object({
     description: z.string().nonempty(),
     steps: z.array(z.object({
         ingredients: z.array(z.object({
-            unit: z.string().nonempty(),
-            name: z.string().nonempty(),
+            unitId: z.number().positive(),
+            ingredientId: z.number().positive(),
             amount: z.number().positive().or(z.literal('')).default(''),
         })),
         instructions: z.string().nonempty()

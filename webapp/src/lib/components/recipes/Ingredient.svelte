@@ -6,25 +6,25 @@
     let {
         form,
         stepIndex,
+        ingredients,
         ingredientIndex,
+        units
     } = $props();
 
     const { form: formData } = form;
 
-    const ingredients = [
-        { value: "greensalad", label: "Green Salad" },
-        { value: "carrots", label: "Carrots" },
-        { value: "chicken", label: "Chicken" },
-        { value: "salt", label: "Salt" },
-        { value: "pepper", label: "Pepper" }
-    ];
-
-    const units = [
-        { value: 'kg', label: 'Kilogram' },
-        { value: 'mg', label: 'Milligram' },
-        { value: 'l', label: 'Litre' },
-        { value: 'pcs', label: 'Pieces' },
-    ]
+    const ingredientOptions = ingredients.map(
+        ingredient => ({
+            value: ingredient.id,
+            label: ingredient.name,
+        })
+    )
+    const unitOptions = units.map(
+        unit => ({
+            value: unit.id,
+            label: unit.name,
+        })
+    )
 
     const basePath = `steps[${stepIndex}].ingredients[${ingredientIndex}]`;
 </script>
@@ -40,13 +40,11 @@
 </Form.ElementField>
 
 <Combobox {form}
-          name="{basePath}.unit"
-          options={units}
-          bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].unit}
+          name="{basePath}.unitId"
+          bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].unitId}
 />
 
 <Combobox {form}
-          name="{basePath}.name"
-          options={ingredients}
-          bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].name}
+          name="{basePath}.ingredientId"
+          bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].ingredientId}
 />

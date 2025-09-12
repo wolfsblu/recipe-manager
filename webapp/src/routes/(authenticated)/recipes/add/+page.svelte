@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { PageProps } from './$types';
     import * as Form from '$lib/components/ui/form/index.js'
     import {Input} from "$lib/components/ui/input/index.js";
     import {Button} from "$lib/components/ui/button/index.js";
@@ -19,14 +20,14 @@
     import TrashIcon from "@lucide/svelte/icons/trash";
     import Ingredient from "$lib/components/recipes/Ingredient.svelte";
 
-    let {data}: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
+    let { data }: PageProps = $props();
+
     const form = superForm(data.form, {
         SPA: true,
         dataType: 'json',
         resetForm: false,
         validators: zodClient(formSchema),
         async onUpdate({form}) {
-            console.log(form)
             if (form.valid) {
                 try {
                     await addRecipe(form.data)
@@ -44,7 +45,7 @@
     const addStep = () => {
         $formData.steps = [...$formData.steps, {
             ingredients: [
-                {name: '', amount: '', unit: ''},
+                {amount: '', ingredientId: 0, unitId: 0},
             ],
             instructions: '',
         }];
@@ -70,7 +71,7 @@
     const addIngredient = (stepIndex: number) => {
         $formData.steps[stepIndex].ingredients = [
             ...$formData.steps[stepIndex].ingredients,
-            {name: '', unit: '', amount: ''},
+            {amount: '', ingredientId: 0, unitId: 0},
         ]
     }
     const removeIngredientByIndex = (stepIndex: number, ingredientIndex: number) => {
@@ -79,13 +80,6 @@
 </script>
 
 <form class="p-6" method="POST" use:enhance>
-    {#if $formData.steps.length > 0}
-    <ul>
-        {#each $formData.steps[0].ingredients as ingredient}
-            <li>{ingredient.name}</li>
-        {/each}
-    </ul>
-    {/if}
     <ImageUpload />
     <div class="flex flex-col lg:flex-row gap-x-3 gap-y-1 mt-3">
         <div class="w-full flex flex-col">

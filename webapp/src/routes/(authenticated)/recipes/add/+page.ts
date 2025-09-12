@@ -2,6 +2,7 @@ import type { PageLoad } from './$types';
 import {superValidate} from "sveltekit-superforms";
 import {zod} from "sveltekit-superforms/adapters";
 import {formSchema} from "./schema";
+import {getIngredients, getUnits} from "$lib/api/recipes/recipes.svelte";
 
 export const load: PageLoad = async () => {
     const breadcrumbs = [
@@ -10,8 +11,13 @@ export const load: PageLoad = async () => {
         { link: "/recipes/add", name: "New Recipe" },
     ]
 
+    const ingredients = await getIngredients()
+    const units = await getUnits()
+
     return {
         breadcrumbs,
+        ingredients,
+        units,
         form: await superValidate(zod(formSchema)),
     };
 };

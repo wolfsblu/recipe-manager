@@ -197,51 +197,184 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ingredients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all ingredients */
+        get: operations["getIngredients"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/units": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all units */
+        get: operations["getUnits"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         Credentials: {
+            /** @example test@example.com */
             email: string;
+            /** @example Spaghetti Carbonara */
             password: string;
         };
         /** @description Represents an error */
         Error: {
             message: string;
         };
+        Ingredient: {
+            /**
+             * Format: int64
+             * @example 10
+             */
+            id: number;
+            /** @example Flour */
+            name: string;
+        };
+        PasswordReset: components["schemas"]["Token"] & {
+            /** @example my new password */
+            password: string;
+        };
+        ReadMealPlan: {
+            /**
+             * @description When are these recipes planned
+             * @example 2006-06-01
+             */
+            date: string;
+            recipes?: components["schemas"]["ReadRecipe"][];
+        };
+        ReadRecipe: components["schemas"]["BaseRecipe"] & {
+            /**
+             * Format: int64
+             * @example 10
+             */
+            id: number;
+            steps: components["schemas"]["ReadRecipeStep"][];
+        };
+        ReadUnit: {
+            /**
+             * Format: int64
+             * @example 10
+             */
+            id: number;
+            /** @example Kilogram */
+            name: string;
+            /** @example kg */
+            code: string | null;
+        };
+        ReadUser: {
+            /**
+             * Format: int64
+             * @example 10
+             */
+            id: number;
+            /** @example user@example.com */
+            email: string;
+        };
         /**
          * @description Recipe status in the store
          * @enum {string}
          */
         RecipeStatus: "available" | "pending" | "sold";
-        WriteRecipe: {
-            name: string;
-            /** @description The HTML description of the recipe */
-            description: string;
-            /** @description How many servings you'll get with this recipe */
-            servings: number;
-            /** @description How long it takes to prepare this recipe (in minutes) */
-            minutes: number;
+        WriteRecipeStep: {
+            ingredients?: components["schemas"]["WriteStepIngredient"][];
+            /**
+             * @description Textual instructions for this step
+             * @example Put chicken into pan and cook on medium heat.
+             */
+            instructions: string;
         };
-        ReadMealPlan: {
-            /** @description When are these recipes planned */
-            date: string;
-            recipes?: components["schemas"]["ReadRecipe"][];
-        };
-        ReadRecipe: components["schemas"]["WriteRecipe"] & {
-            /** Format: int64 */
+        ReadRecipeStep: {
+            /**
+             * Format: int64
+             * @example 10
+             */
             id: number;
+            ingredients?: components["schemas"]["ReadStepIngredient"][];
+            /**
+             * @description Textual instructions for this step
+             * @example Put chicken into pan and cook on medium heat.
+             */
+            instructions: string;
         };
-        ReadUser: {
-            /** Format: int64 */
-            id: number;
-            email: string;
+        WriteStepIngredient: {
+            /**
+             * Format: int64
+             * @example 3
+             */
+            ingredientId: number;
+            /**
+             * Format: int64
+             * @example 4
+             */
+            unitId: number;
+            /**
+             * Format: float64
+             * @example 3.5
+             */
+            amount: number;
+        };
+        ReadStepIngredient: {
+            ingredient: components["schemas"]["Ingredient"];
+            unit: components["schemas"]["ReadUnit"];
+            /**
+             * Format: float64
+             * @example 3.5
+             */
+            amount: number;
         };
         Token: {
+            /** @example abd87ec862b6b8ecc2cf45c170d887d21e835a35f8537ea35ff1af102faa5920 */
             token: string;
         };
-        UpdatePassword: components["schemas"]["Token"] & {
-            password: string;
+        BaseRecipe: {
+            /** @example Spaghetti Carbonara */
+            name: string;
+            /**
+             * @description The HTML description of the recipe
+             * @example <p>My tasty spaghetti recipe</p>
+             */
+            description: string;
+            /**
+             * Format: int64
+             * @description How many servings you'll get with this recipe
+             * @example 4
+             */
+            servings: number;
+            /**
+             * Format: int64
+             * @description How long it takes to prepare this recipe (in minutes)
+             * @example 45
+             */
+            minutes: number;
+            tags?: string[];
+            images?: string[];
+        };
+        WriteRecipe: components["schemas"]["BaseRecipe"] & {
+            steps: components["schemas"]["WriteRecipeStep"][];
         };
     };
     responses: {
@@ -262,6 +395,24 @@ export interface components {
             };
             content: {
                 "application/json": components["schemas"]["ReadUser"];
+            };
+        };
+        /** @description A list of ingredients */
+        IngredientList: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Ingredient"][];
+            };
+        };
+        /** @description A list of units */
+        UnitList: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ReadUnit"][];
             };
         };
         /** @description Meal plan for the user */
@@ -312,13 +463,13 @@ export interface components {
         /** @description Recipe object and related images */
         Recipe: {
             content: {
-                "multipart/form-data": components["schemas"]["WriteRecipe"];
+                "application/json": components["schemas"]["WriteRecipe"];
             };
         };
         /** @description The user's new password as well as the required reset token */
-        UpdatePassword: {
+        PasswordReset: {
             content: {
-                "application/json": components["schemas"]["UpdatePassword"];
+                "application/json": components["schemas"]["PasswordReset"];
             };
         };
         /** @description The user's new password as well as the required reset token */
@@ -431,7 +582,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: components["requestBodies"]["UpdatePassword"];
+        requestBody: components["requestBodies"]["PasswordReset"];
         responses: {
             /** @description Successful operation */
             204: {
@@ -584,6 +735,34 @@ export interface operations {
                 };
                 content?: never;
             };
+            default: components["responses"]["Error"];
+        };
+    };
+    getIngredients: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["IngredientList"];
+            default: components["responses"]["Error"];
+        };
+    };
+    getUnits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["UnitList"];
             default: components["responses"]["Error"];
         };
     };
