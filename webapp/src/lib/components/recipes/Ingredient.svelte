@@ -41,10 +41,12 @@
 
 <Combobox {form}
           name="{basePath}.unitId"
+          options={unitOptions}
           bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].unitId}
 />
 
 <Combobox {form}
           name="{basePath}.ingredientId"
+          options={ingredientOptions}
           bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].ingredientId}
 />

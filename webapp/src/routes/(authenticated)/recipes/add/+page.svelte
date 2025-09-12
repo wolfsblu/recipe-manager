@@ -164,7 +164,7 @@
                 <Form.Legend>Ingredients</Form.Legend>
                 <div class="grid grid-cols-[1fr_1fr_2fr_max-content] md:grid-cols-[1fr_2fr_3fr_max-content] gap-1">
                 {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
-                    <Ingredient {form} {stepIndex} {ingredientIndex} />
+                    <Ingredient {form} {stepIndex} {ingredientIndex} ingredients={data.ingredients} units={data.units} />
                     <div>
                         <Button variant="outline" onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
                             <TrashIcon class="stroke-red-600 dark:stroke-red-400" />
