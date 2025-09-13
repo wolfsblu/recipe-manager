@@ -24,7 +24,7 @@
 		<SearchIcon class="inline size-4" />
 		Go to
 	</span>
-    <Kbd size="sm" variant="secondary">
+    <Kbd class="hidden lg:block" size="sm" variant="secondary">
         {cmdOrCtrl} + K
     </Kbd>
 </Button>

@@ -145,7 +145,7 @@
 			</div>
 			<div class="flex flex-col gap-0.5 text-center">
 				<span class="text-muted-foreground font-medium">
-					Drag 'n' drop files here, or click to select files
+					Drag files here, or click to select files
 				</span>
 				{#if maxFiles || maxFileSize}
 					<span class="text-muted-foreground/75 text-sm">
