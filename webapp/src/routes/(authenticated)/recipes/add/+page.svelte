@@ -78,7 +78,8 @@
     }
 </script>
 
-<ImageUpload/>
+<ImageUpload class="p-6 pb-0" />
+
 <form class="p-6" method="POST" use:enhance>
     <div class="flex flex-col lg:flex-row gap-x-3 gap-y-1 mt-3">
         <div class="w-full flex flex-col">

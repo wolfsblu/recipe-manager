@@ -14,8 +14,10 @@
     import {type DragDropState, draggable, droppable} from "@thisux/sveltednd";
     import { flip } from 'svelte/animate';
     import { fade } from 'svelte/transition';
+    import {cn} from "$lib/utils/utils";
 
     let {
+        class: className,
         maxFiles = 4,
         maxFileSize = 2 * MEGABYTE,
     } = $props()
@@ -87,7 +89,7 @@
     }
 </script>
 
-<div class="flex w-full flex-col gap-4">
+<div class={cn('flex w-full flex-col gap-4', className)}>
     {#if files.length === 0}
         <FileDropZone
                 accept="image/*"
