@@ -76,12 +76,10 @@ export class UploadService {
 
         const file = this.files[fileIndex];
 
-        // Cancel upload if in progress
         if (file.upload && file.status === 'uploading') {
             await file.upload.abort();
         }
 
-        // Delete from server if completed
         if (file.status === 'completed' && file.url) {
             await this.deleteFromServer(file.url);
         }
@@ -106,18 +104,14 @@ export class UploadService {
     }
 
     async cleanup(): Promise<void> {
-        const completedFiles = this.files.filter(file => file.status === 'completed' && file.url);
-
-        // Cancel ongoing uploads
         this.files.forEach(file => {
             if (file.upload && file.status === 'uploading') {
                 file.upload.abort();
             }
         });
 
-        // Delete completed uploads from server
         await Promise.allSettled(
-            completedFiles.map(file => this.deleteFromServer(file.url!))
+            this.completedUrls.map(url => this.deleteFromServer(url))
         );
 
         this.files = [];

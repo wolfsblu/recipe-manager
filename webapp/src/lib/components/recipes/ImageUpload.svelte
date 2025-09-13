@@ -1,6 +1,6 @@
 <script lang="ts">
     import { FileDropZone, type FileDropZoneProps, MEGABYTE } from '$lib/components/ui/file-drop-zone';
-    import { onDestroy } from 'svelte';
+    import {onDestroy} from 'svelte';
     import { toast } from 'svelte-sonner';
     import { type DragDropState, draggable, droppable } from "@thisux/sveltednd";
     import { flip } from 'svelte/animate';
@@ -55,7 +55,13 @@
         value = uploadService.completedUrls;
     });
 
-    onDestroy(uploadService.cleanup);
+    const cleanup = async () => {
+        await uploadService.cleanup()
+    }
+
+    onDestroy(() => {
+        cleanup()
+    })
 </script>
 
 <div class={cn('flex w-full flex-col gap-4', className)}>
