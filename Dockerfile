@@ -31,4 +31,4 @@ COPY --from=docker.io/arigaio/atlas /atlas /bin/atlas
 
 ENV PATH="$PATH:/bin"
 
-ENTRYPOINT ["rman"]
+ENTRYPOINT ["recipe-manager"]
