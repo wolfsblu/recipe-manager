@@ -78,8 +78,8 @@
     }
 </script>
 
+<ImageUpload/>
 <form class="p-6" method="POST" use:enhance>
-    <ImageUpload/>
     <div class="flex flex-col lg:flex-row gap-x-3 gap-y-1 mt-3">
         <div class="w-full flex flex-col">
             <Form.Field {form} name="name">
