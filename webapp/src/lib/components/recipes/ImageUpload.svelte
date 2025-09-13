@@ -101,7 +101,11 @@
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {#each files as file, i (file.id)}
                 <div class="svelte-dnd-touch-feedback"
-                    use:draggable={{ container: i.toString(), dragData: file}}
+                    use:draggable={{
+                        container: i.toString(),
+                        dragData: file,
+                        interactive: ['button'],
+                    }}
                     use:droppable={{
                         container: i.toString(),
                         callbacks: { onDrop: handleDrop }
