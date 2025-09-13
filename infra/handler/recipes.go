@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/wolfsblu/go-chef/api"
-	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/infra/config"
-	"github.com/wolfsblu/go-chef/infra/env"
-	"github.com/wolfsblu/go-chef/infra/handler/mapper"
+	"github.com/wolfsblu/recipe-manager/api"
+	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/infra/config"
+	"github.com/wolfsblu/recipe-manager/infra/env"
+	"github.com/wolfsblu/recipe-manager/infra/handler/mapper"
 )
 
 type RecipeHandler struct {

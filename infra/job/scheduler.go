@@ -2,7 +2,7 @@ package job
 
 import (
 	"context"
-	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/recipe-manager/domain"
 	"time"
 )
 

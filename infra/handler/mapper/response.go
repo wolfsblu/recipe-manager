@@ -4,8 +4,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/wolfsblu/go-chef/api"
-	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/recipe-manager/api"
+	"github.com/wolfsblu/recipe-manager/domain"
 )
 
 func (m *APIMapper) ToIngredient(ingredient domain.Ingredient) (api.Ingredient, error) {

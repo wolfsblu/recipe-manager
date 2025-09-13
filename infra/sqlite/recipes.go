@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/recipe-manager/domain"
 	_ "modernc.org/sqlite"
 )
 

@@ -4,14 +4,14 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wolfsblu/go-chef/api"
-	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/infra/env"
-	"github.com/wolfsblu/go-chef/infra/handler"
-	"github.com/wolfsblu/go-chef/infra/job"
-	"github.com/wolfsblu/go-chef/infra/routing"
-	"github.com/wolfsblu/go-chef/infra/smtp"
-	"github.com/wolfsblu/go-chef/infra/sqlite"
+	"github.com/wolfsblu/recipe-manager/api"
+	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/infra/env"
+	"github.com/wolfsblu/recipe-manager/infra/handler"
+	"github.com/wolfsblu/recipe-manager/infra/job"
+	"github.com/wolfsblu/recipe-manager/infra/routing"
+	"github.com/wolfsblu/recipe-manager/infra/smtp"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite"
 )
 
 func main() {

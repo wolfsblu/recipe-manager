@@ -5,9 +5,9 @@ import (
 
 	swagger "github.com/swaggest/swgui/v5emb"
 	tusd "github.com/tus/tusd/v2/pkg/handler"
-	"github.com/wolfsblu/go-chef/api"
-	"github.com/wolfsblu/go-chef/infra/config"
-	"github.com/wolfsblu/go-chef/infra/env"
+	"github.com/wolfsblu/recipe-manager/api"
+	"github.com/wolfsblu/recipe-manager/infra/config"
+	"github.com/wolfsblu/recipe-manager/infra/env"
 )
 
 func NewServeMux(server *api.Server, uploadServer *tusd.Handler) *http.ServeMux {

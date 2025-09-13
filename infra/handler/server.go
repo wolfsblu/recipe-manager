@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/recipe-manager/domain"
 )
 
 type APIHandler struct {

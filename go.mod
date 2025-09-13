@@ -1,4 +1,4 @@
-module github.com/wolfsblu/go-chef
+module github.com/wolfsblu/recipe-manager
 
 go 1.25.0
 

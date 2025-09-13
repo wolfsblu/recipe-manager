@@ -3,7 +3,7 @@ package handler
 import (
 	"fmt"
 	"github.com/gorilla/securecookie"
-	"github.com/wolfsblu/go-chef/infra/env"
+	"github.com/wolfsblu/recipe-manager/infra/env"
 	"time"
 )
 

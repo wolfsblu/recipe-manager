@@ -1,8 +1,8 @@
 package mapper
 
 import (
-	"github.com/wolfsblu/go-chef/api"
-	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/recipe-manager/api"
+	"github.com/wolfsblu/recipe-manager/domain"
 )
 
 func (m *APIMapper) FromWriteRecipe(req *api.WriteRecipe) domain.Recipe {

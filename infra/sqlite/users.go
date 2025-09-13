@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/domain/roles"
-	"github.com/wolfsblu/go-chef/domain/security"
+	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/domain/roles"
+	"github.com/wolfsblu/recipe-manager/domain/security"
 )
 
 func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User) (token domain.PasswordResetToken, _ error) {

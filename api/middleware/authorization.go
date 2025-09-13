@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/ogen-go/ogen/middleware"
-	"github.com/wolfsblu/go-chef/api/operations"
-	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/domain/permissions"
-	"github.com/wolfsblu/go-chef/infra/config"
+	"github.com/wolfsblu/recipe-manager/api/operations"
+	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/domain/permissions"
+	"github.com/wolfsblu/recipe-manager/infra/config"
 )
 
 var operationPermissions = map[operations.ID]permissions.Slug{

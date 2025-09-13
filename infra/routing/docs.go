@@ -1,7 +1,7 @@
 package routing
 
 import (
-	"github.com/wolfsblu/go-chef/api"
+	"github.com/wolfsblu/recipe-manager/api"
 	"net/http"
 )
 

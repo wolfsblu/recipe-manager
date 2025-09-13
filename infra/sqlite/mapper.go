@@ -1,8 +1,8 @@
 package sqlite
 
 import (
-	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/domain/permissions"
+	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/domain/permissions"
 )
 
 func (r *GetPermissionsByRoleRow) AsDomainModel() domain.Permission {

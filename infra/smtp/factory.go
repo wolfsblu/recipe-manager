@@ -1,7 +1,7 @@
 package smtp
 
 import (
-	"github.com/wolfsblu/go-chef/infra/env"
+	"github.com/wolfsblu/recipe-manager/infra/env"
 )
 
 func NewSMTPMailer() *Mailer {

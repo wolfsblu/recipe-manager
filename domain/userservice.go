@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/wolfsblu/go-chef/domain/security"
+	"github.com/wolfsblu/recipe-manager/domain/security"
 )
 
 type UserService struct {

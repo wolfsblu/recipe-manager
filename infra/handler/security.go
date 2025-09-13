@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 
-	"github.com/wolfsblu/go-chef/api"
-	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/infra/config"
+	"github.com/wolfsblu/recipe-manager/api"
+	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/infra/config"
 )
 
 type SecurityHandler struct {

@@ -1,6 +1,6 @@
 package job
 
-import "github.com/wolfsblu/go-chef/domain"
+import "github.com/wolfsblu/recipe-manager/domain"
 
 func NewScheduler(service *domain.UserService) *Scheduler {
 	s := &Scheduler{

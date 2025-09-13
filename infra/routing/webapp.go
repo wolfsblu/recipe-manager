@@ -1,7 +1,7 @@
 package routing
 
 import (
-	kit "github.com/wolfsblu/go-chef/webapp"
+	kit "github.com/wolfsblu/recipe-manager/webapp"
 	"io/fs"
 	"net/http"
 )

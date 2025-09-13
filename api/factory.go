@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/wolfsblu/go-chef/api/middleware"
+	"github.com/wolfsblu/recipe-manager/api/middleware"
 )
 
 func NewAPIServer(h Handler, sec SecurityHandler) (*Server, error) {

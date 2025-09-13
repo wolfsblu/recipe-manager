@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/wolfsblu/go-chef/infra/env"
+	"github.com/wolfsblu/recipe-manager/infra/env"
 )
 
 type Store struct {

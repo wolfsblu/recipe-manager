@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/go/pkg/mod go generate && go build
 
 FROM scratch
 
-COPY --from=backend /app/go-chef /bin/go-chef
+COPY --from=backend /app/recipe-manager /bin/recipe-manager
 COPY --from=backend /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 # Atlas requires a tmp directory
 COPY --from=backend --chmod=1777 /tmp /tmp
@@ -31,4 +31,4 @@ COPY --from=docker.io/arigaio/atlas /atlas /bin/atlas
 
 ENV PATH="$PATH:/bin"
 
-ENTRYPOINT ["go-chef"]
+ENTRYPOINT ["rman"]

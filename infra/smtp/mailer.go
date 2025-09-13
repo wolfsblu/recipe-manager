@@ -1,7 +1,7 @@
 package smtp
 
 import (
-	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/recipe-manager/domain"
 	"gopkg.in/gomail.v2"
 )
 

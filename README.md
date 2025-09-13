@@ -1,9 +1,8 @@
 ## Introduction
 
-Go-Chef (name not final) is a self-hostable recipe manager written in Go (backend) 
-and Svelte (frontend). The application requires no external dependencies when run
-as a docker container. It uses a SQLite database to store the recipes and the file 
-system for storing media.
+Recipe Manager (name not final) does exactly what it says on the box, it is a self-hostable recipe manager written
+in Go (backend) and Svelte (frontend). The application requires no external dependencies when run as a docker container. 
+It uses a SQLite database to store the recipes and the file system for storing media.
 
 ![Promotional screenshot](screenshots/promo.webp)
 
@@ -13,12 +12,12 @@ system for storing media.
 
 1. Pull the image
    ```
-   docker pull ghcr.io/wolfsblu/go-chef:latest
+   docker pull ghcr.io/wolfsblu/recipe-manager:latest
    ```
 2. Copy the `.env.example` file to `.env` and modify as needed
 3. Launch the container
    ```
-   docker run -d --env-file .env -p 8080:8080 -v uploads:/data/uploads go-chef
+   docker run -d --env-file .env -p 8080:8080 -v uploads:/data/uploads recipe-manager
    ```
 4. Open the [frontend](http://localhost:8080) or browse the [API](http://localhost:8080/api/docs)
 

@@ -3,7 +3,7 @@ package domain
 import (
 	"time"
 
-	"github.com/wolfsblu/go-chef/domain/permissions"
+	"github.com/wolfsblu/recipe-manager/domain/permissions"
 )
 
 type Credentials struct {

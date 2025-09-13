@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"github.com/ogen-go/ogen/ogenerrors"
-	"github.com/wolfsblu/go-chef/api"
-	"github.com/wolfsblu/go-chef/domain"
+	"github.com/wolfsblu/recipe-manager/api"
+	"github.com/wolfsblu/recipe-manager/domain"
 )
 
 var errorStatusCodeMap = map[*domain.Error]int{
