@@ -37,6 +37,7 @@
 		"svelte-dnd-action": "^0.9.61",
 		"svelte-filepond": "^0.2.2",
 		"svelte-sonner": "^1.0.5",
+		"svelte-tiny-virtual-list": "^4.0.0-rc.2",
 		"sveltekit-superforms": "^2.27.1",
 		"tailwind-merge": "^3.3.1",
 		"tailwind-variants": "^3.1.0",
@@ -47,7 +48,6 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
-		"@sveltejs/svelte-virtual-list": "^3.0.1",
 		"mode-watcher": "^1.1.0",
 		"openapi-typescript": "^7.6.1"
 	}

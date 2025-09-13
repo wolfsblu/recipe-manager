@@ -8,7 +8,7 @@
     import { buttonVariants } from "$lib/components/ui/button/index.js";
     import { cn } from "$lib/utils.js";
     import { useId } from "bits-ui";
-    import VirtualList from '@sveltejs/svelte-virtual-list';
+    import VirtualList from 'svelte-tiny-virtual-list';
 
     let {
         empty = 'No results found.',
@@ -103,17 +103,26 @@
                     </Command.Empty>
                 {:else}
                     <div class="w-full" style="height: {dynamicHeight}px;">
-                        <VirtualList items={displayOptions} height="{dynamicHeight}px" itemHeight={itemHeight} let:item>
-                            <Command.Item
-                                    value={item.value.toString()}
-                                    onSelect={() => {
-                                        value = item.value;
-                                        closeAndFocusTrigger(triggerId);
-                                    }}
-                            >
-                                {item.label}
-                                <CheckIcon class={cn("ml-auto h-4 w-4", item.value !== value && "text-transparent")}/>
-                            </Command.Item>
+                        <VirtualList
+                            width="100%"
+                            height={dynamicHeight}
+                            itemCount={displayOptions.length}
+                            itemSize={itemHeight}
+                        >
+                            {#snippet item({ index, style })}
+                                <div {style}>
+                                    <Command.Item
+                                            value={displayOptions[index].value.toString()}
+                                            onSelect={() => {
+                                                value = displayOptions[index].value;
+                                                closeAndFocusTrigger(triggerId);
+                                            }}
+                                    >
+                                        {displayOptions[index].label}
+                                        <CheckIcon class={cn("ml-auto h-4 w-4", displayOptions[index].value !== value && "text-transparent")}/>
+                                    </Command.Item>
+                                </div>
+                            {/snippet}
                         </VirtualList>
                     </div>
                 {/if}
