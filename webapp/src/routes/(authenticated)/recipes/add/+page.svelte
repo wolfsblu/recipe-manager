@@ -45,7 +45,7 @@
     const addStep = () => {
         $formData.steps = [...$formData.steps, {
             ingredients: [
-                {amount: '', ingredientId: 0, unitId: 0},
+                {amount: 0, ingredientId: 0, unitId: 0},
             ],
             instructions: '',
         }];
@@ -71,7 +71,7 @@
     const addIngredient = (stepIndex: number) => {
         $formData.steps[stepIndex].ingredients = [
             ...$formData.steps[stepIndex].ingredients,
-            {amount: '', ingredientId: 0, unitId: 0},
+            {amount: 0, ingredientId: 0, unitId: 0},
         ]
     }
     const removeIngredientByIndex = (stepIndex: number, ingredientIndex: number) => {

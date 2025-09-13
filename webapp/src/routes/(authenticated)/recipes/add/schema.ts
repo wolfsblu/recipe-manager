@@ -2,15 +2,15 @@ import * as z from "zod";
 
 export const formSchema = z.object({
     name: z.string().nonempty(),
-    servings: z.number().positive().or(z.literal('')).default(''),
-    minutes: z.number().positive().or(z.literal('')).default(''),
+    servings: z.number().positive(),
+    minutes: z.number().positive(),
     tags: z.array(z.string().nonempty()),
     description: z.string().nonempty(),
     steps: z.array(z.object({
         ingredients: z.array(z.object({
-            unitId: z.number().positive(),
-            ingredientId: z.number().positive(),
-            amount: z.number().positive().or(z.literal('')).default(''),
+            unitId: z.number({ message: "Invalid unit" }).positive({ message: "Invalid unit" }),
+            ingredientId: z.number({ message: "Invalid ingredient" }).positive({ message: "Invalid ingredient" }),
+            amount: z.number({ message: "Invalid amount" }).positive({ message: "Invalid amount" }),
         })),
         instructions: z.string().nonempty()
     })).nonempty(),
