@@ -1,26 +1,25 @@
 <script lang="ts">
-    import type { PageProps } from './$types';
-    import * as Form from '$lib/components/ui/form/index.js'
+    import type {PageProps} from './$types';
     import {Input} from "$lib/components/ui/input/index.js";
     import {Button} from "$lib/components/ui/button/index.js";
     import {Textarea} from "$lib/components/ui/textarea/index.js";
-    import {formSchema, type FormSchema} from "./schema";
-    import {type Infer, setMessage, superForm, type SuperValidated,} from "sveltekit-superforms";
+    import {formSchema} from "./schema";
+    import {setMessage, superForm} from "sveltekit-superforms";
     import {zodClient} from "sveltekit-superforms/adapters";
     import {toast} from "svelte-sonner";
     import {goto} from "$app/navigation";
     import {addRecipe} from "$lib/api/recipes/recipes.svelte";
-    import { TagsInput } from '$lib/components/ui/tags-input';
+    import {TagsInput} from '$lib/components/ui/tags-input';
     import ImageUpload from "$lib/components/recipes/ImageUpload.svelte";
-    import UnitCombobox from "$lib/components/recipes/UnitCombobox.svelte";
-    import { Separator } from "$lib/components/ui/separator/index.js";
+    import {Separator} from "$lib/components/ui/separator/index.js";
+    import Ingredient from "$lib/components/recipes/Ingredient.svelte";
+    import * as Form from '$lib/components/ui/form/index.js'
     import PlusIcon from "@lucide/svelte/icons/plus";
     import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
     import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
     import TrashIcon from "@lucide/svelte/icons/trash";
-    import Ingredient from "$lib/components/recipes/Ingredient.svelte";
 
-    let { data }: PageProps = $props();
+    let {data}: PageProps = $props();
 
     const form = superForm(data.form, {
         SPA: true,
@@ -80,7 +79,7 @@
 </script>
 
 <form class="p-6" method="POST" use:enhance>
-    <ImageUpload />
+    <ImageUpload/>
     <div class="flex flex-col lg:flex-row gap-x-3 gap-y-1 mt-3">
         <div class="w-full flex flex-col">
             <Form.Field {form} name="name">
@@ -119,7 +118,7 @@
                 <Form.Control>
                     {#snippet children({props})}
                         <Form.Label>Tags</Form.Label>
-                        <TagsInput {...props} bind:value={$formData.tags} placeholder="Add a tag" />
+                        <TagsInput {...props} bind:value={$formData.tags} placeholder="Add a tag"/>
                     {/snippet}
                 </Form.Control>
                 <Form.Description/>
@@ -147,32 +146,37 @@
         <div class="flex items-center justify-between">
             <h1>Step {stepIndex + 1}</h1>
             <div>
-                <Button disabled={stepIndex === 0} variant="ghost" size="icon" class="size-8" onclick={() => moveStep(stepIndex, 'up')}>
-                    <ArrowUpIcon />
+                <Button disabled={stepIndex === 0} variant="ghost" size="icon" class="size-8"
+                        onclick={() => moveStep(stepIndex, 'up')}>
+                    <ArrowUpIcon/>
                 </Button>
-                <Button disabled={stepIndex === $formData.steps.length - 1} variant="ghost" size="icon" class="size-8" onclick={() => moveStep(stepIndex, 'down')}>
-                    <ArrowDownIcon />
+                <Button disabled={stepIndex === $formData.steps.length - 1} variant="ghost" size="icon" class="size-8"
+                        onclick={() => moveStep(stepIndex, 'down')}>
+                    <ArrowDownIcon/>
                 </Button>
                 <Button variant="ghost" size="icon" class="size-8" onclick={() => removeStepByIndex(stepIndex)}>
-                    <TrashIcon class="stroke-red-600 dark:stroke-red-400" />
+                    <TrashIcon class="stroke-red-600 dark:stroke-red-400"/>
                 </Button>
             </div>
         </div>
-        <Separator class="mt-1 mb-2" orientation="horizontal" />
+        <Separator class="mt-1 mb-2" orientation="horizontal"/>
         <div class="grid lg:grid-cols-2 gap-x-3">
             <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
                 <Form.Legend>Ingredients</Form.Legend>
                 <div class="grid grid-cols-[1fr_1fr_2fr_max-content] md:grid-cols-[1fr_2fr_3fr_max-content] gap-1">
-                {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
-                    <Ingredient {form} {stepIndex} {ingredientIndex} ingredients={data.ingredients} units={data.units} />
-                    <div>
-                        <Button variant="outline" onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
-                            <TrashIcon class="stroke-red-600 dark:stroke-red-400" />
-                        </Button>
-                    </div>
-                {/each}
+                    {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
+                        <Ingredient {form} {stepIndex} {ingredientIndex} ingredients={data.ingredients}
+                                    units={data.units}/>
+                        <div>
+                            <Button variant="outline"
+                                    onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
+                                <TrashIcon class="stroke-red-600 dark:stroke-red-400"/>
+                            </Button>
+                        </div>
+                    {/each}
                     <Button variant="outline" class="col-span-4" onclick={() => addIngredient(stepIndex)}>
-                        <PlusIcon/> Add Ingredient
+                        <PlusIcon/>
+                        Add Ingredient
                     </Button>
                 </div>
                 <Form.FieldErrors/>
@@ -197,7 +201,7 @@
     <div class="flex justify-between">
         <Button type="reset">Cancel</Button>
         <div>
-            <Button type="button" onclick={addStep}>Add Step</Button>
+            <Button onclick={addStep} type="button">Add Step</Button>
             {#if $formData.steps.length > 0}
                 <Button type="submit">Create</Button>
             {/if}
