@@ -1,26 +1,38 @@
 <script lang="ts">
-    import { Button } from '$lib/components/ui/button';
-    import {
-        displaySize,
-        FileDropZone,
-        MEGABYTE,
-        type FileDropZoneProps
-    } from '$lib/components/ui/file-drop-zone';
-    import { Progress } from '$lib/components/ui/progress';
-    import CloseIcon from '@lucide/svelte/icons/x';
-    import { onDestroy } from 'svelte';
-    import { toast } from 'svelte-sonner';
-    import { SvelteDate } from 'svelte/reactivity';
+    import {Button} from '$lib/components/ui/button';
+    import {displaySize, FileDropZone, type FileDropZoneProps, MEGABYTE} from '$lib/components/ui/file-drop-zone';
+    import {Progress} from '$lib/components/ui/progress';
+    import {onDestroy} from 'svelte';
+    import {toast} from 'svelte-sonner';
     import {type DragDropState, draggable, droppable} from "@thisux/sveltednd";
-    import { flip } from 'svelte/animate';
-    import { fade } from 'svelte/transition';
+    import {flip} from 'svelte/animate';
+    import {fade} from 'svelte/transition';
     import {cn} from "$lib/utils/utils";
+    import * as tus from 'tus-js-client';
+    import {PUBLIC_UPLOAD_URL} from '$env/static/public';
+    import CloseIcon from '@lucide/svelte/icons/x'
 
     let {
+        value = $bindable(),
         class: className,
         maxFiles = 4,
         maxFileSize = 2 * MEGABYTE,
     } = $props()
+
+
+    type UploadedFile = {
+        id: number;
+        name: string;
+        type: string;
+        size: number;
+        uploadedAt: number;
+        progress: number;
+        status: 'uploading' | 'completed' | 'error';
+        url: string | null;
+        upload?: tus.Upload;
+    };
+
+    let files = $state<UploadedFile[]>([]);
 
     const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
         await Promise.allSettled(files.map((file) => uploadFile(file)));
@@ -33,48 +45,57 @@
     const uploadFile = async (file: File) => {
         if (files.find((f) => f.name === file.name)) return;
 
-        const urlPromise = new Promise<string>((resolve) => {
-            resolve(URL.createObjectURL(file));
-        });
-
-        files.push({
+        const fileData: UploadedFile = {
             id: files.length,
             name: file.name,
             type: file.type,
             size: file.size,
             uploadedAt: Date.now(),
-            url: urlPromise
+            progress: 0,
+            status: 'uploading',
+            url: null
+        };
+
+        files.push(fileData);
+
+        const upload = new tus.Upload(file, {
+            endpoint: PUBLIC_UPLOAD_URL,
+            retryDelays: [0, 3000, 5000, 10000, 20000],
+            metadata: {
+                filename: file.name,
+                filetype: file.type,
+            },
+            onError: () => {
+                fileData.status = 'error';
+                files[0] = fileData
+            },
+            onProgress: (bytesUploaded, bytesTotal) => {
+                fileData.progress = Math.round((bytesUploaded / bytesTotal) * 100);
+                files[0] = fileData
+            },
+            onSuccess: () => {
+                fileData.status = 'completed';
+                fileData.url = upload.url || '';
+                files[0] = fileData
+            }
         });
 
-        await urlPromise;
+        fileData.upload = upload;
+        upload.start();
     };
-
-    type UploadedFile = {
-        id: number;
-        name: string;
-        type: string;
-        size: number;
-        uploadedAt: number;
-        url: Promise<string>;
-    };
-
-    let files = $state<UploadedFile[]>([]);
-    let date = new SvelteDate();
-
-    onDestroy(async () => {
-        for (const file of files) {
-            URL.revokeObjectURL(await file.url);
-        }
-    });
 
     $effect(() => {
-        const interval = setInterval(() => {
-            date.setTime(Date.now());
-        }, 10);
+        value = files
+            .filter(file => file.status === 'completed' && file.url)
+            .map(file => file.url!)
+    });
 
-        return () => {
-            clearInterval(interval);
-        };
+    onDestroy(() => {
+        for (const file of files) {
+            if (file.upload && file.status === 'uploading') {
+                file.upload.abort();
+            }
+        }
     });
 
     const handleDrop = (state: DragDropState<UploadedFile>) => {
@@ -116,20 +137,43 @@
                     out:fade={{ duration: 150 }}
                     animate:flip={{duration: 300 }}
                 >
-                    {#await file.url}
+                    {#if file.status === 'uploading'}
                         <div class="relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
-                            <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center gap-2">
                                 <Progress
                                         class="h-2 w-3/4"
-                                        value={((date.getTime() - file.uploadedAt) / 1000) * 100}
+                                        value={file.progress}
                                         max={100}
                                 />
+                                <div class="text-sm text-gray-600 dark:text-gray-400">
+                                    {file.progress}% uploaded
+                                </div>
                             </div>
                         </div>
-                    {:then src}
+                    {:else if file.status === 'error'}
+                        <div class="relative aspect-[4/3] overflow-hidden rounded-lg bg-red-100 dark:bg-red-900/20">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                                <div class="text-red-600 dark:text-red-400">Upload failed</div>
+                                <Button
+                                    size="sm"
+                                    onclick={() => {
+                                        // Retry upload
+                                        if (file.upload) {
+                                            file.status = 'uploading';
+                                            file.progress = 0;
+                                            file.upload.start();
+                                            files = files.slice();
+                                        }
+                                    }}
+                                >
+                                    Retry
+                                </Button>
+                            </div>
+                        </div>
+                    {:else if file.status === 'completed' && file.url}
                         <div class="group relative aspect-[4/3] overflow-hidden rounded-lg">
                             <img
-                                    {src}
+                                    src={file.url}
                                     alt={file.name}
                                     class="h-full w-full object-cover transition-transform group-hover:scale-105"
                             />
@@ -139,7 +183,10 @@
                                     size="icon"
                                     class="absolute top-2 right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
                                     onclick={() => {
-                                        URL.revokeObjectURL(src);
+                                        // Cancel upload if still in progress
+                                        if (file.upload && file.status === 'uploading') {
+                                            file.upload.abort();
+                                        }
                                         files = [...files.slice(0, i), ...files.slice(i + 1)];
                                     }}
                             >
@@ -150,7 +197,7 @@
                                 <div>{displaySize(file.size)}</div>
                             </div>
                         </div>
-                    {/await}
+                    {/if}
                 </div>
             {/each}
             

@@ -78,7 +78,7 @@
     }
 </script>
 
-<ImageUpload class="p-6 pb-0" />
+<ImageUpload class="p-6 pb-0" bind:value={$formData.images} />
 
 <form class="p-6" method="POST" use:enhance>
     <div class="flex flex-col lg:flex-row gap-x-3 gap-y-1 mt-3">
