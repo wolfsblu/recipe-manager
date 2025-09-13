@@ -7,6 +7,11 @@ INSERT INTO recipes (name, servings, minutes, description, created_by)
 VALUES (?, ?, ?, ?, ?)
 RETURNING id;
 
+-- name: CreateRecipeImages :one
+INSERT INTO recipe_images (recipe_id, path, sort_order)
+VALUES (?, ?, ?)
+RETURNING id;
+
 -- name: CreateRecipeStep :one
 INSERT INTO recipe_steps (recipe_id, instructions)
 VALUES (?, ?)

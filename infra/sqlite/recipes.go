@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"context"
+	"net/url"
 	"time"
 
 	"github.com/wolfsblu/go-chef/domain"
@@ -38,6 +39,9 @@ func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 	if err = s.createRecipeSteps(ctx, recipeId, recipe.Steps); err != nil {
 		return domain.Recipe{}, err
 	}
+	if err = s.createRecipeImages(ctx, recipeId, recipe.Images); err != nil {
+		return domain.Recipe{}, err
+	}
 	if err = s.Commit(); err != nil {
 		return domain.Recipe{}, err
 	}
@@ -69,6 +73,19 @@ func (s *Store) createStepIngredients(ctx context.Context, stepID int64, ingredi
 			UnitID:       ingredient.Unit.ID,
 			Amount:       ingredient.Amount,
 			SortOrder:    int64(i),
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *Store) createRecipeImages(ctx context.Context, recipeID int64, images []domain.RecipeImage) error {
+	for _, image := range images {
+		_, err := s.query().CreateRecipeImages(ctx, CreateRecipeImagesParams{
+			RecipeID: recipeID,
+			Path:     image.URL.String(),
 		})
 		if err != nil {
 			return err
@@ -185,6 +202,11 @@ func (s *Store) GetRecipeById(ctx context.Context, id int64) (recipe domain.Reci
 	recipeImages := make([]domain.RecipeImage, len(images))
 	for i, image := range images {
 		recipeImages[i] = image.AsDomainModel()
+		imageUrl, err := url.ParseRequestURI(image.Path)
+		if err != nil {
+			return recipe, err
+		}
+		recipeImages[i].URL = imageUrl
 	}
 
 	recipe.Steps = recipeSteps
@@ -222,10 +244,13 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipe
 
 	imagesByRecipe := make(map[int64][]domain.RecipeImage)
 	for _, image := range images {
+		imageUrl, err := url.ParseRequestURI(image.Path)
+		if err != nil {
+			return nil, err
+		}
 		imagesByRecipe[image.RecipeID] = append(imagesByRecipe[image.RecipeID], domain.RecipeImage{
-			ID:        image.ID,
-			Path:      image.Path,
-			SortOrder: image.SortOrder,
+			ID:  image.ID,
+			URL: imageUrl,
 		})
 	}
 

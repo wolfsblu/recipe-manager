@@ -112,8 +112,6 @@ func (r *GetTagsForRecipesRow) AsDomainModel() string {
 
 func (r *GetImagesForRecipesRow) AsDomainModel() domain.RecipeImage {
 	return domain.RecipeImage{
-		ID:        r.ID,
-		Path:      r.Path,
-		SortOrder: r.SortOrder,
+		ID: r.ID,
 	}
 }

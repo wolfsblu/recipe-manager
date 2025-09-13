@@ -73,6 +73,25 @@ func (q *Queries) CreateRecipe(ctx context.Context, arg CreateRecipeParams) (int
 	return id, err
 }
 
+const createRecipeImages = `-- name: CreateRecipeImages :one
+INSERT INTO recipe_images (recipe_id, path, sort_order)
+VALUES (?, ?, ?)
+RETURNING id
+`
+
+type CreateRecipeImagesParams struct {
+	RecipeID  int64
+	Path      string
+	SortOrder int64
+}
+
+func (q *Queries) CreateRecipeImages(ctx context.Context, arg CreateRecipeImagesParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createRecipeImages, arg.RecipeID, arg.Path, arg.SortOrder)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const createRecipeStep = `-- name: CreateRecipeStep :one
 INSERT INTO recipe_steps (recipe_id, instructions)
 VALUES (?, ?)

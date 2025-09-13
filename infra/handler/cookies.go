@@ -16,13 +16,13 @@ func createSessionCookie(userId int64) (string, error) {
 	}
 	expiry := 7 * 24 * time.Hour // One week
 	return fmt.Sprintf(
-		"%s=%s; HttpOnly; Secure; SameSite=strict; Path=/; Max-Age=%d", AuthCookieName, payload, int64(expiry/time.Second),
+		"%s=%s; HttpOnly; Secure; SameSite=strict; URL=/; Max-Age=%d", AuthCookieName, payload, int64(expiry/time.Second),
 	), nil
 }
 
 func expireSessionCookie() string {
 	return fmt.Sprintf(
-		"%s=; HttpOnly; Secure; SameSite=strict; Path=/; Max-Age=%d", AuthCookieName, 0,
+		"%s=; HttpOnly; Secure; SameSite=strict; URL=/; Max-Age=%d", AuthCookieName, 0,
 	)
 }
 

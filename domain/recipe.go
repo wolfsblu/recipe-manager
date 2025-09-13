@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"net/url"
+	"time"
+)
 
 type RecipeDetails struct {
 	Name        string
@@ -31,9 +34,8 @@ type Recipe struct {
 }
 
 type RecipeImage struct {
-	ID        int64
-	Path      string
-	SortOrder int64
+	ID  int64
+	URL *url.URL
 }
 
 type MealPlan struct {

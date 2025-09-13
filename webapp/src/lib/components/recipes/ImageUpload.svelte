@@ -54,14 +54,6 @@
     $effect(() => {
         value = uploadService.completedUrls;
     });
-
-    const cleanup = async () => {
-        await uploadService.cleanup()
-    }
-
-    onDestroy(() => {
-        cleanup()
-    })
 </script>
 
 <div class={cn('flex w-full flex-col gap-4', className)}>

@@ -6,7 +6,6 @@ import (
 
 	"github.com/wolfsblu/go-chef/api"
 	"github.com/wolfsblu/go-chef/domain"
-	"github.com/wolfsblu/go-chef/infra/config"
 )
 
 func (m *APIMapper) ToIngredient(ingredient domain.Ingredient) (api.Ingredient, error) {
@@ -150,22 +149,10 @@ func (m *APIMapper) ToUnits(units []domain.Unit) ([]api.ReadUnit, error) {
 	return result, nil
 }
 
-func (m *APIMapper) ToImageURL(imagePath string) (*url.URL, error) {
-	path, err := url.JoinPath(m.baseURL, config.ImagesPathPrefix, imagePath)
-	if err != nil {
-		return nil, err
-	}
-	return url.Parse(path)
-}
-
 func (m *APIMapper) ToRecipeImageURLs(images []domain.RecipeImage) ([]url.URL, error) {
 	urls := make([]url.URL, len(images))
 	for i, image := range images {
-		imageURL, err := m.ToImageURL(image.Path)
-		if err != nil {
-			return nil, err
-		}
-		urls[i] = *imageURL
+		urls[i] = *image.URL
 	}
 	return urls, nil
 }

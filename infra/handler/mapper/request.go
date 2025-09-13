@@ -10,19 +10,16 @@ func (m *APIMapper) FromWriteRecipe(req *api.WriteRecipe) domain.Recipe {
 	for i, step := range req.Steps {
 		steps[i] = m.fromWriteRecipeStep(step)
 	}
-	/*
-		images := make([]domain.RecipeImage, len(req.Images))
-		for i, image := range req.Images {
-			images[i] = domain.RecipeImage{
-				Path:      image,
-				SortOrder: int64(i),
-			}
+	images := make([]domain.RecipeImage, len(req.Images))
+	for i, image := range req.Images {
+		images[i] = domain.RecipeImage{
+			URL: &image,
 		}
-	*/
+	}
 	return domain.Recipe{
-		//Images: images,
-		Tags:  req.Tags,
-		Steps: steps,
+		Images: images,
+		Tags:   req.Tags,
+		Steps:  steps,
 		RecipeDetails: domain.RecipeDetails{
 			Name:        req.Name,
 			Description: req.Description,
