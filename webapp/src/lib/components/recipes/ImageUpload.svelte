@@ -34,6 +34,15 @@
 
     let files = $state<UploadedFile[]>([]);
 
+    const deleteFileFromServer = async (url: string) => {
+        await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Tus-Resumable': '1.0.0',
+            }
+        });
+    };
+
     const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
         await Promise.allSettled(files.map((file) => uploadFile(file)));
     };
@@ -88,14 +97,6 @@
         value = files
             .filter(file => file.status === 'completed' && file.url)
             .map(file => file.url!)
-    });
-
-    onDestroy(() => {
-        for (const file of files) {
-            if (file.upload && file.status === 'uploading') {
-                file.upload.abort();
-            }
-        }
     });
 
     const handleDrop = (state: DragDropState<UploadedFile>) => {
@@ -182,10 +183,14 @@
                                     variant="destructive"
                                     size="icon"
                                     class="absolute top-2 right-2 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                                    onclick={() => {
+                                    onclick={async () => {
                                         // Cancel upload if still in progress
                                         if (file.upload && file.status === 'uploading') {
                                             file.upload.abort();
+                                        }
+                                        // Delete from server if completed
+                                        if (file.status === 'completed' && file.url) {
+                                            await deleteFileFromServer(file.url);
                                         }
                                         files = [...files.slice(0, i), ...files.slice(i + 1)];
                                     }}
