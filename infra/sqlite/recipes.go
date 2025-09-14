@@ -37,6 +37,9 @@ func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 	if err = s.createRecipeImages(ctx, recipeId, recipe.Images); err != nil {
 		return domain.Recipe{}, err
 	}
+	if err = s.createRecipeTags(ctx, recipeId, recipe.Tags); err != nil {
+		return domain.Recipe{}, err
+	}
 	if err = s.Commit(); err != nil {
 		return domain.Recipe{}, err
 	}
@@ -70,6 +73,16 @@ func (s *Store) createStepIngredients(ctx context.Context, stepID int64, ingredi
 func (s *Store) createRecipeImages(ctx context.Context, recipeID int64, images []domain.RecipeImage) error {
 	for _, image := range images {
 		_, err := s.query().CreateRecipeImages(ctx, s.mapper.FromRecipeImage(recipeID, image))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *Store) createRecipeTags(ctx context.Context, recipeID int64, tags []domain.Tag) error {
+	for _, tag := range tags {
+		err := s.query().CreateRecipeTag(ctx, s.mapper.FromRecipeTag(recipeID, tag))
 		if err != nil {
 			return err
 		}
@@ -278,11 +291,17 @@ func (s *Store) UpdateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 	if err = s.query().DeleteRecipeImages(ctx, recipe.ID); err != nil {
 		return domain.Recipe{}, err
 	}
+	if err = s.query().DeleteRecipeTags(ctx, recipe.ID); err != nil {
+		return domain.Recipe{}, err
+	}
 
 	if err = s.createRecipeSteps(ctx, recipe.ID, recipe.Steps); err != nil {
 		return domain.Recipe{}, err
 	}
 	if err = s.createRecipeImages(ctx, recipe.ID, recipe.Images); err != nil {
+		return domain.Recipe{}, err
+	}
+	if err = s.createRecipeTags(ctx, recipe.ID, recipe.Tags); err != nil {
 		return domain.Recipe{}, err
 	}
 

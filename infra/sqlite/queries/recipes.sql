@@ -22,6 +22,10 @@ INSERT INTO recipe_ingredients (step_id, ingredient_id, unit_id, amount, sort_or
 VALUES (?, ?, ?, ?, ?)
 RETURNING id;
 
+-- name: CreateRecipeTag :exec
+INSERT INTO recipe_tags (recipe_id, tag_id)
+VALUES (?, ?);
+
 -- name: DeleteRecipe :exec
 DELETE
 FROM recipes
@@ -119,4 +123,8 @@ WHERE recipe_id = ?;
 
 -- name: DeleteRecipeImages :exec
 DELETE FROM recipe_images
+WHERE recipe_id = ?;
+
+-- name: DeleteRecipeTags :exec
+DELETE FROM recipe_tags
 WHERE recipe_id = ?;

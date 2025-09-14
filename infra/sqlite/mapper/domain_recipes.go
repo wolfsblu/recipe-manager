@@ -48,3 +48,10 @@ func (m *DBMapper) FromRecipeImage(recipeID int64, image domain.RecipeImage) dat
 		Path:     image.URL.String(),
 	}
 }
+
+func (m *DBMapper) FromRecipeTag(recipeID int64, tag domain.Tag) database.CreateRecipeTagParams {
+	return database.CreateRecipeTagParams{
+		RecipeID: recipeID,
+		TagID:    tag.ID,
+	}
+}

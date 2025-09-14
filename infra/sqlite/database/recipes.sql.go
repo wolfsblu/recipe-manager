@@ -110,6 +110,21 @@ func (q *Queries) CreateRecipeStep(ctx context.Context, arg CreateRecipeStepPara
 	return id, err
 }
 
+const createRecipeTag = `-- name: CreateRecipeTag :exec
+INSERT INTO recipe_tags (recipe_id, tag_id)
+VALUES (?, ?)
+`
+
+type CreateRecipeTagParams struct {
+	RecipeID int64
+	TagID    int64
+}
+
+func (q *Queries) CreateRecipeTag(ctx context.Context, arg CreateRecipeTagParams) error {
+	_, err := q.db.ExecContext(ctx, createRecipeTag, arg.RecipeID, arg.TagID)
+	return err
+}
+
 const createStepIngredient = `-- name: CreateStepIngredient :one
 INSERT INTO recipe_ingredients (step_id, ingredient_id, unit_id, amount, sort_order)
 VALUES (?, ?, ?, ?, ?)
@@ -165,6 +180,16 @@ WHERE recipe_id = ?
 
 func (q *Queries) DeleteRecipeSteps(ctx context.Context, recipeID int64) error {
 	_, err := q.db.ExecContext(ctx, deleteRecipeSteps, recipeID)
+	return err
+}
+
+const deleteRecipeTags = `-- name: DeleteRecipeTags :exec
+DELETE FROM recipe_tags
+WHERE recipe_id = ?
+`
+
+func (q *Queries) DeleteRecipeTags(ctx context.Context, recipeID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteRecipeTags, recipeID)
 	return err
 }
 
