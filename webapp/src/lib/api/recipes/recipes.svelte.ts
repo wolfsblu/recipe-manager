@@ -8,6 +8,20 @@ export const getRecipes = async () => {
     return response.data
 }
 
+export const getRecipe = async (id: number) => {
+    const response = await client.GET("/recipes/{recipeId}", {
+        params: {
+            path: {
+                recipeId: id
+            }
+        }
+    })
+    if (response.error) {
+        throw response.error
+    }
+    return response.data
+}
+
 export const addRecipe = async (recipe) => {
     const response = await client.POST("/recipes", {
         body: recipe

@@ -2,9 +2,10 @@ package handler
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/gorilla/securecookie"
 	"github.com/wolfsblu/recipe-manager/infra/env"
-	"time"
 )
 
 const AuthCookieName = "SESSID"
