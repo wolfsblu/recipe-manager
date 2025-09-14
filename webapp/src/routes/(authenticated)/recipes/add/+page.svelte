@@ -119,7 +119,7 @@
                 <Form.Control>
                     {#snippet children({props})}
                         <Form.Label>Tags</Form.Label>
-                        <TagsInput {...props} bind:value={$formData.tags} placeholder="Add a tag"/>
+                        <TagsInput {...props} bind:value={$formData.tags} placeholder="Add a tag" suggestions={data.tags?.map(tag => ({id: tag.id, label: tag.name})) || []}/>
                     {/snippet}
                 </Form.Control>
                 <Form.Description/>
