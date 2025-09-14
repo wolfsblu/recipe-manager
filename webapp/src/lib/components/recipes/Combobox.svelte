@@ -24,7 +24,7 @@
     let open = $state(false)
     let searchQuery = $state('')
 
-    const itemHeight = 32
+    const itemHeight = 34
     const maxHeight = 300
     let dynamicHeight = $derived.by(() => {
         const contentHeight = (displayOptions?.length || 0) * itemHeight
