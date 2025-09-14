@@ -579,13 +579,13 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/WriteRecipeStep'
-              tags:
-                type: array
-                items:
-                  type: integer
-                  format: int64
-                  examples:
-                    - 1
+            tags:
+              type: array
+              items:
+                type: integer
+                format: int64
+                examples:
+                  - 1
   requestBodies:
     Credentials:
       description: User credentials

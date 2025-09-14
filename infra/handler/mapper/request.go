@@ -18,7 +18,7 @@ func (m *APIMapper) FromWriteRecipe(req *api.WriteRecipe) domain.Recipe {
 	}
 	return domain.Recipe{
 		Images: images,
-		Tags:   req.Tags,
+		Tags:   m.fromTagIDs(req.Tags),
 		Steps:  steps,
 		RecipeDetails: domain.RecipeDetails{
 			Name:        req.Name,
@@ -27,6 +27,14 @@ func (m *APIMapper) FromWriteRecipe(req *api.WriteRecipe) domain.Recipe {
 			Minutes:     req.Minutes,
 		},
 	}
+}
+
+func (m *APIMapper) fromTagIDs(ids []int64) []domain.Tag {
+	tags := make([]domain.Tag, len(ids))
+	for i, id := range ids {
+		tags[i] = domain.Tag{ID: id}
+	}
+	return tags
 }
 
 func (m *APIMapper) fromWriteRecipeStep(step api.WriteRecipeStep) domain.RecipeStep {
