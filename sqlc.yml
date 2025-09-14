@@ -5,6 +5,5 @@ sql:
     schema: "infra/sqlite/schema.sql"
     gen:
       go:
-        package: "sqlite"
-        out: "infra/sqlite"
+        out: "infra/sqlite/database"
         emit_pointers_for_null_types: true

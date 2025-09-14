@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 )
 
 func (s *Store) Begin(ctx context.Context) error {
@@ -45,7 +46,7 @@ func (s *Store) Rollback() {
 	_ = s.tx.Rollback()
 }
 
-func (s *Store) query() *Queries {
+func (s *Store) query() *database.Queries {
 	if s.qtx != nil {
 		return s.qtx
 	}

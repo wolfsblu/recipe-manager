@@ -6,14 +6,17 @@ import (
 	"sync"
 
 	"github.com/wolfsblu/recipe-manager/infra/env"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/mapper"
 )
 
 type Store struct {
-	db   *sql.DB
-	path string
-	q    *Queries
-	qtx  *Queries
-	tx   *sql.Tx
+	db     *sql.DB
+	path   string
+	q      *database.Queries
+	qtx    *database.Queries
+	tx     *sql.Tx
+	mapper *mapper.DBMapper
 }
 
 var (
@@ -28,7 +31,12 @@ func NewSqliteStore() (*Store, error) {
 		var con *sql.DB
 		con, err = connect(dbPath)
 		if err == nil {
-			store = &Store{db: con, q: New(con), path: dbPath}
+			store = &Store{
+				db:     con,
+				mapper: mapper.New(),
+				path:   dbPath,
+				q:      database.New(con),
+			}
 			err = store.migrate()
 		}
 	})
