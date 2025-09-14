@@ -11,15 +11,10 @@
 	import * as Command from '$lib/components/ui/command/index.js';
 
 	const defaultValidate: TagsInputProps['validate'] = (val, tags) => {
-		const transformed = val.trim();
-
-		// disallow empties
-		if (transformed.length === 0) return undefined;
-
 		// disallow duplicates
-		if (tags.find((t) => transformed === t)) return undefined;
+		if (tags.find((t) => t === val.id)) return undefined;
 
-		return transformed;
+		return val.id;
 	};
 
 	let {
@@ -59,22 +54,34 @@
 		const query = inputValue.toLowerCase();
 		return suggestions.filter(suggestion =>
 			suggestion.label.toLowerCase().includes(query) &&
-			!value.includes(suggestion.label)
+			!value.includes(Number(suggestion.id))
 		).slice(0, 10);
+	});
+
+	const selectedTags = $derived.by(() => {
+		if (!suggestions || !value) return [];
+		return value.map(tagId => {
+			const suggestion = suggestions.find(s => Number(s.id) === tagId);
+			return {
+				id: tagId,
+				label: suggestion?.label || `Tag ${tagId}`
+			};
+		});
 	});
 
 	const enter = () => {
 		if (isComposing) return;
 
-		const validated = validate(inputValue, value);
+		// Try to find a matching suggestion
+		const matchingSuggestion = suggestions?.find(s =>
+			s.label.toLowerCase() === inputValue.toLowerCase().trim()
+		);
 
-		if (!validated) {
+		if (matchingSuggestion) {
+			selectSuggestion(matchingSuggestion);
+		} else {
 			invalid = true;
-			return;
 		}
-
-		value = [...value, validated];
-		inputValue = '';
 	};
 
 	const compositionStart = () => {
@@ -86,8 +93,9 @@
 	};
 
 	const selectSuggestion = (suggestion: { id: number | string; label: string }) => {
-		const validated = validate(suggestion.label, value);
-		if (validated) {
+		const tagObj = { id: Number(suggestion.id), label: suggestion.label };
+		const validated = validate(tagObj, value);
+		if (validated !== undefined) {
 			value = [...value, validated];
 			inputValue = '';
 			showDropdown = false;
@@ -154,7 +162,7 @@
 						tagIndex = prev;
 					}
 				} else {
-					tagIndex = value.length - 1;
+					tagIndex = selectedTags.length - 1;
 				}
 
 				shouldResetIndex = false;
@@ -169,8 +177,8 @@
 
 						deleteIndex(tagIndex);
 
-						// stay focused on the same index unless value.length === 0
-						if (value.length === 0) tagIndex = undefined;
+						// stay focused on the same index unless selectedTags.length === 0
+						if (selectedTags.length === 0) tagIndex = undefined;
 
 						shouldResetIndex = false;
 					}
@@ -192,7 +200,7 @@
 					}
 				} else {
 					// set initial index
-					tagIndex = value.length - 1;
+					tagIndex = selectedTags.length - 1;
 				}
 
 				shouldResetIndex = false;
@@ -205,7 +213,7 @@
 					if (tagIndex !== undefined) {
 						const next = tagIndex + 1;
 
-						if (next > value.length - 1) {
+						if (next > selectedTags.length - 1) {
 							tagIndex = undefined;
 						} else {
 							tagIndex = next;
@@ -223,7 +231,7 @@
 		}
 	};
 
-	const deleteValue = (val: string) => {
+	const deleteValue = (val: number) => {
 		const index = value.findIndex((v) => val === v);
 
 		if (index === -1) return;
@@ -255,8 +263,8 @@
 	)}
 	aria-disabled={disabled}
 >
-	{#each value as tag, i (tag)}
-		<TagsInputTag value={tag} {disabled} onDelete={deleteValue} active={i === tagIndex} />
+	{#each selectedTags as tag, i (tag.id)}
+		<TagsInputTag value={tag.id} label={tag.label} {disabled} onDelete={deleteValue} active={i === tagIndex} />
 	{/each}
 	<input
 		{...rest}
@@ -283,7 +291,10 @@
 							'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground',
 							index === selectedSuggestionIndex && 'bg-accent text-accent-foreground'
 						)}
-						onclick={() => selectSuggestion(suggestion)}
+						onmousedown={(e) => {
+							e.preventDefault();
+							selectSuggestion(suggestion);
+						}}
 						onmouseenter={() => selectedSuggestionIndex = index}
 					>
 						{suggestion.label}

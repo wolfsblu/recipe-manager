@@ -5,7 +5,7 @@ export const formSchema = z.object({
     images: z.array(z.string().url()),
     servings: z.number().positive(),
     minutes: z.number().positive(),
-    tags: z.array(z.string().nonempty()),
+    tags: z.array(z.number().positive()),
     description: z.string().nonempty(),
     steps: z.array(z.object({
         ingredients: z.array(z.object({

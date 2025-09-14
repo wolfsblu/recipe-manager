@@ -401,6 +401,7 @@ export interface components {
         };
         WriteRecipe: components["schemas"]["BaseRecipe"] & {
             steps: components["schemas"]["WriteRecipeStep"][];
+            tags?: number[];
         };
     };
     responses: {

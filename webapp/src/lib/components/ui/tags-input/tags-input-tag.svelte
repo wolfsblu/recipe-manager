@@ -6,13 +6,14 @@
 	import XIcon from '@lucide/svelte/icons/x';
 
 	type Props = {
-		value: string;
+		value: number;
+		label: string;
 		disabled: boolean | null;
 		active: boolean;
-		onDelete: (value: string) => void;
+		onDelete: (value: number) => void;
 	};
 
-	let { value, disabled, onDelete, active }: Props = $props();
+	let { value, label, disabled, onDelete, active }: Props = $props();
 </script>
 
 <div
@@ -20,7 +21,7 @@
 	aria-selected={active}
 >
 	<span>
-		{value}
+		{label}
 	</span>
 	<button type="button" {disabled} onclick={() => onDelete(value)}>
 		<XIcon class="size-4" />

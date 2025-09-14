@@ -63,7 +63,7 @@
         <div class="flex w-max gap-x-1">
             {#each recipe.tags as tag}
                 <Badge variant="secondary" class="text-muted-foreground">
-                    {tag}
+                    {tag.name}
                 </Badge>
             {/each}
         </div>

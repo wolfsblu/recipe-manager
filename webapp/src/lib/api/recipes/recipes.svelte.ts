@@ -22,7 +22,7 @@ export const getRecipe = async (id: number) => {
     return response.data
 }
 
-export const addRecipe = async (recipe) => {
+export const addRecipe = async (recipe: any) => {
     const response = await client.POST("/recipes", {
         body: recipe
     })
