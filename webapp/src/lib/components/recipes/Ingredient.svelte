@@ -13,18 +13,19 @@
 
     const { form: formData } = form;
 
-    const ingredientOptions = ingredients.map(
+    const ingredientOptions = Array.isArray(ingredients) ? ingredients.map(
         ingredient => ({
-            value: ingredient.id,
-            label: ingredient.name,
+            value: ingredient?.id,
+            label: ingredient?.name || '',
         })
-    )
-    const unitOptions = units.map(
+    ).filter(option => option.value !== undefined) : []
+
+    const unitOptions = Array.isArray(units) ? units.map(
         unit => ({
-            value: unit.id,
-            label: unit.name,
+            value: unit?.id,
+            label: unit?.name || '',
         })
-    )
+    ).filter(option => option.value !== undefined) : []
 
     const basePath = `steps[${stepIndex}].ingredients[${ingredientIndex}]`;
 </script>

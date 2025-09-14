@@ -28,18 +28,23 @@
     const itemHeight = 32;
     const maxHeight = 300;
     let dynamicHeight = $derived.by(() => {
-        const contentHeight = displayOptions.length * itemHeight;
+        const contentHeight = (displayOptions?.length || 0) * itemHeight;
         return Math.min(contentHeight, maxHeight);
     });
 
     // Filter options based on search query
     let filteredOptions = $derived.by(() => {
+        if (!Array.isArray(options) || options.length === 0) {
+            return [];
+        }
+
         if (!searchQuery) {
             return options; // Show all options when no search query
         }
 
         const query = searchQuery.toLowerCase();
         const filtered = options.filter(option =>
+            option && option.label && typeof option.label === 'string' &&
             option.label.toLowerCase().includes(query)
         );
 
@@ -48,10 +53,18 @@
 
     // Show selected option even if not in filtered results
     let displayOptions = $derived.by(() => {
-        const selectedOption = options.find(option => option.value === value);
-        const filtered = filteredOptions;
+        if (!Array.isArray(options) || options.length === 0) {
+            return [];
+        }
 
-        if (selectedOption && !filtered.some(option => option.value === value)) {
+        const selectedOption = options.find(option =>
+            option && option.value !== undefined && option.value === value
+        );
+        const filtered = filteredOptions || [];
+
+        if (selectedOption && !filtered.some(option =>
+            option && option.value !== undefined && option.value === value
+        )) {
             return [selectedOption, ...filtered];
         }
 
@@ -64,14 +77,22 @@
     function closeAndFocusTrigger(triggerId: string) {
         open = false;
         tick().then(() => {
-            document.getElementById(triggerId)?.focus();
+            const trigger = document.getElementById(triggerId);
+            if (trigger) {
+                trigger.focus();
+            }
         });
     }
+
+    const resetSearchQuery = () => {
+        searchQuery = ''
+    }
+
     const triggerId = useId();
 </script>
 
 <Form.Field {form} {name} class="space-y-0 w-full">
-    <Popover.Root bind:open>
+    <Popover.Root bind:open onOpenChangeComplete={resetSearchQuery}>
         <Form.Control id={triggerId}>
             {#snippet children({ props })}
                 <Popover.Trigger
@@ -83,7 +104,7 @@
                         role="combobox"
                         {...props}
                 >
-                    {options.find((f) => f.value === value)?.label ?? placeholder}
+                    {Array.isArray(options) ? options.find((f) => f && f.value === value)?.label ?? placeholder : placeholder}
                     <ChevronsUpDownIcon class="opacity-50" />
                 </Popover.Trigger>
                 <input hidden bind:value={value} name={props.name} />
@@ -97,7 +118,7 @@
                         class="h-9"
                         bind:value={searchQuery}
                 />
-                {#if displayOptions.length === 0}
+                {#if !displayOptions || displayOptions.length === 0}
                     <Command.Empty>
                         {empty}
                     </Command.Empty>
@@ -110,18 +131,23 @@
                             itemSize={itemHeight}
                         >
                             {#snippet item({ index, style })}
-                                <div {style}>
-                                    <Command.Item
-                                            value={displayOptions[index].value.toString()}
-                                            onSelect={() => {
-                                                value = displayOptions[index].value;
-                                                closeAndFocusTrigger(triggerId);
-                                            }}
-                                    >
-                                        {displayOptions[index].label}
-                                        <CheckIcon class={cn("ml-auto h-4 w-4", displayOptions[index].value !== value && "text-transparent")}/>
-                                    </Command.Item>
-                                </div>
+                                {@const option = displayOptions?.[index]}
+                                {#if option && option.value !== undefined && option.label !== undefined}
+                                    <div {style}>
+                                        <Command.Item
+                                                value={option.value.toString()}
+                                                onSelect={() => {
+                                                    if (option && option.value !== undefined) {
+                                                        value = option.value;
+                                                        closeAndFocusTrigger(triggerId);
+                                                    }
+                                                }}
+                                        >
+                                            {option.label ?? ''}
+                                            <CheckIcon class={cn("ml-auto h-4 w-4", option.value !== value && "text-transparent")}/>
+                                        </Command.Item>
+                                    </div>
+                                {/if}
                             {/snippet}
                         </VirtualList>
                     </div>
