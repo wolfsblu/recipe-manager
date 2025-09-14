@@ -41,7 +41,7 @@
         {/if}
     </a>
     <div class="pt-3 px-4 pb-2 space-y-2">
-        <a href="/recipes/1" class="inline-block font-semibold text-base">
+        <a href="/recipes/{recipe.id}" class="inline-block font-semibold text-base">
             {recipe.name}
         </a>
         <div class="text-sm text-muted-foreground grid space-y-1">
