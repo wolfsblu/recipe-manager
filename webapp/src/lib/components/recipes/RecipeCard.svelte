@@ -28,7 +28,7 @@
 </script>
 
 <div class="bg-card rounded-lg shadow-sm overflow-hidden transition-all duration-300">
-    <a href="/recipes/1" class="block relative">
+    <a href="/recipes/{recipe.id}" class="block relative">
         {#if recipe.minutes}
             <Badge variant="secondary" class="absolute top-2 left-2">
                 <ClockIcon /> {formatMinutesAsHours(recipe.minutes)}
