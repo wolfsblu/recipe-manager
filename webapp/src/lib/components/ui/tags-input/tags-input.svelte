@@ -48,6 +48,19 @@
 		});
 	});
 
+	$effect(() => {
+		// Scroll highlighted item into view
+		if (selectedSuggestionIndex >= 0) {
+			const highlightedElement = document.getElementById(`suggestion-${selectedSuggestionIndex}`);
+			if (highlightedElement) {
+				highlightedElement.scrollIntoView({
+					behavior: 'smooth',
+					block: 'nearest'
+				});
+			}
+		}
+	});
+
 	const filteredSuggestions = $derived.by(() => {
 		if (!inputValue || inputValue.length < 2 || !suggestions) return [];
 
@@ -126,12 +139,16 @@
 		if (showDropdown && filteredSuggestions.length > 0) {
 			if (e.key === 'ArrowDown') {
 				e.preventDefault();
-				selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, filteredSuggestions.length - 1);
+				selectedSuggestionIndex = selectedSuggestionIndex >= filteredSuggestions.length - 1
+					? -1
+					: selectedSuggestionIndex + 1;
 				return;
 			}
 			if (e.key === 'ArrowUp') {
 				e.preventDefault();
-				selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+				selectedSuggestionIndex = selectedSuggestionIndex <= -1
+					? filteredSuggestions.length - 1
+					: selectedSuggestionIndex - 1;
 				return;
 			}
 			if (e.key === 'Escape') {
@@ -253,6 +270,7 @@
 		showDropdown = false;
 		selectedSuggestionIndex = -1;
 	};
+
 </script>
 
 <div bind:this={containerElement} class="relative w-full">
@@ -287,6 +305,7 @@
 			<div class="p-1 max-h-[200px] overflow-y-auto">
 				{#each filteredSuggestions as suggestion, index}
 					<div
+						id="suggestion-{index}"
 						class={cn(
 							'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground',
 							index === selectedSuggestionIndex && 'bg-accent text-accent-foreground'
