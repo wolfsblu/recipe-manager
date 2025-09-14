@@ -25,7 +25,10 @@ func (s *RecipeService) GetMealPlan(ctx context.Context, user *User, from time.T
 	return s.store.GetMealPlan(ctx, user, from, until)
 }
 
-func (s *RecipeService) Delete(ctx context.Context, id int64) error {
+func (s *RecipeService) Delete(ctx context.Context, user *User, id int64) error {
+	if err := s.validateRecipeOwnership(ctx, user, id); err != nil {
+		return err
+	}
 	return s.store.DeleteRecipe(ctx, id)
 }
 

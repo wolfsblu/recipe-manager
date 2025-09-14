@@ -45,7 +45,8 @@ func (h *RecipeHandler) BrowseRecipes(ctx context.Context) ([]api.ReadRecipe, er
 }
 
 func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecipeParams) error {
-	err := h.Recipes.Delete(ctx, params.RecipeId)
+	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	err := h.Recipes.Delete(ctx, user, params.RecipeId)
 	if err != nil {
 		return err
 	}
