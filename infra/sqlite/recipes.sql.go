@@ -148,6 +148,26 @@ func (q *Queries) DeleteRecipe(ctx context.Context, id int64) error {
 	return err
 }
 
+const deleteRecipeImages = `-- name: DeleteRecipeImages :exec
+DELETE FROM recipe_images
+WHERE recipe_id = ?
+`
+
+func (q *Queries) DeleteRecipeImages(ctx context.Context, recipeID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteRecipeImages, recipeID)
+	return err
+}
+
+const deleteRecipeSteps = `-- name: DeleteRecipeSteps :exec
+DELETE FROM recipe_steps
+WHERE recipe_id = ?
+`
+
+func (q *Queries) DeleteRecipeSteps(ctx context.Context, recipeID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteRecipeSteps, recipeID)
+	return err
+}
+
 const getImagesForRecipes = `-- name: GetImagesForRecipes :many
 SELECT id, path, sort_order, recipe_id
 FROM recipe_images
@@ -558,17 +578,25 @@ func (q *Queries) ListRecipes(ctx context.Context, createdBy int64) ([]Recipe, e
 
 const updateRecipe = `-- name: UpdateRecipe :exec
 UPDATE recipes
-set name = ?
+SET name = ?, servings = ?, minutes = ?, description = ?
 WHERE id = ?
-RETURNING id, name, servings, minutes, description, created_by, created_at
 `
 
 type UpdateRecipeParams struct {
-	Name string
-	ID   int64
+	Name        string
+	Servings    int64
+	Minutes     int64
+	Description string
+	ID          int64
 }
 
 func (q *Queries) UpdateRecipe(ctx context.Context, arg UpdateRecipeParams) error {
-	_, err := q.db.ExecContext(ctx, updateRecipe, arg.Name, arg.ID)
+	_, err := q.db.ExecContext(ctx, updateRecipe,
+		arg.Name,
+		arg.Servings,
+		arg.Minutes,
+		arg.Description,
+		arg.ID,
+	)
 	return err
 }

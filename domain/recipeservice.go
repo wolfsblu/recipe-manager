@@ -26,7 +26,7 @@ func (s *RecipeService) GetMealPlan(ctx context.Context, user *User, from time.T
 }
 
 func (s *RecipeService) Delete(ctx context.Context, user *User, id int64) error {
-	if err := s.validateRecipeOwnership(ctx, user, id); err != nil {
+	if err := s.validateRecipeOwnership(ctx, user.ID, id); err != nil {
 		return err
 	}
 	return s.store.DeleteRecipe(ctx, id)
@@ -46,4 +46,16 @@ func (s *RecipeService) GetIngredients(ctx context.Context) ([]Ingredient, error
 
 func (s *RecipeService) GetUnits(ctx context.Context) ([]Unit, error) {
 	return s.store.GetUnits(ctx)
+}
+
+func (s *RecipeService) UpdateRecipe(ctx context.Context, recipe Recipe) (Recipe, error) {
+	if err := s.validateRecipeOwnership(ctx, recipe.CreatedBy.ID, recipe.ID); err != nil {
+		return Recipe{}, err
+	}
+
+	if err := s.validateRecipe(ctx, recipe); err != nil {
+		return Recipe{}, err
+	}
+
+	return s.store.UpdateRecipe(ctx, recipe)
 }

@@ -81,9 +81,18 @@ func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeB
 	return h.mapper.ToReadRecipe(recipe)
 }
 
-func (h *RecipeHandler) UpdateRecipe(_ context.Context, _ *api.WriteRecipe, _ api.UpdateRecipeParams) (*api.ReadRecipe, error) {
-	// TODO: Implement
-	return &api.ReadRecipe{}, nil
+func (h *RecipeHandler) UpdateRecipe(ctx context.Context, req *api.WriteRecipe, params api.UpdateRecipeParams) (*api.ReadRecipe, error) {
+	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	recipe := h.mapper.FromWriteRecipe(req)
+	recipe.ID = params.RecipeId
+	recipe.CreatedBy = user
+
+	result, err := h.Recipes.UpdateRecipe(ctx, recipe)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.mapper.ToReadRecipe(result)
 }
 
 func (h *RecipeHandler) GetIngredients(ctx context.Context) ([]api.Ingredient, error) {

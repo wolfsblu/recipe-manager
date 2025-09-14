@@ -105,6 +105,13 @@ ORDER BY name;
 
 -- name: UpdateRecipe :exec
 UPDATE recipes
-set name = ?
-WHERE id = ?
-RETURNING *;
+SET name = ?, servings = ?, minutes = ?, description = ?
+WHERE id = ?;
+
+-- name: DeleteRecipeSteps :exec
+DELETE FROM recipe_steps
+WHERE recipe_id = ?;
+
+-- name: DeleteRecipeImages :exec
+DELETE FROM recipe_images
+WHERE recipe_id = ?;

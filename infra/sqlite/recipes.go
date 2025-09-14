@@ -263,3 +263,40 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipe
 	}
 	return recipes, nil
 }
+
+func (s *Store) UpdateRecipe(ctx context.Context, recipe domain.Recipe) (domain.Recipe, error) {
+	if err := s.Begin(ctx); err != nil {
+		return domain.Recipe{}, err
+	}
+	defer s.Rollback()
+
+	err := s.query().UpdateRecipe(ctx, UpdateRecipeParams{
+		Name:        recipe.Name,
+		Servings:    recipe.Servings,
+		Minutes:     recipe.Minutes,
+		Description: recipe.Description,
+		ID:          recipe.ID,
+	})
+	if err != nil {
+		return domain.Recipe{}, err
+	}
+
+	if err = s.query().DeleteRecipeSteps(ctx, recipe.ID); err != nil {
+		return domain.Recipe{}, err
+	}
+	if err = s.query().DeleteRecipeImages(ctx, recipe.ID); err != nil {
+		return domain.Recipe{}, err
+	}
+
+	if err = s.createRecipeSteps(ctx, recipe.ID, recipe.Steps); err != nil {
+		return domain.Recipe{}, err
+	}
+	if err = s.createRecipeImages(ctx, recipe.ID, recipe.Images); err != nil {
+		return domain.Recipe{}, err
+	}
+
+	if err = s.Commit(); err != nil {
+		return domain.Recipe{}, err
+	}
+	return s.GetRecipeById(ctx, recipe.ID)
+}
