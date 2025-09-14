@@ -386,6 +386,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ReadRecipeStep'
+            tags:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReadTag'
     ReadUnit:
       type: object
       required:
@@ -554,12 +558,6 @@ components:
           description: How long it takes to prepare this recipe (in minutes)
           examples:
             - 45
-        tags:
-          type: array
-          items:
-            type: string
-            examples:
-              - Spicy
         images:
           type: array
           items:
@@ -581,7 +579,13 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/WriteRecipeStep'
-
+              tags:
+                type: array
+                items:
+                  type: integer
+                  format: int64
+                  examples:
+                    - 1
   requestBodies:
     Credentials:
       description: User credentials

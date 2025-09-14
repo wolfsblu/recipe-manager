@@ -290,6 +290,7 @@ export interface components {
              */
             id: number;
             steps: components["schemas"]["ReadRecipeStep"][];
+            tags?: components["schemas"]["ReadTag"][];
         };
         ReadUnit: {
             /**
@@ -396,7 +397,6 @@ export interface components {
              * @example 45
              */
             minutes: number;
-            tags?: string[];
             images?: string[];
         };
         WriteRecipe: components["schemas"]["BaseRecipe"] & {

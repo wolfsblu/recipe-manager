@@ -8,39 +8,28 @@ import (
 	"github.com/wolfsblu/recipe-manager/domain"
 )
 
-func (m *APIMapper) ToIngredient(ingredient domain.Ingredient) (api.Ingredient, error) {
+func (m *APIMapper) ToIngredient(ingredient domain.Ingredient) api.Ingredient {
 	return api.Ingredient{
 		ID:   ingredient.ID,
 		Name: ingredient.Name,
-	}, nil
+	}
 }
 
-func (m *APIMapper) ToReadStepIngredient(ingredient domain.StepIngredient) (api.ReadStepIngredient, error) {
-	unit, err := m.ToUnit(ingredient.Unit)
-	if err != nil {
-		return api.ReadStepIngredient{}, err
-	}
-
-	apiIngredient, err := m.ToIngredient(ingredient.Ingredient)
-	if err != nil {
-		return api.ReadStepIngredient{}, err
-	}
+func (m *APIMapper) ToReadStepIngredient(ingredient domain.StepIngredient) api.ReadStepIngredient {
+	unit := m.ToUnit(ingredient.Unit)
+	apiIngredient := m.ToIngredient(ingredient.Ingredient)
 
 	return api.ReadStepIngredient{
 		Ingredient: apiIngredient,
 		Unit:       unit,
 		Amount:     ingredient.Amount,
-	}, nil
+	}
 }
 
 func (m *APIMapper) ToReadRecipeStep(step domain.RecipeStep) (api.ReadRecipeStep, error) {
 	ingredients := make([]api.ReadStepIngredient, len(step.Ingredients))
 	for i, ingredient := range step.Ingredients {
-		apiIngredient, err := m.ToReadStepIngredient(ingredient)
-		if err != nil {
-			return api.ReadRecipeStep{}, err
-		}
-		ingredients[i] = apiIngredient
+		ingredients[i] = m.ToReadStepIngredient(ingredient)
 	}
 
 	return api.ReadRecipeStep{
@@ -53,11 +42,7 @@ func (m *APIMapper) ToReadRecipeStep(step domain.RecipeStep) (api.ReadRecipeStep
 func (m *APIMapper) ToIngredients(ingredients []domain.Ingredient) ([]api.Ingredient, error) {
 	result := make([]api.Ingredient, len(ingredients))
 	for i, ingredient := range ingredients {
-		mapped, err := m.ToIngredient(ingredient)
-		if err != nil {
-			return nil, err
-		}
-		result[i] = mapped
+		result[i] = m.ToIngredient(ingredient)
 	}
 	return result, nil
 }
@@ -96,6 +81,7 @@ func (m *APIMapper) ToReadRecipe(recipe domain.Recipe) (*api.ReadRecipe, error) 
 		return nil, err
 	}
 
+	tags := m.ToTags(recipe.Tags)
 	steps := make([]api.ReadRecipeStep, len(recipe.Steps))
 	for i, step := range recipe.Steps {
 		readStep, err := m.ToReadRecipeStep(step)
@@ -112,7 +98,7 @@ func (m *APIMapper) ToReadRecipe(recipe domain.Recipe) (*api.ReadRecipe, error) 
 		Servings:    recipe.Servings,
 		Minutes:     recipe.Minutes,
 		Images:      images,
-		Tags:        recipe.Tags,
+		Tags:        tags,
 		Steps:       steps,
 	}, nil
 }
@@ -129,43 +115,35 @@ func (m *APIMapper) ToRecipes(recipes []domain.Recipe) ([]api.ReadRecipe, error)
 	return result, nil
 }
 
-func (m *APIMapper) ToUnit(unit domain.Unit) (api.ReadUnit, error) {
+func (m *APIMapper) ToUnit(unit domain.Unit) api.ReadUnit {
 	return api.ReadUnit{
 		ID:   unit.ID,
 		Name: unit.Name,
 		Code: ToNilString(unit.Code),
-	}, nil
+	}
 }
 
-func (m *APIMapper) ToUnits(units []domain.Unit) ([]api.ReadUnit, error) {
+func (m *APIMapper) ToUnits(units []domain.Unit) []api.ReadUnit {
 	result := make([]api.ReadUnit, len(units))
 	for i, unit := range units {
-		mapped, err := m.ToUnit(unit)
-		if err != nil {
-			return nil, err
-		}
-		result[i] = mapped
+		result[i] = m.ToUnit(unit)
 	}
-	return result, nil
+	return result
 }
 
-func (m *APIMapper) ToTag(tag domain.Tag) (api.ReadTag, error) {
+func (m *APIMapper) ToTag(tag domain.Tag) api.ReadTag {
 	return api.ReadTag{
 		ID:   tag.ID,
 		Name: tag.Name,
-	}, nil
+	}
 }
 
-func (m *APIMapper) ToTags(tags []domain.Tag) ([]api.ReadTag, error) {
+func (m *APIMapper) ToTags(tags []domain.Tag) []api.ReadTag {
 	result := make([]api.ReadTag, len(tags))
 	for i, tag := range tags {
-		mapped, err := m.ToTag(tag)
-		if err != nil {
-			return nil, err
-		}
-		result[i] = mapped
+		result[i] = m.ToTag(tag)
 	}
-	return result, nil
+	return result
 }
 
 func (m *APIMapper) ToRecipeImageURLs(images []domain.RecipeImage) ([]url.URL, error) {
