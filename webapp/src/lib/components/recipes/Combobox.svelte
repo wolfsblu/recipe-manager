@@ -21,25 +21,23 @@
         maxResults = 200,
     } = $props();
 
-    let open = $state(false);
-    let searchQuery = $state('');
-    
-    // Dynamic height calculation
-    const itemHeight = 32;
-    const maxHeight = 300;
+    let open = $state(false)
+    let searchQuery = $state('')
+
+    const itemHeight = 32
+    const maxHeight = 300
     let dynamicHeight = $derived.by(() => {
-        const contentHeight = (displayOptions?.length || 0) * itemHeight;
-        return Math.min(contentHeight, maxHeight);
+        const contentHeight = (displayOptions?.length || 0) * itemHeight
+        return Math.min(contentHeight, maxHeight)
     });
 
-    // Filter options based on search query
     let filteredOptions = $derived.by(() => {
         if (!Array.isArray(options) || options.length === 0) {
-            return [];
+            return []
         }
 
         if (!searchQuery) {
-            return options; // Show all options when no search query
+            return options
         }
 
         const query = searchQuery.toLowerCase();
@@ -123,9 +121,8 @@
                         {empty}
                     </Command.Empty>
                 {:else}
-                    <div class="w-full" style="height: {dynamicHeight}px;">
+                    <div class="my-1">
                         <VirtualList
-                            width="100%"
                             height={dynamicHeight}
                             itemCount={displayOptions.length}
                             itemSize={itemHeight}
@@ -135,6 +132,7 @@
                                 {#if option && option.value !== undefined && option.label !== undefined}
                                     <div {style}>
                                         <Command.Item
+                                                class="mx-1"
                                                 value={option.value.toString()}
                                                 onSelect={() => {
                                                     if (option && option.value !== undefined) {
