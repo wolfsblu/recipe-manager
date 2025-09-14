@@ -140,6 +140,20 @@ func (s *Store) GetUnits(ctx context.Context) ([]domain.Unit, error) {
 	return units, nil
 }
 
+func (s *Store) GetTags(ctx context.Context) ([]domain.Tag, error) {
+	result, err := s.query().GetTags(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	tags := make([]domain.Tag, len(result))
+	for i, tag := range result {
+		tags[i] = s.mapper.ToTag(tag)
+	}
+
+	return tags, nil
+}
+
 func (s *Store) GetRecipeById(ctx context.Context, id int64) (recipe domain.Recipe, _ error) {
 	result, err := s.query().GetRecipe(ctx, id)
 	if err != nil {
@@ -156,7 +170,7 @@ func (s *Store) GetRecipeById(ctx context.Context, id int64) (recipe domain.Reci
 	if err != nil {
 		return recipe, err
 	}
-	tags, err := s.query().GetTagsForRecipes(ctx, recipeIds)
+	databaseTags, err := s.query().GetTagsForRecipes(ctx, recipeIds)
 	if err != nil {
 		return recipe, err
 	}
@@ -177,9 +191,9 @@ func (s *Store) GetRecipeById(ctx context.Context, id int64) (recipe domain.Reci
 		recipeSteps[i] = recipeStep
 	}
 
-	recipeTags := make([]string, len(tags))
-	for i, tag := range tags {
-		recipeTags[i] = s.mapper.ToTag(tag)
+	recipeTags := make([]domain.Tag, len(databaseTags))
+	for i, databaseTag := range databaseTags {
+		recipeTags[i] = s.mapper.ToTag(databaseTag.Tag)
 	}
 
 	recipeImages := make([]domain.RecipeImage, len(images))
@@ -220,9 +234,9 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipe
 		return nil, err
 	}
 
-	tagsByRecipe := make(map[int64][]string)
+	tagsByRecipe := make(map[int64][]domain.Tag)
 	for _, tag := range tags {
-		tagsByRecipe[tag.RecipeID] = append(tagsByRecipe[tag.RecipeID], tag.Name)
+		tagsByRecipe[tag.RecipeID] = append(tagsByRecipe[tag.RecipeID], s.mapper.ToTag(tag.Tag))
 	}
 
 	imagesByRecipe := make(map[int64][]domain.RecipeImage)

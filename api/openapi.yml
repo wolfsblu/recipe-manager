@@ -16,6 +16,8 @@ tags:
     description: Everything about your ingredients
   - name: Units
     description: Everything about your units
+  - name: Tags
+    description: Everything about your tags
 security:
   - cookieAuth: []
 paths:
@@ -279,6 +281,18 @@ paths:
           $ref: '#/components/responses/UnitList'
         default:
           $ref: '#/components/responses/Error'
+  /tags:
+    get:
+      tags:
+        - Tags
+      summary: Get all tags
+      operationId: getTags
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/TagList'
+        default:
+          $ref: '#/components/responses/Error'
 components:
   headers:
     SessionCookie:
@@ -393,6 +407,21 @@ components:
           nullable: true
           examples:
             - kg
+    ReadTag:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+            - 1
+        name:
+          type: string
+          examples:
+            - Vegetarian
     ReadUser:
       type: object
       required:
@@ -614,6 +643,14 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/ReadUnit'
+    TagList:
+      description: A list of tags
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ReadTag'
     MealPlan:
       description: Meal plan for the user
       content:

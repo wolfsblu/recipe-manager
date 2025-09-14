@@ -27,6 +27,13 @@ func (m *DBMapper) ToRecipe(r database.Recipe) domain.Recipe {
 	}
 }
 
+func (m *DBMapper) ToTag(t database.Tag) domain.Tag {
+	return domain.Tag{
+		ID:   t.ID,
+		Name: t.Name,
+	}
+}
+
 func (m *DBMapper) ToUnit(u database.Unit) domain.Unit {
 	return domain.Unit{
 		ID:   u.ID,
@@ -56,10 +63,6 @@ func (m *DBMapper) ToStepIngredient(r database.GetIngredientsForRecipesRow) doma
 		},
 		Amount: r.Amount,
 	}
-}
-
-func (m *DBMapper) ToTag(r database.GetTagsForRecipesRow) string {
-	return r.Name
 }
 
 func (m *DBMapper) ToRecipeImage(r database.GetImagesForRecipesRow) domain.RecipeImage {

@@ -460,8 +460,37 @@ func (q *Queries) GetStepsForRecipes(ctx context.Context, recipeIds []int64) ([]
 	return items, nil
 }
 
+const getTags = `-- name: GetTags :many
+SELECT id, name
+FROM tags
+ORDER BY name
+`
+
+func (q *Queries) GetTags(ctx context.Context) ([]Tag, error) {
+	rows, err := q.db.QueryContext(ctx, getTags)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Tag
+	for rows.Next() {
+		var i Tag
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTagsForRecipes = `-- name: GetTagsForRecipes :many
-SELECT tags.id, tags.name, recipe_tags.recipe_id
+SELECT recipe_tags.recipe_id, tags.id, tags.name
 FROM tags
          INNER JOIN recipe_tags ON tags.id = recipe_tags.tag_id
 WHERE recipe_tags.recipe_id IN (
@@ -471,9 +500,8 @@ ORDER BY tags.name
 `
 
 type GetTagsForRecipesRow struct {
-	ID       int64
-	Name     string
 	RecipeID int64
+	Tag      Tag
 }
 
 func (q *Queries) GetTagsForRecipes(ctx context.Context, recipeIds []int64) ([]GetTagsForRecipesRow, error) {
@@ -495,7 +523,7 @@ func (q *Queries) GetTagsForRecipes(ctx context.Context, recipeIds []int64) ([]G
 	var items []GetTagsForRecipesRow
 	for rows.Next() {
 		var i GetTagsForRecipesRow
-		if err := rows.Scan(&i.ID, &i.Name, &i.RecipeID); err != nil {
+		if err := rows.Scan(&i.RecipeID, &i.Tag.ID, &i.Tag.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

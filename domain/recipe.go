@@ -27,7 +27,7 @@ type RecipeStep struct {
 
 type Recipe struct {
 	ID     int64
-	Tags   []string
+	Tags   []Tag
 	Images []RecipeImage
 	Steps  []RecipeStep
 	RecipeDetails
@@ -52,4 +52,9 @@ type Unit struct {
 	ID   int64
 	Name string
 	Code *string
+}
+
+type Tag struct {
+	ID   int64
+	Name string
 }

@@ -110,3 +110,11 @@ func (h *RecipeHandler) GetUnits(ctx context.Context) ([]api.ReadUnit, error) {
 	}
 	return h.mapper.ToUnits(units)
 }
+
+func (h *RecipeHandler) GetTags(ctx context.Context) ([]api.ReadTag, error) {
+	tags, err := h.Recipes.GetTags(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return h.mapper.ToTags(tags)
+}

@@ -48,6 +48,10 @@ func (s *RecipeService) GetUnits(ctx context.Context) ([]Unit, error) {
 	return s.store.GetUnits(ctx)
 }
 
+func (s *RecipeService) GetTags(ctx context.Context) ([]Tag, error) {
+	return s.store.GetTags(ctx)
+}
+
 func (s *RecipeService) UpdateRecipe(ctx context.Context, recipe Recipe) (Recipe, error) {
 	if err := s.validateRecipeOwnership(ctx, recipe.CreatedBy.ID, recipe.ID); err != nil {
 		return Recipe{}, err

@@ -149,6 +149,25 @@ func (m *APIMapper) ToUnits(units []domain.Unit) ([]api.ReadUnit, error) {
 	return result, nil
 }
 
+func (m *APIMapper) ToTag(tag domain.Tag) (api.ReadTag, error) {
+	return api.ReadTag{
+		ID:   tag.ID,
+		Name: tag.Name,
+	}, nil
+}
+
+func (m *APIMapper) ToTags(tags []domain.Tag) ([]api.ReadTag, error) {
+	result := make([]api.ReadTag, len(tags))
+	for i, tag := range tags {
+		mapped, err := m.ToTag(tag)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = mapped
+	}
+	return result, nil
+}
+
 func (m *APIMapper) ToRecipeImageURLs(images []domain.RecipeImage) ([]url.URL, error) {
 	urls := make([]url.URL, len(images))
 	for i, image := range images {

@@ -47,3 +47,11 @@ export const getUnits = async () => {
     }
     return response.data
 }
+
+export const getTags = async () => {
+    const response = await client.GET("/tags")
+    if (response.error) {
+        throw response.error
+    }
+    return response.data
+}

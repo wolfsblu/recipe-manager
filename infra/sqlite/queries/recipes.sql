@@ -80,6 +80,11 @@ SELECT *
 FROM units
 ORDER BY name;
 
+-- name: GetTags :many
+SELECT *
+FROM tags
+ORDER BY name;
+
 -- name: GetStepsForRecipes :many
 SELECT id, instructions, sort_order, recipe_id
 FROM recipe_steps
@@ -89,7 +94,7 @@ WHERE recipe_id IN (
 ORDER BY sort_order;
 
 -- name: GetTagsForRecipes :many
-SELECT tags.id, tags.name, recipe_tags.recipe_id
+SELECT recipe_tags.recipe_id, sqlc.embed(tags)
 FROM tags
          INNER JOIN recipe_tags ON tags.id = recipe_tags.tag_id
 WHERE recipe_tags.recipe_id IN (
