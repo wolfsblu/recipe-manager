@@ -7,14 +7,11 @@ import (
 	"github.com/wolfsblu/recipe-manager/domain"
 	"github.com/wolfsblu/recipe-manager/domain/roles"
 	"github.com/wolfsblu/recipe-manager/domain/security"
-	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 )
 
 func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User) (token domain.PasswordResetToken, _ error) {
-	result, err := s.query().CreatePasswordResetToken(ctx, database.CreatePasswordResetTokenParams{
-		UserID: user.ID,
-		Token:  security.GenerateToken(security.DefaultTokenLength),
-	})
+	generatedToken := security.GenerateToken(security.DefaultTokenLength)
+	result, err := s.query().CreatePasswordResetToken(ctx, s.mapper.FromUserForPasswordResetToken(user, generatedToken))
 	if err != nil {
 		return token, domain.WrapError(domain.ErrCreatingPasswordResetToken, err)
 	}
@@ -25,11 +22,7 @@ func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User)
 }
 
 func (s *Store) CreateUser(ctx context.Context, credentials domain.Credentials) (user domain.User, _ error) {
-	result, err := s.query().CreateUser(ctx, database.CreateUserParams{
-		Email:        credentials.Email,
-		PasswordHash: credentials.PasswordHash,
-		RoleID:       int64(roles.User),
-	})
+	result, err := s.query().CreateUser(ctx, s.mapper.FromCredentials(credentials, int64(roles.User)))
 	if err != nil {
 		return user, domain.WrapError(domain.ErrCreatingUser, err)
 	}
@@ -37,10 +30,8 @@ func (s *Store) CreateUser(ctx context.Context, credentials domain.Credentials) 
 }
 
 func (s *Store) CreateUserRegistration(ctx context.Context, user *domain.User) (registration domain.UserRegistration, _ error) {
-	result, err := s.query().CreateUserRegistration(ctx, database.CreateUserRegistrationParams{
-		UserID: user.ID,
-		Token:  security.GenerateToken(security.DefaultTokenLength),
-	})
+	generatedToken := security.GenerateToken(security.DefaultTokenLength)
+	result, err := s.query().CreateUserRegistration(ctx, s.mapper.FromUserForRegistration(user, generatedToken))
 	if err != nil {
 		return registration, domain.WrapError(domain.ErrCreatingRegistrationToken, err)
 	}
@@ -123,10 +114,7 @@ func (s *Store) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPa
 	if err != nil {
 		return domain.WrapError(domain.ErrPasswordResetTokenNotFound, err)
 	}
-	if err = s.query().UpdatePasswordByUserId(ctx, database.UpdatePasswordByUserIdParams{
-		PasswordHash: hashedPassword,
-		ID:           token.User.ID,
-	}); err != nil {
+	if err = s.query().UpdatePasswordByUserId(ctx, s.mapper.FromUserForPasswordUpdate(hashedPassword, token.User.ID)); err != nil {
 		return domain.WrapError(domain.ErrUpdatingPassword, err)
 	}
 	if err = s.query().DeletePasswordResetTokenByUserId(ctx, token.User.ID); err != nil {
@@ -136,11 +124,7 @@ func (s *Store) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPa
 }
 
 func (s *Store) UpdateUser(ctx context.Context, user *domain.User) error {
-	err := s.query().UpdateUser(ctx, database.UpdateUserParams{
-		Email:       user.Email,
-		IsConfirmed: user.Confirmed,
-		ID:          user.ID,
-	})
+	err := s.query().UpdateUser(ctx, s.mapper.FromUserForUpdate(user))
 	if err != nil {
 		return domain.WrapError(domain.ErrUpdatingUser, err)
 	}
