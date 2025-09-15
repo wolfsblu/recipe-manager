@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/webapp/.npm \
     npm ci && \
     npm run build
 
-FROM docker.io/golang:alpine AS backend
+FROM docker.io/golang:1.25-alpine AS backend
 
 RUN apk --no-cache add ca-certificates
 
