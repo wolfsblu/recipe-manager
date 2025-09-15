@@ -7,6 +7,7 @@
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
     import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
     import ClockIcon from '@lucide/svelte/icons/clock';
+    import StepsIcon from '@lucide/svelte/icons/footprints';
     import UsersIcon from '@lucide/svelte/icons/users';
     import ChefHatIcon from '@lucide/svelte/icons/chef-hat';
     import ListIcon from '@lucide/svelte/icons/list';
@@ -104,7 +105,7 @@
 
                     <Card class="p-0">
                         <CardContent class="p-4 flex items-center gap-3">
-                            <ChefHatIcon class="w-5 h-5 text-primary" />
+                            <StepsIcon class="w-5 h-5 text-primary" />
                             <div>
                                 <p class="text-sm text-muted-foreground">Steps</p>
                                 <p class="text-lg font-semibold">{recipe.steps.length}</p>
