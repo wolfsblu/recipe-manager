@@ -1,0 +1,18 @@
+import type { PageLoad } from './$types';
+import {getRecipe} from "$lib/api/recipes/recipes.svelte.js";
+
+export const load: PageLoad = async ({ params }) => {
+    const recipeId = Number(params.id)
+    const recipe = await getRecipe(recipeId)
+
+    const breadcrumbs = [
+        { link: "/", name: "Home" },
+        { link: "/recipes", name: "Recipes" },
+        { link: `/recipes/${recipeId}`, name: recipe.name },
+    ]
+
+    return {
+        breadcrumbs,
+        recipe,
+    };
+};

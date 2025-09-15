@@ -3,6 +3,7 @@
     import pluralize from 'pluralize'
     import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "$lib/components/ui/card/index.js";
     import { Badge } from "$lib/components/ui/badge/index.js";
+    import { Button } from "$lib/components/ui/button/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
     import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
@@ -14,10 +15,36 @@
     import ImageIcon from '@lucide/svelte/icons/image';
     import TagIcon from '@lucide/svelte/icons/tag';
     import IngredientIcon from "@lucide/svelte/icons/salad";
-    import fruits from '$lib/components/recipes/fruits.jpg';
+    import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
+    import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+    import EditIcon from '@lucide/svelte/icons/edit';
+    import {goto} from "$app/navigation";
 
     let { data }: { data: PageData } = $props();
-    const { recipe, breadcrumbs } = data;
+    const { recipe } = data;
+
+    let votes = $state(0)
+    let userVote = $state<'up' | 'down' | null>(null)
+
+    const handleVote = (voteType: 'up' | 'down') => {
+        if (userVote === voteType) {
+            // Remove vote if clicking the same button
+            votes -= voteType === 'up' ? 1 : -1
+            userVote = null;
+        } else if (userVote === null) {
+            // Add new vote
+            votes += voteType === 'up' ? 1 : -1
+            userVote = voteType;
+        } else {
+            // Switch vote
+            votes += voteType === 'up' ? 2 : -2
+            userVote = voteType;
+        }
+    }
+
+    const handleEdit = async () => {
+        await goto(`/recipes/${recipe.id}/edit`)
+    }
 
     const formatMinutesAsHours = (minutes: number) => {
         if (!minutes || minutes < 0) {
@@ -42,7 +69,46 @@
     <div class="mb-8">
         <div class="flex flex-col lg:flex-row gap-8">
             <div class="lg:w-1/2">
-                <div class="relative aspect-square rounded-lg overflow-hidden shadow-lg">
+                <div class="flex gap-3">
+                    <div class="flex flex-col items-center gap-2">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onclick={() => handleVote('up')}
+                            class={userVote === 'up' ? 'text-green-600 hover:text-green-700' : ''}
+                            title="Upvote recipe"
+                        >
+                            <ChevronUpIcon class="w-5 h-5" />
+                        </Button>
+
+                        <span class="text-base font-bold text-foreground">
+                            {votes}
+                        </span>
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onclick={() => handleVote('down')}
+                            class={userVote === 'down' ? 'text-red-600 hover:text-red-700' : ''}
+                            title="Downvote recipe"
+                        >
+                            <ChevronDownIcon class="w-5 h-5" />
+                        </Button>
+
+                        <Separator orientation="horizontal" class="my-1 w-full" />
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onclick={handleEdit}
+                            title="Edit recipe"
+                        >
+                            <EditIcon class="w-5 h-5" />
+                        </Button>
+                    </div>
+
+                    <!-- Recipe Image -->
+                    <div class="flex-1 relative aspect-square rounded-lg overflow-hidden shadow-lg">
                     {#if recipe.images && recipe.images.length > 0}
                         <img
                             src={recipe.images[0]}
@@ -57,6 +123,7 @@
                             </div>
                         </div>
                     {/if}
+                    </div>
                 </div>
             </div>
 
