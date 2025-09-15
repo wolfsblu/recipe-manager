@@ -21,7 +21,7 @@ func createSessionCookie(userId int64) (string, error) {
 		MaxAge:   int(expiry / time.Second),
 		Name:     AuthCookieName,
 		Path:     "/",
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteDefaultMode,
 		Secure:   true,
 		Value:    payload,
 	}
@@ -34,7 +34,7 @@ func expireSessionCookie() string {
 		MaxAge:   -1,
 		Name:     AuthCookieName,
 		Path:     "/",
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteDefaultMode,
 		Secure:   true,
 	}
 	return cookie.String()
