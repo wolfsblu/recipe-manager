@@ -25,10 +25,11 @@ func (m *DBMapper) FromRecipeForUpdate(recipe domain.Recipe) database.UpdateReci
 	}
 }
 
-func (m *DBMapper) FromRecipeStep(recipeID int64, step domain.RecipeStep) database.CreateRecipeStepParams {
+func (m *DBMapper) FromRecipeStep(recipeID int64, step domain.RecipeStep, sortOrder int64) database.CreateRecipeStepParams {
 	return database.CreateRecipeStepParams{
 		RecipeID:     recipeID,
 		Instructions: step.Instructions,
+		SortOrder:    sortOrder,
 	}
 }
 

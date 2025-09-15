@@ -93,18 +93,19 @@ func (q *Queries) CreateRecipeImages(ctx context.Context, arg CreateRecipeImages
 }
 
 const createRecipeStep = `-- name: CreateRecipeStep :one
-INSERT INTO recipe_steps (recipe_id, instructions)
-VALUES (?, ?)
+INSERT INTO recipe_steps (recipe_id, instructions, sort_order)
+VALUES (?, ?, ?)
 RETURNING id
 `
 
 type CreateRecipeStepParams struct {
 	RecipeID     int64
 	Instructions string
+	SortOrder    int64
 }
 
 func (q *Queries) CreateRecipeStep(ctx context.Context, arg CreateRecipeStepParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createRecipeStep, arg.RecipeID, arg.Instructions)
+	row := q.db.QueryRowContext(ctx, createRecipeStep, arg.RecipeID, arg.Instructions, arg.SortOrder)
 	var id int64
 	err := row.Scan(&id)
 	return id, err

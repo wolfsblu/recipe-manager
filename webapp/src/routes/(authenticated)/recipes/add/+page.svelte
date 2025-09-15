@@ -1,211 +1,438 @@
 <script lang="ts">
-    import type {PageProps} from './$types';
-    import {Input} from "$lib/components/ui/input/index.js";
-    import {Button} from "$lib/components/ui/button/index.js";
-    import {Textarea} from "$lib/components/ui/textarea/index.js";
-    import {formSchema} from "./schema";
-    import {setMessage, superForm} from "sveltekit-superforms";
-    import {zodClient} from "sveltekit-superforms/adapters";
-    import {toast} from "svelte-sonner";
-    import {goto} from "$app/navigation";
-    import {addRecipe} from "$lib/api/recipes/recipes.svelte";
-    import {TagsInput} from '$lib/components/ui/tags-input';
+    import type { PageData } from './$types';
+    import { Card, CardContent, CardHeader, CardTitle } from "$lib/components/ui/card/index.js";
+    import { Badge } from "$lib/components/ui/badge/index.js";
+    import { Button } from "$lib/components/ui/button/index.js";
+    import { Input } from "$lib/components/ui/input/index.js";
+    import { Textarea } from "$lib/components/ui/textarea/index.js";
+    import { Separator } from "$lib/components/ui/separator/index.js";
+    import * as Form from '$lib/components/ui/form/index.js';
+    import { TagsInput } from '$lib/components/ui/tags-input';
     import ImageUpload from "$lib/components/recipes/ImageUpload.svelte";
-    import {Separator} from "$lib/components/ui/separator/index.js";
-    import Ingredient from "$lib/components/recipes/Ingredient.svelte";
-    import * as Form from '$lib/components/ui/form/index.js'
-    import PlusIcon from "@lucide/svelte/icons/plus";
-    import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
-    import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
-    import TrashIcon from "@lucide/svelte/icons/trash";
+    import Combobox from "$lib/components/recipes/Combobox.svelte";
 
-    let {data}: PageProps = $props();
+    import ClockIcon from '@lucide/svelte/icons/clock';
+    import UsersIcon from '@lucide/svelte/icons/users';
+    import ChefHatIcon from '@lucide/svelte/icons/chef-hat';
+    import ListIcon from '@lucide/svelte/icons/list';
+    import SaladIcon from '@lucide/svelte/icons/salad';
+    import PlusIcon from '@lucide/svelte/icons/plus';
+    import ArrowUpIcon from '@lucide/svelte/icons/arrow-up';
+    import ArrowDownIcon from '@lucide/svelte/icons/arrow-down';
+    import TrashIcon from '@lucide/svelte/icons/trash';
+    import ImageIcon from '@lucide/svelte/icons/image';
+    import SaveIcon from '@lucide/svelte/icons/save';
+    import XIcon from '@lucide/svelte/icons/x';
+
+    import { formSchema } from "./schema";
+    import { setMessage, superForm } from "sveltekit-superforms";
+    import { zodClient } from "sveltekit-superforms/adapters";
+    import { toast } from "svelte-sonner";
+    import { goto } from "$app/navigation";
+    import { addRecipe } from "$lib/api/recipes/recipes.svelte";
+
+    let { data }: { data: PageData } = $props();
+    const { ingredients, units, tags } = data;
 
     const form = superForm(data.form, {
         SPA: true,
         dataType: 'json',
         resetForm: false,
         validators: zodClient(formSchema),
-        async onUpdate({form}) {
+        async onUpdate({ form }) {
             if (form.valid) {
                 try {
-                    await addRecipe(form.data)
-                    toast.success("Recipe added successfully")
-                    await goto("/recipes")
+                    await addRecipe(form.data);
+                    toast.success("Recipe created successfully!");
+                    await goto("/recipes");
                 } catch (error) {
-                    toast.error("Failed to save recipe")
+                    toast.error("Failed to create recipe");
                 }
-                setMessage(form, "Recipe added successfully");
             }
         }
-    })
-    const {form: formData, enhance} = form;
+    });
+    const { form: formData, enhance } = form;
 
+    // Step management
     const addStep = () => {
         $formData.steps = [...$formData.steps, {
-            ingredients: [
-                {amount: 0, ingredientId: 0, unitId: 0},
-            ],
+            ingredients: [{ amount: 0, ingredientId: 0, unitId: 0 }],
             instructions: '',
         }];
-    }
+    };
 
     const moveStep = (stepIndex: number, direction: 'up' | 'down') => {
         const offset = direction === 'up' ? -1 : 1;
         const targetIndex = stepIndex + offset;
 
         if (targetIndex < 0 || targetIndex >= $formData.steps.length) {
-            return
+            return;
         }
 
         const newSteps = [...$formData.steps];
         [newSteps[stepIndex], newSteps[targetIndex]] = [newSteps[targetIndex], newSteps[stepIndex]];
         $formData.steps = newSteps;
-    }
+    };
 
-    const removeStepByIndex = (stepIndex: number) => {
-        $formData.steps = $formData.steps.filter((_, i) => i !== stepIndex)
-    }
+    const removeStep = (stepIndex: number) => {
+        $formData.steps = $formData.steps.filter((_, i) => i !== stepIndex);
+    };
 
+    // Ingredient management
     const addIngredient = (stepIndex: number) => {
         $formData.steps[stepIndex].ingredients = [
             ...$formData.steps[stepIndex].ingredients,
-            {amount: 0, ingredientId: 0, unitId: 0},
-        ]
-    }
-    const removeIngredientByIndex = (stepIndex: number, ingredientIndex: number) => {
-        $formData.steps[stepIndex].ingredients = $formData.steps[stepIndex].ingredients.filter((_, i) => i !== ingredientIndex)
-    }
+            { amount: 0, ingredientId: 0, unitId: 0 },
+        ];
+    };
+
+    const removeIngredient = (stepIndex: number, ingredientIndex: number) => {
+        $formData.steps[stepIndex].ingredients = $formData.steps[stepIndex].ingredients.filter((_, i) => i !== ingredientIndex);
+    };
+
+    const formatMinutesAsHours = (minutes: number) => {
+        if (!minutes || minutes < 0) return "N/A";
+        if (minutes < 60) return `${minutes}m`;
+        const hours = minutes / 60;
+        const roundedHours = Math.round(hours * 100) / 100;
+        return `${roundedHours}h`;
+    };
 </script>
 
-<ImageUpload class="p-6 pb-0" bind:value={$formData.images} />
+<svelte:head>
+    <title>Create New Recipe - Recipe Manager</title>
+</svelte:head>
 
-<form class="p-6" method="POST" use:enhance>
-    <div class="flex flex-col lg:flex-row gap-x-3 gap-y-1 mt-3">
-        <div class="w-full flex flex-col">
-            <Form.Field {form} name="name">
-                <Form.Control>
-                    {#snippet children({props})}
-                        <Form.Label>Name</Form.Label>
-                        <Input {...props} bind:value={$formData.name} placeholder="My super tasty recipe"/>
-                    {/snippet}
-                </Form.Control>
-                <Form.Description/>
-                <Form.FieldErrors/>
-            </Form.Field>
-            <div class="grid grid-cols-2 gap-3">
-                <Form.Field {form} name="servings">
-                    <Form.Control>
-                        {#snippet children({props})}
-                            <Form.Label>Servings</Form.Label>
-                            <Input {...props} bind:value={$formData.servings} type="number" placeholder="4"/>
-                        {/snippet}
-                    </Form.Control>
-                    <Form.Description/>
-                    <Form.FieldErrors/>
-                </Form.Field>
-                <Form.Field {form} name="minutes">
-                    <Form.Control>
-                        {#snippet children({props})}
-                            <Form.Label>Time (min.)</Form.Label>
-                            <Input {...props} bind:value={$formData.minutes} type="number" placeholder="45"/>
-                        {/snippet}
-                    </Form.Control>
-                    <Form.Description/>
-                    <Form.FieldErrors/>
-                </Form.Field>
-            </div>
-            <Form.Field {form} name="tags">
-                <Form.Control>
-                    {#snippet children({props})}
-                        <Form.Label>Tags</Form.Label>
-                        <TagsInput {...props} bind:value={$formData.tags} placeholder="Add a tag" suggestions={data.tags?.map(tag => ({id: tag.id, label: tag.name})) || []}/>
-                    {/snippet}
-                </Form.Control>
-                <Form.Description/>
-                <Form.FieldErrors/>
-            </Form.Field>
-        </div>
-
-        <Form.Field class="w-full flex flex-col" {form} name="description">
-            <Form.Control>
-                {#snippet children({props})}
-                    <Form.Label>Description</Form.Label>
-                    <Textarea {...props}
-                              class="flex-grow resize-none"
-                              bind:value={$formData.description}
-                              placeholder="Grandma's original pasta recipe handed down for generations."
-                    />
-                {/snippet}
-            </Form.Control>
-            <Form.Description class="sr-only">Test</Form.Description>
-            <Form.FieldErrors/>
-        </Form.Field>
+<div class="container mx-auto px-4 py-6">
+    <!-- Form Header -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-bold text-foreground mb-2">Create New Recipe</h1>
+        <p class="text-lg text-muted-foreground">Share your culinary creation with the world</p>
     </div>
 
-    {#each $formData.steps as _, stepIndex}
-        <div class="flex items-center justify-between">
-            <h1>Step {stepIndex + 1}</h1>
-            <div>
-                <Button disabled={stepIndex === 0} variant="ghost" size="icon" class="size-8"
-                        onclick={() => moveStep(stepIndex, 'up')}>
-                    <ArrowUpIcon/>
-                </Button>
-                <Button disabled={stepIndex === $formData.steps.length - 1} variant="ghost" size="icon" class="size-8"
-                        onclick={() => moveStep(stepIndex, 'down')}>
-                    <ArrowDownIcon/>
-                </Button>
-                <Button variant="ghost" size="icon" class="size-8" onclick={() => removeStepByIndex(stepIndex)}>
-                    <TrashIcon class="stroke-red-600 dark:stroke-red-400"/>
-                </Button>
-            </div>
-        </div>
-        <Separator class="mt-1 mb-2" orientation="horizontal"/>
-        <div class="grid lg:grid-cols-2 gap-x-3">
-            <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
-                <Form.Legend>Ingredients</Form.Legend>
-                <div class="grid grid-cols-[1fr_1fr_2fr_max-content] md:grid-cols-[1fr_2fr_3fr_max-content] gap-1">
-                    {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
-                        <Ingredient {form} {stepIndex} {ingredientIndex} ingredients={data.ingredients}
-                                    units={data.units}/>
-                        <div>
-                            <Button variant="outline"
-                                    onclick={() => removeIngredientByIndex(stepIndex, ingredientIndex)} type="button">
-                                <TrashIcon class="stroke-red-600 dark:stroke-red-400"/>
-                            </Button>
+    <form method="POST" use:enhance class="space-y-8">
+        <!-- Recipe Header Section -->
+        <Card>
+            <CardHeader>
+                <CardTitle class="flex items-center gap-2">
+                    <ChefHatIcon class="w-5 h-5" />
+                    Recipe Details
+                </CardTitle>
+            </CardHeader>
+            <CardContent class="space-y-6">
+                <!-- Image Upload -->
+                <div>
+                    <label class="text-sm font-medium text-foreground mb-3 block">Recipe Images</label>
+                    <ImageUpload bind:value={$formData.images} />
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <!-- Recipe Name -->
+                        <Form.Field {form} name="name">
+                            <Form.Control>
+                                {#snippet children({ props })}
+                                    <Form.Label>Recipe Name</Form.Label>
+                                    <Input
+                                        {...props}
+                                        bind:value={$formData.name}
+                                        placeholder="My amazing recipe"
+                                        class="text-lg"
+                                    />
+                                {/snippet}
+                            </Form.Control>
+                            <Form.FieldErrors />
+                        </Form.Field>
+
+                        <!-- Recipe Stats -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <Form.Field {form} name="servings">
+                                <Form.Control>
+                                    {#snippet children({ props })}
+                                        <Form.Label class="flex items-center gap-2">
+                                            <UsersIcon class="w-4 h-4" />
+                                            Servings
+                                        </Form.Label>
+                                        <Input
+                                            {...props}
+                                            bind:value={$formData.servings}
+                                            type="number"
+                                            placeholder="4"
+                                            min="1"
+                                        />
+                                    {/snippet}
+                                </Form.Control>
+                                <Form.FieldErrors />
+                            </Form.Field>
+
+                            <Form.Field {form} name="minutes">
+                                <Form.Control>
+                                    {#snippet children({ props })}
+                                        <Form.Label class="flex items-center gap-2">
+                                            <ClockIcon class="w-4 h-4" />
+                                            Cook Time (min)
+                                        </Form.Label>
+                                        <Input
+                                            {...props}
+                                            bind:value={$formData.minutes}
+                                            type="number"
+                                            placeholder="30"
+                                            min="1"
+                                        />
+                                    {/snippet}
+                                </Form.Control>
+                                <Form.FieldErrors />
+                            </Form.Field>
                         </div>
-                    {/each}
-                    <Button variant="outline" class="col-span-4" onclick={() => addIngredient(stepIndex)}>
-                        <PlusIcon/>
-                        Add Ingredient
+
+                        <!-- Tags -->
+                        <Form.Field {form} name="tags">
+                            <Form.Control>
+                                {#snippet children({ props })}
+                                    <Form.Label>Tags</Form.Label>
+                                    <TagsInput
+                                        {...props}
+                                        bind:value={$formData.tags}
+                                        placeholder="Add a tag"
+                                        suggestions={tags?.map(tag => ({ id: tag.id, label: tag.name })) || []}
+                                    />
+                                {/snippet}
+                            </Form.Control>
+                            <Form.FieldErrors />
+                        </Form.Field>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div>
+                        <Form.Field {form} name="description">
+                            <Form.Control>
+                                {#snippet children({ props })}
+                                    <Form.Label>Description</Form.Label>
+                                    <Textarea
+                                        {...props}
+                                        bind:value={$formData.description}
+                                        placeholder="Tell us about your recipe..."
+                                        class="min-h-[200px] resize-none"
+                                    />
+                                {/snippet}
+                            </Form.Control>
+                            <Form.FieldErrors />
+                        </Form.Field>
+                    </div>
+                </div>
+
+                <!-- Preview Stats -->
+                {#if $formData.servings || $formData.minutes}
+                    <div class="flex gap-4 p-4 bg-muted/30 rounded-lg">
+                        {#if $formData.servings}
+                            <div class="flex items-center gap-2">
+                                <UsersIcon class="w-4 h-4 text-muted-foreground" />
+                                <span class="text-sm text-muted-foreground">Serves {$formData.servings}</span>
+                            </div>
+                        {/if}
+                        {#if $formData.minutes}
+                            <div class="flex items-center gap-2">
+                                <ClockIcon class="w-4 h-4 text-muted-foreground" />
+                                <span class="text-sm text-muted-foreground">{formatMinutesAsHours($formData.minutes)}</span>
+                            </div>
+                        {/if}
+                    </div>
+                {/if}
+            </CardContent>
+        </Card>
+
+        <!-- Instructions Section -->
+        {#if $formData.steps.length === 0}
+            <!-- Empty State Card -->
+            <Card>
+                <CardHeader>
+                    <CardTitle class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <ListIcon class="w-5 h-5" />
+                            Cooking Instructions
+                        </div>
+                        <Button type="button" onclick={addStep} variant="outline" size="sm">
+                            <PlusIcon class="w-4 h-4" />
+                            Add Step
+                        </Button>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div class="text-center py-12 text-muted-foreground">
+                        <ChefHatIcon class="w-12 h-12 mx-auto mb-4" />
+                        <p class="text-lg mb-2">No cooking steps yet</p>
+                        <p class="text-sm">Add your first step to get started</p>
+                    </div>
+                </CardContent>
+            </Card>
+        {:else}
+            <!-- Steps as Individual Cards -->
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold flex items-center gap-2">
+                        <ListIcon class="w-6 h-6" />
+                        Cooking Instructions
+                    </h2>
+                </div>
+
+                {#each $formData.steps as _, stepIndex}
+                    <Card class="overflow-hidden">
+                        <CardHeader class="bg-muted/50 gap-0 py-1">
+                            <div class="flex items-center justify-between">
+                                <CardTitle class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
+                                        {stepIndex + 1}
+                                    </div>
+                                    Step {stepIndex + 1}
+                                </CardTitle>
+                                <div class="flex items-center gap-1">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onclick={() => moveStep(stepIndex, 'up')}
+                                        disabled={stepIndex === 0}
+                                    >
+                                        <ArrowUpIcon class="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onclick={() => moveStep(stepIndex, 'down')}
+                                        disabled={stepIndex === $formData.steps.length - 1}
+                                    >
+                                        <ArrowDownIcon class="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onclick={() => removeStep(stepIndex)}
+                                    >
+                                        <TrashIcon class="w-4 h-4 text-destructive" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent class="px-6">
+                            <div class="grid lg:grid-cols-2 gap-6">
+                                <!-- Ingredients -->
+                                <div>
+                                    <h4 class="font-semibold mb-3 flex items-center gap-2">
+                                        <SaladIcon class="w-4 h-4" />
+                                        Ingredients
+                                    </h4>
+                                    <Form.Fieldset {form} name="steps[{stepIndex}].ingredients">
+                                        <div class="space-y-3">
+                                            {#each $formData.steps[stepIndex].ingredients as _, ingredientIndex}
+                                                <div class="space-y-2 md:space-y-0 md:grid md:grid-cols-[2fr_2fr_3fr_auto] md:gap-2 md:items-start">
+                                                    <div class="grid grid-cols-[1fr_2fr] gap-2 md:contents">
+                                                        <Form.ElementField class="space-y-0" {form} name="steps[{stepIndex}].ingredients[{ingredientIndex}].amount">
+                                                            <Form.Control>
+                                                                {#snippet children({ props })}
+                                                                    <Input
+                                                                        {...props}
+                                                                        type="number"
+                                                                        bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].amount}
+                                                                        placeholder="1"
+                                                                        class="text-sm"
+                                                                    />
+                                                                {/snippet}
+                                                            </Form.Control>
+                                                            <Form.FieldErrors />
+                                                        </Form.ElementField>
+
+                                                        <Combobox
+                                                            {form}
+                                                            name="steps[{stepIndex}].ingredients[{ingredientIndex}].unitId"
+                                                            options={units?.map(unit => ({ value: unit.id, label: unit.name })) || []}
+                                                            bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].unitId}
+                                                        />
+                                                    </div>
+
+                                                    <Combobox
+                                                        {form}
+                                                        name="steps[{stepIndex}].ingredients[{ingredientIndex}].ingredientId"
+                                                        options={ingredients?.map(ingredient => ({ value: ingredient.id, label: ingredient.name })) || []}
+                                                        bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].ingredientId}
+                                                    />
+
+                                                    <div class="md:flex md:justify-center md:items-start">
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            onclick={() => removeIngredient(stepIndex, ingredientIndex)}
+                                                            class="w-full md:w-auto md:h-9 md:px-3"
+                                                        >
+                                                            <TrashIcon class="w-4 h-4 text-destructive md:mr-0 mr-2" />
+                                                            <span class="md:hidden">Delete</span>
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            {/each}
+
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onclick={() => addIngredient(stepIndex)}
+                                                class="w-full"
+                                            >
+                                                <PlusIcon class="w-4 h-4" />
+                                                Add Ingredient
+                                            </Button>
+                                        </div>
+                                        <Form.FieldErrors />
+                                    </Form.Fieldset>
+                                </div>
+
+                                <!-- Instructions -->
+                                <div>
+                                    <h4 class="font-semibold mb-3 flex items-center gap-2">
+                                        <ChefHatIcon class="w-4 h-4" />
+                                        Instructions
+                                    </h4>
+                                    <Form.Field {form} name="steps[{stepIndex}].instructions">
+                                        <Form.Control>
+                                            {#snippet children({ props })}
+                                                <Textarea
+                                                    {...props}
+                                                    bind:value={$formData.steps[stepIndex].instructions}
+                                                    placeholder="Describe what to do in this step..."
+                                                    class="min-h-[120px] resize-none"
+                                                />
+                                            {/snippet}
+                                        </Form.Control>
+                                        <Form.FieldErrors />
+                                    </Form.Field>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                {/each}
+
+                <!-- Add Step Button at Bottom -->
+                <div class="flex justify-center pt-2">
+                    <Button type="button" onclick={addStep} variant="outline">
+                        <PlusIcon class="w-4 h-4" />
+                        Add Another Step
                     </Button>
                 </div>
-                <Form.FieldErrors/>
-            </Form.Fieldset>
-            <Form.Fieldset class="flex flex-col" {form} name="steps[{stepIndex}].instructions">
-                <Form.Control>
-                    {#snippet children({props})}
-                        <Form.Label>Instructions</Form.Label>
-                        <Textarea {...props}
-                                  class="flex-grow"
-                                  bind:value={$formData.steps[stepIndex].instructions}
-                                  placeholder="Stir the potatoes."
-                        />
-                    {/snippet}
-                </Form.Control>
-                <Form.Description class="sr-only">Test</Form.Description>
-                <Form.FieldErrors/>
-            </Form.Fieldset>
-        </div>
-    {/each}
+            </div>
+        {/if}
 
-    <div class="flex justify-between">
-        <Button type="reset">Cancel</Button>
-        <div>
-            <Button onclick={addStep} type="button">Add Step</Button>
-            {#if $formData.steps.length > 0}
-                <Button type="submit">Create</Button>
-            {/if}
+        <!-- Form Actions -->
+        <div class="flex justify-between items-center">
+            <Button type="reset" variant="outline">
+                Reset
+            </Button>
+
+            <Button type="submit" disabled={$formData.steps.length === 0}>
+                <ChefHatIcon class="w-4 h-4" />
+                Create Recipe
+            </Button>
         </div>
-    </div>
-</form>
+    </form>
+</div>

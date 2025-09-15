@@ -47,8 +47,8 @@ func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 }
 
 func (s *Store) createRecipeSteps(ctx context.Context, recipeID int64, steps []domain.RecipeStep) error {
-	for _, step := range steps {
-		stepId, err := s.query().CreateRecipeStep(ctx, s.mapper.FromRecipeStep(recipeID, step))
+	for i, step := range steps {
+		stepId, err := s.query().CreateRecipeStep(ctx, s.mapper.FromRecipeStep(recipeID, step, int64(i)))
 		if err != nil {
 			return err
 		}
