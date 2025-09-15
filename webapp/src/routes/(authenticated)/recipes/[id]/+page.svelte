@@ -126,17 +126,19 @@
                 </div>
 
                 {#if recipe.images && recipe.images.length > 1}
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {#each recipe.images.slice(1) as image}
-                            <div class="aspect-square rounded-lg overflow-hidden shadow-sm">
-                                <img
-                                        src={image}
-                                        alt="{recipe.name} - Additional view"
-                                        class="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
-                                />
-                            </div>
-                        {/each}
-                    </div>
+                    <ScrollArea class="whitespace-nowrap lg:whitespace-normal" orientation="horizontal">
+                        <div class="flex lg:grid lg:grid-cols-3 gap-4 pb-2 lg:pb-0">
+                            {#each recipe.images.slice(1) as image}
+                                <div class="aspect-square w-40 md:w-48 lg:w-auto rounded-lg overflow-hidden shadow-sm flex-shrink-0">
+                                    <img
+                                            src={image}
+                                            alt="{recipe.name} - Additional view"
+                                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                                    />
+                                </div>
+                            {/each}
+                        </div>
+                    </ScrollArea>
                 {/if}
             </div>
         </div>
