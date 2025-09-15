@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/gorilla/securecookie"
@@ -16,15 +16,28 @@ func createSessionCookie(userId int64) (string, error) {
 		return "", err
 	}
 	expiry := 7 * 24 * time.Hour // One week
-	return fmt.Sprintf(
-		"%s=%s; HttpOnly; Secure; SameSite=strict; URL=/; Max-Age=%d", AuthCookieName, payload, int64(expiry/time.Second),
-	), nil
+	cookie := http.Cookie{
+		HttpOnly: true,
+		MaxAge:   int(expiry / time.Second),
+		Name:     AuthCookieName,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+		Secure:   true,
+		Value:    payload,
+	}
+	return cookie.String(), nil
 }
 
 func expireSessionCookie() string {
-	return fmt.Sprintf(
-		"%s=; HttpOnly; Secure; SameSite=strict; URL=/; Max-Age=%d", AuthCookieName, 0,
-	)
+	cookie := http.Cookie{
+		HttpOnly: true,
+		MaxAge:   -1,
+		Name:     AuthCookieName,
+		Path:     "/",
+		SameSite: http.SameSiteStrictMode,
+		Secure:   true,
+	}
+	return cookie.String()
 }
 
 func getUserFromSessionCookie(cookieValue string) (int64, error) {
