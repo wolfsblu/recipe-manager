@@ -62,6 +62,20 @@
             <div class="lg:w-1/2 space-y-6">
                 <div>
                     <h1 class="text-4xl font-bold text-foreground mb-2">{recipe.name}</h1>
+
+                    {#if recipe.tags && recipe.tags.length > 0}
+                        <ScrollArea class="whitespace-nowrap" orientation="horizontal">
+                            <div class="flex gap-1">
+                                {#each recipe.tags as tag}
+                                    <Badge variant="secondary" class="whitespace-nowrap text-sm">
+                                        <TagIcon class="w-4 h-4 text-muted-foreground" />
+                                        {tag.name}
+                                    </Badge>
+                                {/each}
+                            </div>
+                        </ScrollArea>
+                    {/if}
+
                     {#if recipe.description}
                         <p class="text-lg text-muted-foreground leading-relaxed">{recipe.description}</p>
                     {/if}
@@ -123,19 +137,6 @@
                             </div>
                         {/each}
                     </div>
-                {/if}
-
-                {#if recipe.tags && recipe.tags.length > 0}
-                    <ScrollArea class="whitespace-nowrap" orientation="horizontal">
-                        <div class="flex gap-1">
-                            {#each recipe.tags as tag}
-                                <Badge variant="secondary" class="whitespace-nowrap text-sm">
-                                    <TagIcon class="w-4 h-4 text-muted-foreground" />
-                                    {tag.name}
-                                </Badge>
-                            {/each}
-                        </div>
-                    </ScrollArea>
                 {/if}
             </div>
         </div>
