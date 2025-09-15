@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { PageData } from './$types';
+    import pluralize from 'pluralize'
     import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "$lib/components/ui/card/index.js";
     import { Badge } from "$lib/components/ui/badge/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
@@ -170,7 +171,8 @@
                                                         {ingredient.ingredient?.name || 'Unknown ingredient'}
                                                     </span>
                                                     <Badge variant="outline" class="text-sm text-muted-foreground">
-                                                        {ingredient.amount} {ingredient.unit?.name || ''}
+                                                        {ingredient.amount}
+                                                        {pluralize(ingredient.unit.name, ingredient.amount)}
                                                     </Badge>
                                                 </div>
                                             {/each}
