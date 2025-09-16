@@ -117,6 +117,12 @@ UPDATE recipes
 SET name = ?, servings = ?, minutes = ?, description = ?
 WHERE id = ?;
 
+-- name: DeleteRecipeIngredients :exec
+DELETE FROM recipe_ingredients
+WHERE step_id IN (
+    SELECT id FROM recipe_steps WHERE recipe_id = ?
+);
+
 -- name: DeleteRecipeSteps :exec
 DELETE FROM recipe_steps
 WHERE recipe_id = ?;

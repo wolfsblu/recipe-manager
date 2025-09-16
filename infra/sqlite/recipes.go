@@ -285,6 +285,9 @@ func (s *Store) UpdateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 		return domain.Recipe{}, err
 	}
 
+	if err = s.query().DeleteRecipeIngredients(ctx, recipe.ID); err != nil {
+		return domain.Recipe{}, err
+	}
 	if err = s.query().DeleteRecipeSteps(ctx, recipe.ID); err != nil {
 		return domain.Recipe{}, err
 	}

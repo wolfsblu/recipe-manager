@@ -174,6 +174,18 @@ func (q *Queries) DeleteRecipeImages(ctx context.Context, recipeID int64) error 
 	return err
 }
 
+const deleteRecipeIngredients = `-- name: DeleteRecipeIngredients :exec
+DELETE FROM recipe_ingredients
+WHERE step_id IN (
+    SELECT id FROM recipe_steps WHERE recipe_id = ?
+)
+`
+
+func (q *Queries) DeleteRecipeIngredients(ctx context.Context, recipeID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteRecipeIngredients, recipeID)
+	return err
+}
+
 const deleteRecipeSteps = `-- name: DeleteRecipeSteps :exec
 DELETE FROM recipe_steps
 WHERE recipe_id = ?
