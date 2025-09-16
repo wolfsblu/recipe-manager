@@ -32,6 +32,7 @@
 		"filepond-plugin-image-preview": "^4.6.12",
 		"filepond-plugin-image-resize": "^2.0.10",
 		"formsnap": "^2.0.1",
+		"layerchart": "^2.0.0-next.27",
 		"luxon": "^3.6.1",
 		"openapi-fetch": "^0.14.0",
 		"pluralize": "^8.0.0",
