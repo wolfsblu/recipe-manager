@@ -22,7 +22,7 @@
 >
 	<span class="text-muted-foreground flex place-items-center gap-2">
 		<SearchIcon class="inline size-4" />
-		Go to
+		<span class="hidden sm:inline">Go to</span>
 	</span>
     <Kbd class="hidden lg:block" size="sm" variant="secondary">
         {cmdOrCtrl} + K
