@@ -1,5 +1,5 @@
 import * as tus from 'tus-js-client';
-import { PUBLIC_UPLOAD_URL } from '$env/static/public';
+import {PUBLIC_UPLOAD_URL} from '$env/static/public';
 
 export type UploadFile = {
     id: number;
@@ -25,13 +25,66 @@ export class UploadService {
             .map(file => file.url!);
     }
 
+    async initializeWithUrls(urls: string[]): Promise<void> {
+        this.files = await Promise.all(urls.map(async (url, index) => {
+            let name = `image-${index}`;
+            let size = 0;
+            let type = 'image/*';
+
+            try {
+                const response = await fetch(url, {method: 'HEAD'});
+                const uploadMetadata = response.headers.get('upload-metadata');
+                if (uploadMetadata) {
+                    const filenameMatch = uploadMetadata.match(/filename\s+([A-Za-z0-9+/=]+)/);
+                    if (filenameMatch) {
+                        try {
+                            name = atob(filenameMatch[1]);
+                        } catch (e) {
+                            console.warn('Failed to decode base64 filename:', filenameMatch[1]);
+                        }
+                    }
+
+                    const filetypeMatch = uploadMetadata.match(/filetype\s+([A-Za-z0-9+/=]+)/);
+                    if (filetypeMatch) {
+                        try {
+                            type = atob(filetypeMatch[1]);
+                        } catch (e) {
+                            console.warn('Failed to decode base64 filetype:', filetypeMatch[1]);
+                        }
+                    }
+                }
+
+                const contentLength = response.headers.get('content-length');
+                if (contentLength) {
+                    size = parseInt(contentLength, 10);
+                }
+                const contentType = response.headers.get('content-type');
+                if (contentType) {
+                    type = contentType;
+                }
+            } catch (error) {
+                console.warn(`Failed to fetch metadata for ${url}:`, error);
+            }
+
+            return {
+                id: -(index + 1), // Use negative IDs for existing images to avoid conflicts
+                name,
+                type,
+                size,
+                progress: 100,
+                status: 'completed' as const,
+                url: url
+            };
+        }));
+    }
+
     async uploadFile(file: File): Promise<UploadFile> {
         if (this.files.find((f) => f.name === file.name)) {
             throw new Error('File already exists');
         }
 
         const fileData: UploadFile = {
-            id: this.files.length,
+            id: Date.now() + Math.random(), // Use timestamp + random to avoid conflicts
             name: file.name,
             type: file.type,
             size: file.size,

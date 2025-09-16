@@ -22,13 +22,14 @@ export const load: PageLoad = async ({ params }) => {
     const units = await getUnits()
     const tags = await getTags()
 
+    console.log(recipe.images)
     // Pre-populate form with recipe data
     const form = await superValidate({
         name: recipe.name,
         description: recipe.description,
         servings: recipe.servings,
         minutes: recipe.minutes,
-        images: recipe.images || [],
+        images: recipe.images?.map(image => image || '') || [],
         tags: recipe.tags?.map(tag => tag.id) || [],
         steps: recipe.steps?.map(step => ({
             instructions: step.instructions,

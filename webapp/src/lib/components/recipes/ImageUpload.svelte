@@ -12,7 +12,7 @@
     import UploadSuccess from '$lib/components/ui/upload/UploadSuccess.svelte';
 
     let {
-        value = $bindable(),
+        value = $bindable<string[] | undefined>(),
         class: className,
         maxFiles = 4,
         maxFileSize = 2 * MEGABYTE,
@@ -24,6 +24,12 @@
     }>();
 
     const uploadService = new UploadService();
+    
+    $effect(() => {
+        if (value && value.length > 0 && uploadService.uploadedFiles.length === 0) {
+            uploadService.initializeWithUrls(value);
+        }
+    });
 
     const onUpload: FileDropZoneProps['onUpload'] = async (files) => {
         const promises = files.map(async (file) => {
