@@ -138,7 +138,6 @@
                                         {...props}
                                         bind:value={$formData.name}
                                         placeholder="My amazing recipe"
-                                        class="text-lg"
                                     />
                                 {/snippet}
                             </Form.Control>
