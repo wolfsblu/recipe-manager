@@ -108,6 +108,7 @@
 
             {#if uploadService.uploadedFiles.length < maxFiles}
                 <button
+                    type="button"
                     class="flex aspect-[4/3] items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 transition-colors hover:border-gray-400 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500 dark:hover:bg-gray-700"
                     onclick={() => {
                         const input = document.createElement('input');
