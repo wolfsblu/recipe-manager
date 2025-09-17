@@ -80,13 +80,12 @@
         return `${roundedHours}h`;
     }
 
-    // Aggregate all ingredients from all steps
-    const getAllIngredients = () => {
-        const ingredientMap = new Map();
-        
-        recipe.steps.forEach(step => {
-            step.ingredients?.forEach(ingredient => {
+    const ingredients = Array.from(
+        recipe.steps
+            .flatMap(step => step.ingredients || [])
+            .reduce((ingredientMap, ingredient) => {
                 const key = `${ingredient.ingredient?.id}-${ingredient.unit.id}`;
+                
                 if (ingredientMap.has(key)) {
                     // If same ingredient with same unit exists, add the amounts
                     ingredientMap.get(key).amount += ingredient.amount;
@@ -98,13 +97,13 @@
                         amount: ingredient.amount
                     });
                 }
-            });
-        });
-        
-        return Array.from(ingredientMap.values()).sort((a, b) => 
-            (a.ingredient?.name || '').localeCompare(b.ingredient?.name || '')
-        );
-    }
+                
+                return ingredientMap;
+            }, new Map())
+            .values()
+    ).sort((a, b) => 
+        (a.ingredient?.name || '').localeCompare(b.ingredient?.name || '')
+    )
 </script>
 
 <svelte:head>
@@ -267,12 +266,12 @@
         </div>
     </div>
 
-    {#if recipe.steps && recipe.steps.length > 0 && getAllIngredients().length > 0}
+    {#if recipe.steps && recipe.steps.length > 0 && ingredients.length > 0}
         <h2 class="font-bold text-2xl text-foreground mb-3">
             Ingredients
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {#each getAllIngredients() as ingredient}
+            {#each ingredients as ingredient}
                 <div class="border flex items-center justify-between px-3 py-2 bg-muted/30 rounded-lg">
                     <span class="font-medium text-muted-foreground">
                         {ingredient.ingredient?.name || 'Unknown ingredient'}
