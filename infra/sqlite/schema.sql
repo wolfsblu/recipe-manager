@@ -83,7 +83,7 @@ CREATE TABLE recipe_images
 CREATE TABLE recipe_ingredients
 (
     id            INTEGER PRIMARY KEY,
-    step_id       INTEGER NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
+    step_id       INTEGER NOT NULL REFERENCES recipe_steps (id) ON DELETE CASCADE,
     ingredient_id INTEGER NOT NULL REFERENCES ingredients (id) ON DELETE CASCADE,
     unit_id       INTEGER NOT NULL REFERENCES units (id) ON DELETE RESTRICT,
     amount        REAL    NOT NULL,
