@@ -16,11 +16,13 @@
         class: className,
         maxFiles = 4,
         maxFileSize = 2 * MEGABYTE,
+        deferDeletion = false,
     } = $props<{
         value?: string[];
         class?: string;
         maxFiles?: number;
         maxFileSize?: number;
+        deferDeletion?: boolean;
     }>();
 
     const uploadService = new UploadService();
@@ -98,7 +100,7 @@
                             url={file.url}
                             name={file.name}
                             size={file.size}
-                            onRemove={() => uploadService.removeFile(file.id)}
+                            onRemove={() => uploadService.removeFile(file.id, deferDeletion)}
                         />
                     {/if}
                 </div>

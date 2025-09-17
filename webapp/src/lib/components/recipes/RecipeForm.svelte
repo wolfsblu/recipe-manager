@@ -106,7 +106,7 @@
             <!-- Image Upload -->
             <div>
                 <label class="text-sm font-medium text-foreground mb-3 block">Recipe Images</label>
-                <ImageUpload bind:value={$formData.images} />
+                <ImageUpload bind:value={$formData.images} deferDeletion={isEditing} />
             </div>
 
             <div class="grid lg:grid-cols-2 gap-6">

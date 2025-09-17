@@ -1,5 +1,6 @@
 import * as tus from 'tus-js-client';
 import {PUBLIC_UPLOAD_URL} from '$env/static/public';
+import { queueImageDeletion } from '$lib/stores/imageDeleteQueue';
 
 export type UploadFile = {
     id: number;
@@ -123,7 +124,7 @@ export class UploadService {
         return fileData;
     }
 
-    async removeFile(id: number): Promise<void> {
+    async removeFile(id: number, deferDeletion: boolean = false): Promise<void> {
         const fileIndex = this.files.findIndex(f => f.id === id);
         if (fileIndex === -1) return;
 
@@ -134,7 +135,11 @@ export class UploadService {
         }
 
         if (file.status === 'completed' && file.url) {
-            await this.deleteFromServer(file.url);
+            if (deferDeletion) {
+                queueImageDeletion(file.url);
+            } else {
+                await this.deleteFromServer(file.url);
+            }
         }
 
         this.files.splice(fileIndex, 1);
@@ -154,20 +159,6 @@ export class UploadService {
 
         const [item] = this.files.splice(dragIndex, 1);
         this.files.splice(dropIndex, 0, item);
-    }
-
-    async cleanup(): Promise<void> {
-        this.files.forEach(file => {
-            if (file.upload && file.status === 'uploading') {
-                file.upload.abort();
-            }
-        });
-
-        await Promise.allSettled(
-            this.completedUrls.map(url => this.deleteFromServer(url))
-        );
-
-        this.files = [];
     }
 
     private async deleteFromServer(url: string): Promise<void> {
