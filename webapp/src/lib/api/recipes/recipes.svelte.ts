@@ -47,6 +47,20 @@ export const updateRecipe = async (id: number, recipe: any) => {
     return response.data
 }
 
+export const deleteRecipe = async (id: number) => {
+    const response = await client.DELETE("/recipes/{recipeId}", {
+        params: {
+            path: {
+                recipeId: id
+            }
+        }
+    })
+    if (response.error) {
+        throw response.error
+    }
+    return response.data
+}
+
 export const getIngredients = async () => {
     const response = await client.GET("/ingredients")
     if (response.error) {

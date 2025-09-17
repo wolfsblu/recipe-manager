@@ -7,6 +7,7 @@
     import { Separator } from "$lib/components/ui/separator/index.js";
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
     import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
     import ClockIcon from '@lucide/svelte/icons/clock';
     import StepsIcon from '@lucide/svelte/icons/footprints';
     import UsersIcon from '@lucide/svelte/icons/users';
@@ -18,13 +19,17 @@
     import ChevronUpIcon from '@lucide/svelte/icons/chevron-up';
     import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
     import EditIcon from '@lucide/svelte/icons/edit';
+    import TrashIcon from '@lucide/svelte/icons/trash-2';
     import {goto} from "$app/navigation";
+    import { deleteRecipe } from "$lib/api/recipes/recipes.svelte";
+    import { toast } from "svelte-sonner";
 
     let { data }: { data: PageData } = $props();
     const { recipe } = data;
 
     let votes = $state(0)
     let userVote = $state<'up' | 'down' | null>(null)
+    let showDeleteDialog = $state(false)
 
     const handleVote = (voteType: 'up' | 'down') => {
         if (userVote === voteType) {
@@ -44,6 +49,21 @@
 
     const handleEdit = async () => {
         await goto(`/recipes/${recipe.id}/edit`)
+    }
+
+    const handleDelete = () => {
+        showDeleteDialog = true;
+    }
+
+    const confirmDelete = async () => {
+        showDeleteDialog = false;
+        try {
+            await deleteRecipe(recipe.id);
+            toast.success("Recipe deleted successfully!");
+            await goto("/recipes");
+        } catch (error) {
+            toast.error("Failed to delete recipe");
+        }
     }
 
     const formatMinutesAsHours = (minutes: number) => {
@@ -104,6 +124,14 @@
                             title="Edit recipe"
                         >
                             <EditIcon class="w-5 h-5" />
+                        </Button>
+
+                        <Button
+                            variant="ghost"
+                            onclick={handleDelete}
+                            title="Delete recipe"
+                        >
+                            <TrashIcon class="w-5 h-5" />
                         </Button>
                     </div>
 
@@ -280,3 +308,20 @@
     {/if}
 
 </div>
+
+<AlertDialog.Root bind:open={showDeleteDialog}>
+    <AlertDialog.Content>
+        <AlertDialog.Header>
+            <AlertDialog.Title>Delete Recipe</AlertDialog.Title>
+            <AlertDialog.Description>
+                Are you sure you want to delete "{recipe.name}"? This action cannot be undone.
+            </AlertDialog.Description>
+        </AlertDialog.Header>
+        <AlertDialog.Footer>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <AlertDialog.Action onclick={confirmDelete}>
+                Delete
+            </AlertDialog.Action>
+        </AlertDialog.Footer>
+    </AlertDialog.Content>
+</AlertDialog.Root>
