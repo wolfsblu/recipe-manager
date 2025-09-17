@@ -72,6 +72,13 @@ type RecipeTag struct {
 	TagID    int64
 }
 
+type RecipeVote struct {
+	ID       int64
+	RecipeID int64
+	UserID   int64
+	Vote     int64
+}
+
 type Role struct {
 	ID   int64
 	Name string

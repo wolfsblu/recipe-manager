@@ -56,3 +56,10 @@ func (m *DBMapper) FromRecipeTag(recipeID int64, tag domain.Tag) database.Create
 		TagID:    tag.ID,
 	}
 }
+
+func (m *DBMapper) FromUserVotesParams(recipeIds []int64, userID int64) database.GetUserVotesForRecipesParams {
+	return database.GetUserVotesForRecipesParams{
+		RecipeIds: recipeIds,
+		UserID:    userID,
+	}
+}

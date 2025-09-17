@@ -197,6 +197,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/recipes/{recipeId}/vote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Vote on a recipe
+         * @description Cast an upvote (1) or downvote (-1) on a recipe
+         */
+        post: operations["addVote"];
+        /**
+         * Remove vote from a recipe
+         * @description Remove your vote from a recipe
+         */
+        delete: operations["removeVote"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ingredients": {
         parameters: {
             query?: never;
@@ -291,6 +315,7 @@ export interface components {
             id: number;
             steps: components["schemas"]["ReadRecipeStep"][];
             tags?: components["schemas"]["ReadTag"][];
+            votes?: components["schemas"]["RecipeVotes"];
         };
         ReadUnit: {
             /**
@@ -403,6 +428,30 @@ export interface components {
             steps: components["schemas"]["WriteRecipeStep"][];
             tags?: number[];
         };
+        Vote: {
+            /**
+             * Format: int64
+             * @description Vote value (1 for upvote, -1 for downvote)
+             * @example 1
+             * @enum {integer}
+             */
+            vote: 1 | -1;
+        };
+        RecipeVotes: {
+            /**
+             * Format: int64
+             * @description Total vote score (upvotes minus downvotes)
+             * @example 15
+             */
+            total: number;
+            /**
+             * Format: int64
+             * @description Current user's vote on this recipe (1 for upvote, -1 for downvote, 0 if no vote)
+             * @example 1
+             * @enum {integer}
+             */
+            user: 1 | -1 | 0;
+        };
     };
     responses: {
         /** @description Something went wrong */
@@ -487,6 +536,15 @@ export interface components {
                 "application/json": components["schemas"]["ReadUser"];
             };
         };
+        /** @description Recipe voting information */
+        RecipeVotes: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["RecipeVotes"];
+            };
+        };
     };
     parameters: never;
     requestBodies: {
@@ -512,6 +570,12 @@ export interface components {
         ConfirmUser: {
             content: {
                 "application/json": components["schemas"]["Token"];
+            };
+        };
+        /** @description Vote on a recipe */
+        Vote: {
+            content: {
+                "application/json": components["schemas"]["Vote"];
             };
         };
     };
@@ -771,6 +835,40 @@ export interface operations {
                 };
                 content?: never;
             };
+            default: components["responses"]["Error"];
+        };
+    };
+    addVote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the recipe to vote on */
+                recipeId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["Vote"];
+        responses: {
+            /** @description successful operation */
+            200: components["responses"]["RecipeVotes"];
+            default: components["responses"]["Error"];
+        };
+    };
+    removeVote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the recipe to remove vote from */
+                recipeId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description successful operation */
+            200: components["responses"]["RecipeVotes"];
             default: components["responses"]["Error"];
         };
     };

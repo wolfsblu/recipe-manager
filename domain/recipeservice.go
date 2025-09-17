@@ -26,7 +26,7 @@ func (s *RecipeService) GetMealPlan(ctx context.Context, user *User, from time.T
 }
 
 func (s *RecipeService) Delete(ctx context.Context, user *User, id int64) error {
-	if err := s.validateRecipeOwnership(ctx, user.ID, id); err != nil {
+	if err := s.validateRecipeOwnership(ctx, user, id); err != nil {
 		return err
 	}
 	return s.store.DeleteRecipe(ctx, id)
@@ -36,8 +36,8 @@ func (s *RecipeService) GetByUser(ctx context.Context, user *User) ([]Recipe, er
 	return s.store.GetRecipesByUser(ctx, user)
 }
 
-func (s *RecipeService) GetById(ctx context.Context, id int64) (Recipe, error) {
-	return s.store.GetRecipeById(ctx, id)
+func (s *RecipeService) GetById(ctx context.Context, user *User, id int64) (Recipe, error) {
+	return s.store.GetRecipeById(ctx, user, id)
 }
 
 func (s *RecipeService) GetIngredients(ctx context.Context) ([]Ingredient, error) {
@@ -52,8 +52,49 @@ func (s *RecipeService) GetTags(ctx context.Context) ([]Tag, error) {
 	return s.store.GetTags(ctx)
 }
 
+func (s *RecipeService) AddVote(ctx context.Context, user *User, recipeID int64, vote int64) (RecipeVotes, error) {
+	if err := s.validateVote(vote); err != nil {
+		return RecipeVotes{}, err
+	}
+
+	if err := s.store.AddVote(ctx, recipeID, user.ID, vote); err != nil {
+		return RecipeVotes{}, err
+	}
+
+	total, err := s.store.GetRecipeVotes(ctx, recipeID)
+	if err != nil {
+		return RecipeVotes{}, err
+	}
+
+	userVote, err := s.store.GetUserVote(ctx, recipeID, user.ID)
+	if err != nil {
+		return RecipeVotes{}, err
+	}
+
+	return RecipeVotes{
+		Total: total,
+		User:  userVote,
+	}, nil
+}
+
+func (s *RecipeService) RemoveVote(ctx context.Context, user *User, recipeID int64) (RecipeVotes, error) {
+	if err := s.store.RemoveVote(ctx, recipeID, user.ID); err != nil {
+		return RecipeVotes{}, err
+	}
+
+	total, err := s.store.GetRecipeVotes(ctx, recipeID)
+	if err != nil {
+		return RecipeVotes{}, err
+	}
+
+	return RecipeVotes{
+		Total: total,
+		User:  0,
+	}, nil
+}
+
 func (s *RecipeService) UpdateRecipe(ctx context.Context, recipe Recipe) (Recipe, error) {
-	if err := s.validateRecipeOwnership(ctx, recipe.CreatedBy.ID, recipe.ID); err != nil {
+	if err := s.validateRecipeOwnership(ctx, recipe.CreatedBy, recipe.ID); err != nil {
 		return Recipe{}, err
 	}
 

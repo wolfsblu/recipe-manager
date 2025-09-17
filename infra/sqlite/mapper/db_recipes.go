@@ -70,3 +70,10 @@ func (m *DBMapper) ToRecipeImage(r database.GetImagesForRecipesRow) domain.Recip
 		ID: r.ID,
 	}
 }
+
+func (m *DBMapper) ToRecipeVotes(totalVotes int64, userVote int64) domain.RecipeVotes {
+	return domain.RecipeVotes{
+		Total: totalVotes,
+		User:  userVote,
+	}
+}

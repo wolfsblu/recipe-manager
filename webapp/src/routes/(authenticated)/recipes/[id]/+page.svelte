@@ -23,29 +23,12 @@
     import {goto} from "$app/navigation";
     import { deleteRecipe } from "$lib/api/recipes/recipes.svelte";
     import { toast } from "svelte-sonner";
+    import VoteButtons from "$lib/components/recipes/VoteButtons.svelte";
 
     let { data }: { data: PageData } = $props();
     const { recipe } = data;
 
-    let votes = $state(0)
-    let userVote = $state<'up' | 'down' | null>(null)
     let showDeleteDialog = $state(false)
-
-    const handleVote = (voteType: 'up' | 'down') => {
-        if (userVote === voteType) {
-            // Remove vote if clicking the same button
-            votes -= voteType === 'up' ? 1 : -1
-            userVote = null;
-        } else if (userVote === null) {
-            // Add new vote
-            votes += voteType === 'up' ? 1 : -1
-            userVote = voteType;
-        } else {
-            // Switch vote
-            votes += voteType === 'up' ? 2 : -2
-            userVote = voteType;
-        }
-    }
 
     const handleEdit = async () => {
         await goto(`/recipes/${recipe.id}/edit`)
@@ -116,29 +99,7 @@
             <div class="lg:w-1/2">
                 <div class="flex flex-row-reverse md:flex-row gap-3">
                     <div class="flex flex-col items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onclick={() => handleVote('up')}
-                            class={userVote === 'up' ? 'text-green-600 hover:text-green-700' : ''}
-                            title="Upvote recipe"
-                        >
-                            <ChevronUpIcon class="w-5 h-5" />
-                        </Button>
-
-                        <span class="text-base font-bold text-foreground">
-                            {votes}
-                        </span>
-
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onclick={() => handleVote('down')}
-                            class={userVote === 'down' ? 'text-red-600 hover:text-red-700' : ''}
-                            title="Downvote recipe"
-                        >
-                            <ChevronDownIcon class="w-5 h-5" />
-                        </Button>
+                        <VoteButtons recipeId={recipe.id} votes={recipe.votes} />
 
                         <Separator orientation="horizontal" class="my-1 w-full" />
 
