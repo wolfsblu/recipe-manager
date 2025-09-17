@@ -89,7 +89,7 @@
     <div class="mb-8">
         <div class="flex flex-col lg:flex-row gap-8">
             <div class="lg:w-1/2">
-                <div class="flex gap-3">
+                <div class="flex flex-row-reverse md:flex-row gap-3">
                     <div class="flex flex-col items-center gap-2">
                         <Button
                             variant="ghost"
@@ -128,6 +128,7 @@
 
                         <Button
                             variant="ghost"
+                            size="sm"
                             onclick={handleDelete}
                             title="Delete recipe"
                         >
