@@ -34,23 +34,25 @@
         <main class="flex flex-col flex-grow">
             <header class="shrink-0 items-center gap-2 transition-[width,height] ease-linear p-3 border-b">
                 <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2 px-2">
-                        <Sidebar.Trigger class="-ml-1" />
-                        <Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
-                        <Breadcrumb.Root>
-                            <Breadcrumb.List>
-                                {#each breadcrumbs as breadcrumb, i (breadcrumb.link)}
-                                    {#if i > 0}
-                                        <Breadcrumb.Separator class="hidden md:block" />
-                                    {/if}
-                                    <Breadcrumb.Item class="hidden md:block">
-                                        <Breadcrumb.Link href={breadcrumb.link}>{breadcrumb.name}</Breadcrumb.Link>
-                                    </Breadcrumb.Item>
-                                {/each}
-                            </Breadcrumb.List>
-                        </Breadcrumb.Root>
+                    <div class="flex items-center gap-2 px-2 min-w-0 flex-1 mr-4">
+                        <Sidebar.Trigger class="-ml-1 flex-shrink-0" />
+                        <Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4 flex-shrink-0" />
+                        <div class="overflow-x-auto min-w-0">
+                            <Breadcrumb.Root>
+                                <Breadcrumb.List class="whitespace-nowrap flex-nowrap">
+                                    {#each breadcrumbs as breadcrumb, i (breadcrumb.link)}
+                                        {#if i > 0}
+                                            <Breadcrumb.Separator />
+                                        {/if}
+                                        <Breadcrumb.Item>
+                                            <Breadcrumb.Link href={breadcrumb.link}>{breadcrumb.name}</Breadcrumb.Link>
+                                        </Breadcrumb.Item>
+                                    {/each}
+                                </Breadcrumb.List>
+                            </Breadcrumb.Root>
+                        </div>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 flex-shrink-0">
                         <SearchButton />
                         <ModeToggle />
                     </div>
