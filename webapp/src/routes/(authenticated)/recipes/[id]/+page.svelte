@@ -79,6 +79,32 @@
         const roundedHours = Math.round(hours * 100) / 100;
         return `${roundedHours}h`;
     }
+
+    // Aggregate all ingredients from all steps
+    const getAllIngredients = () => {
+        const ingredientMap = new Map();
+        
+        recipe.steps.forEach(step => {
+            step.ingredients?.forEach(ingredient => {
+                const key = `${ingredient.ingredient?.id}-${ingredient.unit.id}`;
+                if (ingredientMap.has(key)) {
+                    // If same ingredient with same unit exists, add the amounts
+                    ingredientMap.get(key).amount += ingredient.amount;
+                } else {
+                    // Create new entry
+                    ingredientMap.set(key, {
+                        ingredient: ingredient.ingredient,
+                        unit: ingredient.unit,
+                        amount: ingredient.amount
+                    });
+                }
+            });
+        });
+        
+        return Array.from(ingredientMap.values()).sort((a, b) => 
+            (a.ingredient?.name || '').localeCompare(b.ingredient?.name || '')
+        );
+    }
 </script>
 
 <svelte:head>
@@ -241,10 +267,31 @@
         </div>
     </div>
 
-    {#if recipe.steps && recipe.steps.length > 0}
-        <div class="space-y-6">
-            <h2 class="text-2xl font-bold text-foreground">Instructions</h2>
+    {#if recipe.steps && recipe.steps.length > 0 && getAllIngredients().length > 0}
+        <h2 class="font-bold text-2xl text-foreground mb-3">
+            Ingredients
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {#each getAllIngredients() as ingredient}
+                <div class="border flex items-center justify-between px-3 py-2 bg-muted/30 rounded-lg">
+                    <span class="font-medium text-muted-foreground">
+                        {ingredient.ingredient?.name || 'Unknown ingredient'}
+                    </span>
+                    <Badge variant="outline" class="text-sm text-muted-foreground">
+                        {ingredient.amount}
+                        {pluralize(ingredient.unit.name, ingredient.amount)}
+                    </Badge>
+                </div>
+            {/each}
+        </div>
+    {/if}
 
+    <Separator class="my-6" />
+
+    <h2 class="font-bold text-2xl text-foreground mb-3">Instructions</h2>
+    {#if recipe.steps && recipe.steps.length > 0}
+        <!-- Instructions Section -->
+        <div class="space-y-6">
             <div class="space-y-8">
                 {#each recipe.steps as step, stepIndex}
                     <Card class="overflow-hidden">

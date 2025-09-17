@@ -43,8 +43,8 @@
     <title>Edit {recipe.name} - Recipe Manager</title>
 </svelte:head>
 
-<div class="container mx-auto px-4 py-6">
-    <div class="mb-8">
+<div class="container mx-auto px-0 md:px-4 py-6">
+    <div class="mb-8 px-4 md:px-0">
         <h1 class="text-4xl font-bold text-foreground mb-2">Edit Recipe</h1>
         <p class="text-lg text-muted-foreground">Update your "{recipe.name}" recipe</p>
     </div>

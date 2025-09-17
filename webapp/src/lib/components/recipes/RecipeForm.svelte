@@ -84,25 +84,18 @@
         $formData.steps[stepIndex].ingredients = $formData.steps[stepIndex].ingredients.filter((_, i) => i !== ingredientIndex);
     };
 
-    const formatMinutesAsHours = (minutes: number) => {
-        if (!minutes || minutes < 0) return "N/A";
-        if (minutes < 60) return `${minutes}m`;
-        const hours = minutes / 60;
-        const roundedHours = Math.round(hours * 100) / 100;
-        return `${roundedHours}h`;
-    };
 </script>
 
 <form method="POST" use:enhance class="space-y-8">
     <!-- Recipe Header Section -->
-    <Card>
-        <CardHeader>
+    <Card class="border-0 md:border shadow-none md:shadow-sm">
+        <CardHeader class="px-4 md:px-6">
             <CardTitle class="flex items-center gap-2">
                 <ChefHatIcon class="w-5 h-5" />
                 Recipe Details
             </CardTitle>
         </CardHeader>
-        <CardContent class="space-y-6">
+        <CardContent class="space-y-6 px-4 md:px-6">
             <!-- Image Upload -->
             <div>
                 <label class="text-sm font-medium text-foreground mb-3 block">Recipe Images</label>
@@ -204,31 +197,14 @@
                 </div>
             </div>
 
-            <!-- Preview Stats -->
-            {#if $formData.servings || $formData.minutes}
-                <div class="flex gap-4 p-4 bg-muted/30 rounded-lg">
-                    {#if $formData.servings}
-                        <div class="flex items-center gap-2">
-                            <UsersIcon class="w-4 h-4 text-muted-foreground" />
-                            <span class="text-sm text-muted-foreground">Serves {$formData.servings}</span>
-                        </div>
-                    {/if}
-                    {#if $formData.minutes}
-                        <div class="flex items-center gap-2">
-                            <ClockIcon class="w-4 h-4 text-muted-foreground" />
-                            <span class="text-sm text-muted-foreground">{formatMinutesAsHours($formData.minutes)}</span>
-                        </div>
-                    {/if}
-                </div>
-            {/if}
         </CardContent>
     </Card>
 
     <!-- Instructions Section -->
     {#if $formData.steps.length === 0}
         <!-- Empty State Card -->
-        <Card>
-            <CardHeader>
+        <Card class="border-0 md:border shadow-none md:shadow-sm">
+            <CardHeader class="px-4 md:px-6">
                 <CardTitle class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <ListIcon class="w-5 h-5" />
@@ -240,7 +216,7 @@
                     </Button>
                 </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent class="px-4 md:px-6">
                 <div class="text-center py-12 text-muted-foreground">
                     <ChefHatIcon class="w-12 h-12 mx-auto mb-4" />
                     <p class="text-lg mb-2">No cooking steps yet</p>
@@ -251,7 +227,7 @@
     {:else}
         <!-- Steps as Individual Cards -->
         <div class="space-y-6">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between px-4 md:px-0">
                 <h2 class="text-2xl font-bold flex items-center gap-2">
                     <ListIcon class="w-6 h-6" />
                     Cooking Instructions
@@ -259,8 +235,8 @@
             </div>
 
             {#each $formData.steps as _, stepIndex}
-                <Card class="overflow-hidden">
-                    <CardHeader class="bg-muted/50 gap-0 py-1">
+                <Card class="overflow-hidden border-0 md:border shadow-none md:shadow-sm">
+                    <CardHeader class="bg-muted/50 gap-0 py-1 px-4 md:px-6">
                         <div class="flex items-center justify-between">
                             <CardTitle class="flex items-center gap-3">
                                 <div class="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
@@ -298,7 +274,7 @@
                             </div>
                         </div>
                     </CardHeader>
-                    <CardContent class="px-6">
+                    <CardContent class="px-4 md:px-6">
                         <div class="grid lg:grid-cols-2 gap-6">
                             <!-- Ingredients -->
                             <div>
@@ -406,7 +382,7 @@
     {/if}
 
     <!-- Form Actions -->
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center px-4 md:px-0">
         {#if onCancel}
             <Button type="button" variant="outline" onclick={onCancel}>
                 Cancel
