@@ -1,0 +1,1 @@
+INSERT INTO ingredients (name) VALUES ('Water');
