@@ -6,6 +6,7 @@
     import {curveNatural} from "d3-shape";
     import {scaleUtc, scaleBand} from "d3-scale";
     import {cubicInOut} from "svelte/easing";
+    import { isAuthenticated } from "$lib/api/auth/user.svelte";
 
     let recipeStats = $state({
         totalRecipes: 123,
@@ -105,23 +106,24 @@
         </Card>
     </div>
 
-    <!-- CTA Section -->
-    <Card class="text-center">
-        <CardHeader>
-            <CardTitle>Join Our Community</CardTitle>
-            <CardDescription>Start sharing your favorite recipes and discover new ones</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div class="space-x-4">
-                <Button href="/auth/register">
-                    Get Started
-                </Button>
-                <Button variant="outline" href="/auth/login">
-                    Sign In
-                </Button>
-            </div>
-        </CardContent>
-    </Card>
+    {#if !isAuthenticated()}
+        <Card class="text-center">
+            <CardHeader>
+                <CardTitle>Join Our Community</CardTitle>
+                <CardDescription>Start sharing your favorite recipes and discover new ones</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div class="space-x-4">
+                    <Button href="/auth/register">
+                        Get Started
+                    </Button>
+                    <Button variant="outline" href="/auth/login">
+                        Sign In
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>
+    {/if}
 
     <!-- Charts Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
