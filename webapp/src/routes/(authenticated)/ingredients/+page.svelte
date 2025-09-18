@@ -247,116 +247,114 @@
     });
 </script>
 
-<div class="flex flex-col gap-5 h-full p-5">
-    <div class="w-full">
-        <div class="flex items-center justify-between gap-2 pb-4">
-            <Input
-                placeholder="Filter ingredients..."
-                value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                oninput={(e) =>
-                    table.getColumn("name")?.setFilterValue(e.currentTarget.value)}
-                onchange={(e) => {
-                    table.getColumn("name")?.setFilterValue(e.currentTarget.value);
-                }}
-                class="max-w-sm"
-            />
-            <div class="flex items-center gap-2">
-                {#if getSelectedCount() > 0}
-                    <Button variant="destructive" onclick={() => showBulkDeleteDialog = true}>
-                        <TrashIcon />
-                        <span class="hidden sm:inline">Delete {getSelectedCount()}</span>
-                    </Button>
-                {/if}
-                <Button onclick={() => showAddDialog = true}>
-                    <PlusIcon />
-                    <span class="hidden sm:inline">Add Ingredient</span>
+<div class="container mx-auto p-5">
+    <div class="flex items-center justify-between gap-2 pb-4">
+        <Input
+            placeholder="Filter ingredients..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            oninput={(e) =>
+                table.getColumn("name")?.setFilterValue(e.currentTarget.value)}
+            onchange={(e) => {
+                table.getColumn("name")?.setFilterValue(e.currentTarget.value);
+            }}
+            class="max-w-sm"
+        />
+        <div class="flex items-center gap-2">
+            {#if getSelectedCount() > 0}
+                <Button variant="destructive" onclick={() => showBulkDeleteDialog = true}>
+                    <TrashIcon />
+                    <span class="hidden sm:inline">Delete {getSelectedCount()}</span>
                 </Button>
-            </div>
+            {/if}
+            <Button onclick={() => showAddDialog = true}>
+                <PlusIcon />
+                <span class="hidden sm:inline">Add Ingredient</span>
+            </Button>
         </div>
-        <div class="flex items-center justify-between text-sm text-muted-foreground pb-4">
-            <div>
-                {table.getFilteredSelectedRowModel().rows.length} of
-                {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div>
-            <div>
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-            </div>
+    </div>
+    <div class="flex items-center justify-between text-sm text-muted-foreground pb-4">
+        <div>
+            {table.getFilteredSelectedRowModel().rows.length} of
+            {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div class="rounded-md border">
-            <Table.Root>
-                <Table.Header>
-                    {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-                        <Table.Row>
-                            {#each headerGroup.headers as header (header.id)}
-                                <Table.Head class="[&:has([role=checkbox])]:pl-3">
-                                    {#if !header.isPlaceholder}
-                                        <FlexRender
-                                            content={header.column.columnDef.header}
-                                            context={header.getContext()}
-                                        />
-                                    {/if}
-                                </Table.Head>
-                            {/each}
-                        </Table.Row>
-                    {/each}
-                </Table.Header>
-                <Table.Body>
-                    {#each table.getRowModel().rows as row (row.id)}
-                        <Table.Row data-state={row.getIsSelected() && "selected"}>
-                            {#each row.getVisibleCells() as cell (cell.id)}
-                                <Table.Cell class="[&:has([role=checkbox])]:pl-3">
+        <div>
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+        </div>
+    </div>
+    <div class="rounded-md border">
+        <Table.Root>
+            <Table.Header>
+                {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
+                    <Table.Row>
+                        {#each headerGroup.headers as header (header.id)}
+                            <Table.Head class="[&:has([role=checkbox])]:pl-3">
+                                {#if !header.isPlaceholder}
                                     <FlexRender
-                                        content={cell.column.columnDef.cell}
-                                        context={cell.getContext()}
+                                        content={header.column.columnDef.header}
+                                        context={header.getContext()}
                                     />
-                                </Table.Cell>
-                            {/each}
-                        </Table.Row>
-                    {:else}
-                        <Table.Row>
-                            <Table.Cell colspan={columns.length} class="h-24 text-center">
-                                No ingredients found.
+                                {/if}
+                            </Table.Head>
+                        {/each}
+                    </Table.Row>
+                {/each}
+            </Table.Header>
+            <Table.Body>
+                {#each table.getRowModel().rows as row (row.id)}
+                    <Table.Row data-state={row.getIsSelected() && "selected"}>
+                        {#each row.getVisibleCells() as cell (cell.id)}
+                            <Table.Cell class="[&:has([role=checkbox])]:pl-3">
+                                <FlexRender
+                                    content={cell.column.columnDef.cell}
+                                    context={cell.getContext()}
+                                />
                             </Table.Cell>
-                        </Table.Row>
-                    {/each}
-                </Table.Body>
-            </Table.Root>
-        </div>
-        <div class="flex items-center justify-center pt-4">
-            <div class="flex items-center space-x-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onclick={() => table.setPageIndex(0)}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    <ChevronsLeftIcon class="h-4 w-4" />
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onclick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    <ChevronLeftIcon class="h-4 w-4" />
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onclick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    <ChevronRightIcon class="h-4 w-4" />
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onclick={() => table.setPageIndex(table.getPageCount() - 1)}
-                    disabled={!table.getCanNextPage()}
-                >
-                    <ChevronsRightIcon class="h-4 w-4" />
-                </Button>
-            </div>
+                        {/each}
+                    </Table.Row>
+                {:else}
+                    <Table.Row>
+                        <Table.Cell colspan={columns.length} class="h-24 text-center">
+                            No ingredients found.
+                        </Table.Cell>
+                    </Table.Row>
+                {/each}
+            </Table.Body>
+        </Table.Root>
+    </div>
+    <div class="flex items-center justify-center pt-4">
+        <div class="flex items-center space-x-2">
+            <Button
+                variant="outline"
+                size="sm"
+                onclick={() => table.setPageIndex(0)}
+                disabled={!table.getCanPreviousPage()}
+            >
+                <ChevronsLeftIcon class="h-4 w-4" />
+            </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                onclick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+            >
+                <ChevronLeftIcon class="h-4 w-4" />
+            </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                onclick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+            >
+                <ChevronRightIcon class="h-4 w-4" />
+            </Button>
+            <Button
+                variant="outline"
+                size="sm"
+                onclick={() => table.setPageIndex(table.getPageCount() - 1)}
+                disabled={!table.getCanNextPage()}
+            >
+                <ChevronsRightIcon class="h-4 w-4" />
+            </Button>
         </div>
     </div>
 </div>
