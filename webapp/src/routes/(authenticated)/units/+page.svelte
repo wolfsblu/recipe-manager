@@ -7,7 +7,7 @@
     import { addUnit, updateUnit, deleteUnit } from "$lib/api/units/units.svelte";
     import { useCrud } from "$lib/hooks/useCrud.svelte";
     import { renderSnippet } from "$lib/components/ui/data-table/index.js";
-    import { dialogStore } from "$lib/stores/dialog.svelte";
+    import { dialogStore, addUnitDialogOpen } from "$lib/stores/dialog.svelte";
     import type { PageProps } from './$types';
 
     type Unit = {
@@ -104,9 +104,9 @@
     });
 
     $effect(() => {
-        if (dialogStore.addUnitDialogOpen) {
+        if ($addUnitDialogOpen) {
             crud.openAddDialog();
-            dialogStore.addUnitDialogOpen = false;
+            addUnitDialogOpen.set(false);
         }
     });
 </script>

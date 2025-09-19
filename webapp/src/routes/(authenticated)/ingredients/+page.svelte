@@ -7,7 +7,7 @@
     import { addIngredient, updateIngredient, deleteIngredient } from "$lib/api/ingredients/ingredients.svelte";
     import { useCrud } from "$lib/hooks/useCrud.svelte";
     import { renderSnippet } from "$lib/components/ui/data-table/index.js";
-    import { dialogStore } from "$lib/stores/dialog.svelte";
+    import { dialogStore, addIngredientDialogOpen } from "$lib/stores/dialog.svelte";
     import type { PageProps } from './$types';
 
     type Ingredient = {
@@ -73,9 +73,9 @@
     });
 
     $effect(() => {
-        if (dialogStore.addIngredientDialogOpen) {
+        if ($addIngredientDialogOpen) {
             crud.openAddDialog();
-            dialogStore.addIngredientDialogOpen = false;
+            addIngredientDialogOpen.set(false);
         }
     });
 </script>

@@ -1,18 +1,14 @@
-let addIngredientDialogOpen = $state(false);
-let addUnitDialogOpen = $state(false);
+import { writable } from 'svelte/store';
+
+export const addIngredientDialogOpen = writable(false);
+export const addUnitDialogOpen = writable(false);
 
 export const dialogStore = {
-    get addIngredientDialogOpen() { return addIngredientDialogOpen; },
-    set addIngredientDialogOpen(value: boolean) { addIngredientDialogOpen = value; },
-    
-    get addUnitDialogOpen() { return addUnitDialogOpen; },
-    set addUnitDialogOpen(value: boolean) { addUnitDialogOpen = value; },
-    
     openAddIngredientDialog() {
-        addIngredientDialogOpen = true;
+        addIngredientDialogOpen.set(true);
     },
     
     openAddUnitDialog() {
-        addUnitDialogOpen = true;
+        addUnitDialogOpen.set(true);
     }
 };
