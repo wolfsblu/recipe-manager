@@ -16,8 +16,11 @@
     import NavUser from "$lib/components/nav/user/NavUser.svelte";
     import { goto } from '$app/navigation'
     import { isAuthenticated } from "$lib/api/auth/user.svelte";
+    import { dialogStore } from "$lib/stores/dialog.svelte";
 
-    const onAddRecipe = () => goto("/recipes/add")
+    const onAddRecipe = () => goto("/recipes/add");
+    const onAddIngredient = () => dialogStore.openAddIngredientDialog();
+    const onAddUnit = () => dialogStore.openAddUnitDialog();
 </script>
 
 <Sidebar.Root variant="inset" collapsible="icon">
@@ -62,7 +65,7 @@
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
-                        <Sidebar.MenuAction>
+                        <Sidebar.MenuAction onclick={onAddIngredient}>
                             <PlusIcon />
                         </Sidebar.MenuAction>
                     </Sidebar.MenuItem>
@@ -75,7 +78,7 @@
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
-                        <Sidebar.MenuAction>
+                        <Sidebar.MenuAction onclick={onAddUnit}>
                             <PlusIcon />
                         </Sidebar.MenuAction>
                     </Sidebar.MenuItem>
