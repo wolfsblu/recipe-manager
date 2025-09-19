@@ -78,7 +78,7 @@
     <div class="relative">
         <a href="/recipes/{recipe.id}" class="block">
             {#if recipe.minutes}
-                <Badge variant="secondary" class="absolute top-2 left-2 z-10 opacity-90">
+                <Badge variant="secondary" class="absolute top-2 left-2 z-10 opacity-90 rounded-full">
                     <ClockIcon /> {formatMinutesAsHours(recipe.minutes)}
                 </Badge>
             {/if}
