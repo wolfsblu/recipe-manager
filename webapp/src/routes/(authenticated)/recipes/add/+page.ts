@@ -11,9 +11,11 @@ export const load: PageLoad = async () => {
         { link: "/recipes/add", name: "New Recipe" },
     ]
 
-    const ingredients = await getIngredients()
-    const units = await getUnits()
-    const tags = await getTags()
+    const [ingredients, units, tags] = await Promise.all([
+        getIngredients(),
+        getUnits(),
+        getTags()
+    ])
 
     return {
         breadcrumbs,

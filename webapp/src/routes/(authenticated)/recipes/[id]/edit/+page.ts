@@ -8,7 +8,13 @@ export const prerender = false
 
 export const load: PageLoad = async ({ params }) => {
     const recipeId = Number(params.id)
-    const recipe = await getRecipe(recipeId)
+
+    const [recipe, ingredients, units, tags] = await Promise.all([
+        getRecipe(recipeId),
+        getIngredients(),
+        getUnits(),
+        getTags()
+    ])
 
     const breadcrumbs = [
         { link: "/", name: "Home" },
@@ -17,13 +23,6 @@ export const load: PageLoad = async ({ params }) => {
         { link: `/recipes/${recipeId}/edit`, name: "Edit" },
     ]
 
-    // Get reference data
-    const ingredients = await getIngredients()
-    const units = await getUnits()
-    const tags = await getTags()
-
-    console.log(recipe.images)
-    // Pre-populate form with recipe data
     const form = await superValidate({
         name: recipe.name,
         description: recipe.description,
