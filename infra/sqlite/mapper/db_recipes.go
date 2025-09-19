@@ -36,9 +36,9 @@ func (m *DBMapper) ToTag(t database.Tag) domain.Tag {
 
 func (m *DBMapper) ToUnit(u database.Unit) domain.Unit {
 	return domain.Unit{
-		ID:   u.ID,
-		Name: u.Name,
-		Code: u.Code,
+		ID:     u.ID,
+		Name:   u.Name,
+		Symbol: u.Symbol,
 	}
 }
 
@@ -53,9 +53,9 @@ func (m *DBMapper) ToRecipeStep(r database.GetStepsForRecipesRow) domain.RecipeS
 func (m *DBMapper) ToStepIngredient(r database.GetIngredientsForRecipesRow) domain.StepIngredient {
 	return domain.StepIngredient{
 		Unit: domain.Unit{
-			ID:   r.UnitID,
-			Name: r.UnitName,
-			Code: r.UnitCode,
+			ID:     r.UnitID,
+			Name:   r.UnitName,
+			Symbol: r.UnitSymbol,
 		},
 		Ingredient: domain.Ingredient{
 			ID:   r.IngredientID,

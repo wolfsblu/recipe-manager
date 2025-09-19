@@ -231,8 +231,27 @@ export interface paths {
         /** Get all ingredients */
         get: operations["getIngredients"];
         put?: never;
-        post?: never;
+        /** Add a new ingredient */
+        post: operations["addIngredient"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ingredients/{ingredientId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update an ingredient */
+        put: operations["updateIngredient"];
+        post?: never;
+        /** Delete an ingredient */
+        delete: operations["deleteIngredient"];
         options?: never;
         head?: never;
         patch?: never;
@@ -248,8 +267,27 @@ export interface paths {
         /** Get all units */
         get: operations["getUnits"];
         put?: never;
-        post?: never;
+        /** Add a new unit */
+        post: operations["addUnit"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/units/{unitId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a unit */
+        put: operations["updateUnit"];
+        post?: never;
+        /** Delete a unit */
+        delete: operations["deleteUnit"];
         options?: never;
         head?: never;
         patch?: never;
@@ -315,7 +353,7 @@ export interface components {
             id: number;
             steps: components["schemas"]["ReadRecipeStep"][];
             tags?: components["schemas"]["ReadTag"][];
-            votes?: components["schemas"]["RecipeVotes"];
+            votes: components["schemas"]["RecipeVotes"];
         };
         ReadUnit: {
             /**
@@ -326,7 +364,7 @@ export interface components {
             /** @example Kilogram */
             name: string;
             /** @example kg */
-            code: string | null;
+            symbol: string | null;
         };
         ReadTag: {
             /**
@@ -437,6 +475,16 @@ export interface components {
              */
             vote: 1 | -1;
         };
+        WriteIngredient: {
+            /** @example Flour */
+            name: string;
+        };
+        WriteUnit: {
+            /** @example Kilogram */
+            name: string;
+            /** @example kg */
+            symbol?: string | null;
+        };
         RecipeVotes: {
             /**
              * Format: int64
@@ -545,6 +593,24 @@ export interface components {
                 "application/json": components["schemas"]["RecipeVotes"];
             };
         };
+        /** @description Ingredient object returned as result */
+        Ingredient: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Ingredient"];
+            };
+        };
+        /** @description Unit object returned as result */
+        Unit: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ReadUnit"];
+            };
+        };
     };
     parameters: never;
     requestBodies: {
@@ -576,6 +642,18 @@ export interface components {
         Vote: {
             content: {
                 "application/json": components["schemas"]["Vote"];
+            };
+        };
+        /** @description Ingredient object to create or update */
+        WriteIngredient: {
+            content: {
+                "application/json": components["schemas"]["WriteIngredient"];
+            };
+        };
+        /** @description Unit object to create or update */
+        WriteUnit: {
+            content: {
+                "application/json": components["schemas"]["WriteUnit"];
             };
         };
     };
@@ -886,6 +964,59 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
+    addIngredient: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["WriteIngredient"];
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["Ingredient"];
+            default: components["responses"]["Error"];
+        };
+    };
+    updateIngredient: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the ingredient to update */
+                ingredientId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["WriteIngredient"];
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["Ingredient"];
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteIngredient: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the ingredient to delete */
+                ingredientId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
     getUnits: {
         parameters: {
             query?: never;
@@ -897,6 +1028,59 @@ export interface operations {
         responses: {
             /** @description Successful operation */
             200: components["responses"]["UnitList"];
+            default: components["responses"]["Error"];
+        };
+    };
+    addUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["WriteUnit"];
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["Unit"];
+            default: components["responses"]["Error"];
+        };
+    };
+    updateUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the unit to update */
+                unitId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["WriteUnit"];
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["Unit"];
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteUnit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the unit to delete */
+                unitId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             default: components["responses"]["Error"];
         };
     };

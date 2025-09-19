@@ -42,9 +42,9 @@ CREATE TABLE tags
 
 CREATE TABLE units
 (
-    id   INTEGER PRIMARY KEY,
-    code TEXT,
-    name TEXT NOT NULL
+    id     INTEGER PRIMARY KEY,
+    symbol TEXT,
+    name   TEXT NOT NULL
 );
 
 CREATE TABLE users

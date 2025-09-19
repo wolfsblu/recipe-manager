@@ -13,15 +13,15 @@
     type Unit = {
         id: number;
         name: string;
-        code?: string;
+        symbol?: string;
     };
 
     const { data }: PageProps = $props();
 
     let newUnitName = $state('');
-    let newUnitCode = $state('');
+    let newUnitSymbol = $state('');
     let editUnitName = $state('');
-    let editUnitCode = $state('');
+    let editUnitSymbol = $state('');
 
     const crud = useCrud<Unit>({
         add: (unit) => addUnit(unit),
@@ -45,16 +45,16 @@
             enableSorting: false
         },
         {
-            accessorKey: "code",
-            header: "Code",
+            accessorKey: "symbol",
+            header: "Symbol",
             cell: ({ row }: any) => {
-                const codeSnippet = createRawSnippet<[string]>((getCode) => {
-                    const code = getCode();
+                const symbolSnippet = createRawSnippet<[string]>((getSymbol) => {
+                    const symbol = getSymbol();
                     return {
-                        render: () => `<div class="text-muted-foreground">${code || '-'}</div>`
+                        render: () => `<div class="text-muted-foreground">${symbol || '-'}</div>`
                     };
                 });
-                return renderSnippet(codeSnippet, row.getValue("code"));
+                return renderSnippet(symbolSnippet, row.getValue("symbol"));
             },
             enableSorting: false
         }
@@ -64,14 +64,14 @@
         if (!newUnitName.trim()) return;
         
         const unitData: Omit<Unit, 'id'> = { name: newUnitName.trim() };
-        if (newUnitCode.trim()) {
-            unitData.code = newUnitCode.trim();
+        if (newUnitSymbol.trim()) {
+            unitData.symbol = newUnitSymbol.trim();
         }
         
         const success = await crud.handleAdd(unitData);
         if (success) {
             newUnitName = '';
-            newUnitCode = '';
+            newUnitSymbol = '';
         }
     };
 
@@ -79,27 +79,27 @@
         if (!editUnitName.trim()) return;
         
         const unitData: Omit<Unit, 'id'> = { name: editUnitName.trim() };
-        if (editUnitCode.trim()) {
-            unitData.code = editUnitCode.trim();
+        if (editUnitSymbol.trim()) {
+            unitData.symbol = editUnitSymbol.trim();
         }
         
         const success = await crud.handleEdit(unitData);
         if (success) {
             editUnitName = '';
-            editUnitCode = '';
+            editUnitSymbol = '';
         }
     };
 
     const openEditDialog = (unit: Unit) => {
         editUnitName = unit.name;
-        editUnitCode = unit.code || '';
+        editUnitSymbol = unit.symbol || '';
         crud.openEditDialog(unit);
     };
 
     $effect(() => {
         if (crud.editingItem) {
             editUnitName = crud.editingItem?.name || '';
-            editUnitCode = crud.editingItem?.code || '';
+            editUnitSymbol = crud.editingItem?.symbol || '';
         }
     });
 
@@ -141,12 +141,12 @@
                 />
             </div>
             <div class="grid grid-cols-4 items-center gap-4">
-                <label for="code" class="text-right">Code</label>
+                <label for="symbol" class="text-right">Symbol</label>
                 <Input
-                    id="code"
+                    id="symbol"
                     class="col-span-3"
-                    bind:value={newUnitCode}
-                    placeholder="Enter unit code (optional)"
+                    bind:value={newUnitSymbol}
+                    placeholder="Enter unit symbol (optional)"
                     onkeydown={(e) => e.key === 'Enter' && handleAddSubmit()}
                 />
             </div>
@@ -180,12 +180,12 @@
                 />
             </div>
             <div class="grid grid-cols-4 items-center gap-4">
-                <label for="edit-code" class="text-right">Code</label>
+                <label for="edit-symbol" class="text-right">Symbol</label>
                 <Input
-                    id="edit-code"
+                    id="edit-symbol"
                     class="col-span-3"
-                    bind:value={editUnitCode}
-                    placeholder="Enter unit code (optional)"
+                    bind:value={editUnitSymbol}
+                    placeholder="Enter unit symbol (optional)"
                     onkeydown={(e) => e.key === 'Enter' && handleEditSubmit()}
                 />
             </div>

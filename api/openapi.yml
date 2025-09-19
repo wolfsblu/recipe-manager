@@ -547,7 +547,7 @@ components:
       required:
         - id
         - name
-        - code
+        - symbol
       properties:
         id:
           type: integer
@@ -558,7 +558,7 @@ components:
           type: string
           examples:
             - Kilogram
-        code:
+        symbol:
           type: string
           nullable: true
           examples:
@@ -768,7 +768,7 @@ components:
           type: string
           examples:
             - Kilogram
-        code:
+        symbol:
           type: string
           nullable: true
           examples:

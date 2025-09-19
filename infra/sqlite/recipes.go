@@ -413,24 +413,24 @@ func (s *Store) DeleteIngredient(ctx context.Context, id int64) error {
 
 func (s *Store) CreateUnit(ctx context.Context, unit domain.Unit) (domain.Unit, error) {
 	id, err := s.query().CreateUnit(ctx, database.CreateUnitParams{
-		Name: unit.Name,
-		Code: unit.Code,
+		Name:   unit.Name,
+		Symbol: unit.Symbol,
 	})
 	if err != nil {
 		return domain.Unit{}, err
 	}
 	return domain.Unit{
-		ID:   id,
-		Name: unit.Name,
-		Code: unit.Code,
+		ID:     id,
+		Name:   unit.Name,
+		Symbol: unit.Symbol,
 	}, nil
 }
 
 func (s *Store) UpdateUnit(ctx context.Context, unit domain.Unit) error {
 	return s.query().UpdateUnit(ctx, database.UpdateUnitParams{
-		Name: unit.Name,
-		Code: unit.Code,
-		ID:   unit.ID,
+		Name:   unit.Name,
+		Symbol: unit.Symbol,
+		ID:     unit.ID,
 	})
 }
 

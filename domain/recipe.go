@@ -50,9 +50,9 @@ type Ingredient struct {
 }
 
 type Unit struct {
-	ID   int64
-	Name string
-	Code *string
+	ID     int64
+	Name   string
+	Symbol *string
 }
 
 type Tag struct {

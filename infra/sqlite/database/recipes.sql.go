@@ -184,18 +184,18 @@ func (q *Queries) CreateStepIngredient(ctx context.Context, arg CreateStepIngred
 }
 
 const createUnit = `-- name: CreateUnit :one
-INSERT INTO units (name, code)
+INSERT INTO units (name, symbol)
 VALUES (?, ?)
 RETURNING id
 `
 
 type CreateUnitParams struct {
-	Name string
-	Code *string
+	Name   string
+	Symbol *string
 }
 
 func (q *Queries) CreateUnit(ctx context.Context, arg CreateUnitParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createUnit, arg.Name, arg.Code)
+	row := q.db.QueryRowContext(ctx, createUnit, arg.Name, arg.Symbol)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
@@ -363,7 +363,7 @@ SELECT recipe_ingredients.id as recipe_ingredient_id,
        ingredients.name as ingredient_name, 
        units.id as unit_id, 
        units.name as unit_name, 
-       units.code as unit_code, 
+       units.symbol as unit_symbol, 
        recipe_steps.id as step_id, 
        recipe_ingredients.amount, 
        recipe_ingredients.sort_order
@@ -383,7 +383,7 @@ type GetIngredientsForRecipesRow struct {
 	IngredientName     string
 	UnitID             int64
 	UnitName           string
-	UnitCode           *string
+	UnitSymbol         *string
 	StepID             int64
 	Amount             float64
 	SortOrder          int64
@@ -414,7 +414,7 @@ func (q *Queries) GetIngredientsForRecipes(ctx context.Context, recipeIds []int6
 			&i.IngredientName,
 			&i.UnitID,
 			&i.UnitName,
-			&i.UnitCode,
+			&i.UnitSymbol,
 			&i.StepID,
 			&i.Amount,
 			&i.SortOrder,
@@ -658,7 +658,7 @@ func (q *Queries) GetTagsForRecipes(ctx context.Context, recipeIds []int64) ([]G
 }
 
 const getUnits = `-- name: GetUnits :many
-SELECT id, code, name
+SELECT id, symbol, name
 FROM units
 ORDER BY name
 `
@@ -672,7 +672,7 @@ func (q *Queries) GetUnits(ctx context.Context) ([]Unit, error) {
 	var items []Unit
 	for rows.Next() {
 		var i Unit
-		if err := rows.Scan(&i.ID, &i.Code, &i.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.Symbol, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -900,17 +900,17 @@ func (q *Queries) UpdateRecipe(ctx context.Context, arg UpdateRecipeParams) erro
 
 const updateUnit = `-- name: UpdateUnit :exec
 UPDATE units
-SET name = ?, code = ?
+SET name = ?, symbol = ?
 WHERE id = ?
 `
 
 type UpdateUnitParams struct {
-	Name string
-	Code *string
-	ID   int64
+	Name   string
+	Symbol *string
+	ID     int64
 }
 
 func (q *Queries) UpdateUnit(ctx context.Context, arg UpdateUnitParams) error {
-	_, err := q.db.ExecContext(ctx, updateUnit, arg.Name, arg.Code, arg.ID)
+	_, err := q.db.ExecContext(ctx, updateUnit, arg.Name, arg.Symbol, arg.ID)
 	return err
 }

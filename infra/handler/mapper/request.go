@@ -69,8 +69,8 @@ func (m *APIMapper) FromWriteIngredient(req *api.WriteIngredient) domain.Ingredi
 
 func (m *APIMapper) FromWriteUnit(req *api.WriteUnit) domain.Unit {
 	return domain.Unit{
-		Name: req.Name,
-		Code: FromOptNilString(req.Code),
+		Name:   req.Name,
+		Symbol: FromOptNilString(req.Symbol),
 	}
 }
 

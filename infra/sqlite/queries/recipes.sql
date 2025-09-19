@@ -61,7 +61,7 @@ SELECT recipe_ingredients.id as recipe_ingredient_id,
        ingredients.name as ingredient_name, 
        units.id as unit_id, 
        units.name as unit_name, 
-       units.code as unit_code, 
+       units.symbol as unit_symbol, 
        recipe_steps.id as step_id, 
        recipe_ingredients.amount, 
        recipe_ingredients.sort_order
@@ -186,13 +186,13 @@ DELETE FROM ingredients
 WHERE id = ?;
 
 -- name: CreateUnit :one
-INSERT INTO units (name, code)
+INSERT INTO units (name, symbol)
 VALUES (?, ?)
 RETURNING id;
 
 -- name: UpdateUnit :exec
 UPDATE units
-SET name = ?, code = ?
+SET name = ?, symbol = ?
 WHERE id = ?;
 
 -- name: DeleteUnit :exec

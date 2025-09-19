@@ -118,9 +118,9 @@ func (m *APIMapper) ToRecipes(recipes []domain.Recipe) ([]api.ReadRecipe, error)
 
 func (m *APIMapper) ToUnit(unit domain.Unit) *api.ReadUnit {
 	return &api.ReadUnit{
-		ID:   unit.ID,
-		Name: unit.Name,
-		Code: ToNilString(unit.Code),
+		ID:     unit.ID,
+		Name:   unit.Name,
+		Symbol: ToNilString(unit.Symbol),
 	}
 }
 

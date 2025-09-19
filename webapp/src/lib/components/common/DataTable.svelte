@@ -186,7 +186,7 @@
         <div class="flex items-center justify-between text-sm text-muted-foreground pb-4">
             <div>
                 {table.getFilteredSelectedRowModel().rows.length} of
-                {table.getFilteredRowModel().rows.length} row(s) selected.
+                {table.getFilteredRowModel().rows.length} row(s) selected
             </div>
             <div>
                 Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}

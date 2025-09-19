@@ -95,9 +95,9 @@ type Tag struct {
 }
 
 type Unit struct {
-	ID   int64
-	Code *string
-	Name string
+	ID     int64
+	Symbol *string
+	Name   string
 }
 
 type User struct {

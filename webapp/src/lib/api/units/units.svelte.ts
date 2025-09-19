@@ -8,7 +8,7 @@ export const getUnits = async () => {
     return response.data
 }
 
-export const addUnit = async (unit: { name: string; code?: string }) => {
+export const addUnit = async (unit: { name: string; symbol?: string }) => {
     const response = await client.POST("/units", {
         body: unit
     })
@@ -18,7 +18,7 @@ export const addUnit = async (unit: { name: string; code?: string }) => {
     return response.data
 }
 
-export const updateUnit = async (id: number, unit: { name: string; code?: string }) => {
+export const updateUnit = async (id: number, unit: { name: string; symbol?: string }) => {
     const response = await client.PUT("/units/{unitId}", {
         params: {
             path: {
