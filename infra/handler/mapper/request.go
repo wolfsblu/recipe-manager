@@ -60,3 +60,23 @@ func (m *APIMapper) fromWriteStepIngredient(ingredient api.WriteStepIngredient) 
 		},
 	}
 }
+
+func (m *APIMapper) FromWriteIngredient(req *api.WriteIngredient) domain.Ingredient {
+	return domain.Ingredient{
+		Name: req.Name,
+	}
+}
+
+func (m *APIMapper) FromWriteUnit(req *api.WriteUnit) domain.Unit {
+	return domain.Unit{
+		Name: req.Name,
+		Code: FromOptNilString(req.Code),
+	}
+}
+
+func FromOptNilString(s api.OptNilString) *string {
+	if v, ok := s.Get(); ok {
+		return &v
+	}
+	return nil
+}

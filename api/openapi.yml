@@ -312,6 +312,59 @@ paths:
           $ref: '#/components/responses/IngredientList'
         default:
           $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Ingredients
+      summary: Add a new ingredient
+      operationId: addIngredient
+      requestBody:
+        $ref: '#/components/requestBodies/WriteIngredient'
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/Ingredient'
+        default:
+          $ref: '#/components/responses/Error'
+  '/ingredients/{ingredientId}':
+    put:
+      tags:
+        - Ingredients
+      summary: Update an ingredient
+      operationId: updateIngredient
+      parameters:
+        - name: ingredientId
+          in: path
+          description: ID of the ingredient to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        $ref: '#/components/requestBodies/WriteIngredient'
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/Ingredient'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Ingredients
+      summary: Delete an ingredient
+      operationId: deleteIngredient
+      parameters:
+        - name: ingredientId
+          in: path
+          description: ID of the ingredient to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        default:
+          $ref: '#/components/responses/Error'
   /units:
     get:
       tags:
@@ -322,6 +375,59 @@ paths:
         '200':
           description: Successful operation
           $ref: '#/components/responses/UnitList'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Units
+      summary: Add a new unit
+      operationId: addUnit
+      requestBody:
+        $ref: '#/components/requestBodies/WriteUnit'
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/Unit'
+        default:
+          $ref: '#/components/responses/Error'
+  '/units/{unitId}':
+    put:
+      tags:
+        - Units
+      summary: Update a unit
+      operationId: updateUnit
+      parameters:
+        - name: unitId
+          in: path
+          description: ID of the unit to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        $ref: '#/components/requestBodies/WriteUnit'
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/Unit'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Units
+      summary: Delete a unit
+      operationId: deleteUnit
+      parameters:
+        - name: unitId
+          in: path
+          description: ID of the unit to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
         default:
           $ref: '#/components/responses/Error'
   /tags:
@@ -644,6 +750,29 @@ components:
           enum: [1, -1]
           examples:
             - 1
+    WriteIngredient:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          examples:
+            - Flour
+    WriteUnit:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          examples:
+            - Kilogram
+        code:
+          type: string
+          nullable: true
+          examples:
+            - kg
     RecipeVotes:
       type: object
       required:
@@ -699,6 +828,20 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Vote'
+    WriteIngredient:
+      description: Ingredient object to create or update
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WriteIngredient'
+    WriteUnit:
+      description: Unit object to create or update
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WriteUnit'
   responses:
     Error:
       description: Something went wrong
@@ -773,3 +916,15 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/RecipeVotes'
+    Ingredient:
+      description: Ingredient object returned as result
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Ingredient'
+    Unit:
+      description: Unit object returned as result
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ReadUnit'

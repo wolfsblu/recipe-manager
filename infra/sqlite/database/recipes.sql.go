@@ -63,6 +63,19 @@ func (q *Queries) BrowseRecipes(ctx context.Context) ([]Recipe, error) {
 	return items, nil
 }
 
+const createIngredient = `-- name: CreateIngredient :one
+INSERT INTO ingredients (name)
+VALUES (?)
+RETURNING id
+`
+
+func (q *Queries) CreateIngredient(ctx context.Context, name string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createIngredient, name)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const createRecipe = `-- name: CreateRecipe :one
 INSERT INTO recipes (name, servings, minutes, description, created_by)
 VALUES (?, ?, ?, ?, ?)
@@ -170,6 +183,34 @@ func (q *Queries) CreateStepIngredient(ctx context.Context, arg CreateStepIngred
 	return id, err
 }
 
+const createUnit = `-- name: CreateUnit :one
+INSERT INTO units (name, code)
+VALUES (?, ?)
+RETURNING id
+`
+
+type CreateUnitParams struct {
+	Name string
+	Code *string
+}
+
+func (q *Queries) CreateUnit(ctx context.Context, arg CreateUnitParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createUnit, arg.Name, arg.Code)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const deleteIngredient = `-- name: DeleteIngredient :exec
+DELETE FROM ingredients
+WHERE id = ?
+`
+
+func (q *Queries) DeleteIngredient(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteIngredient, id)
+	return err
+}
+
 const deleteRecipe = `-- name: DeleteRecipe :exec
 DELETE
 FROM recipes
@@ -220,6 +261,16 @@ WHERE recipe_id = ?
 
 func (q *Queries) DeleteRecipeTags(ctx context.Context, recipeID int64) error {
 	_, err := q.db.ExecContext(ctx, deleteRecipeTags, recipeID)
+	return err
+}
+
+const deleteUnit = `-- name: DeleteUnit :exec
+DELETE FROM units
+WHERE id = ?
+`
+
+func (q *Queries) DeleteUnit(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteUnit, id)
 	return err
 }
 
@@ -806,6 +857,22 @@ func (q *Queries) RemoveVote(ctx context.Context, arg RemoveVoteParams) error {
 	return err
 }
 
+const updateIngredient = `-- name: UpdateIngredient :exec
+UPDATE ingredients
+SET name = ?
+WHERE id = ?
+`
+
+type UpdateIngredientParams struct {
+	Name string
+	ID   int64
+}
+
+func (q *Queries) UpdateIngredient(ctx context.Context, arg UpdateIngredientParams) error {
+	_, err := q.db.ExecContext(ctx, updateIngredient, arg.Name, arg.ID)
+	return err
+}
+
 const updateRecipe = `-- name: UpdateRecipe :exec
 UPDATE recipes
 SET name = ?, servings = ?, minutes = ?, description = ?
@@ -828,5 +895,22 @@ func (q *Queries) UpdateRecipe(ctx context.Context, arg UpdateRecipeParams) erro
 		arg.Description,
 		arg.ID,
 	)
+	return err
+}
+
+const updateUnit = `-- name: UpdateUnit :exec
+UPDATE units
+SET name = ?, code = ?
+WHERE id = ?
+`
+
+type UpdateUnitParams struct {
+	Name string
+	Code *string
+	ID   int64
+}
+
+func (q *Queries) UpdateUnit(ctx context.Context, arg UpdateUnitParams) error {
+	_, err := q.db.ExecContext(ctx, updateUnit, arg.Name, arg.Code, arg.ID)
 	return err
 }

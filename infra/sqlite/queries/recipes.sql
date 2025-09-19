@@ -170,3 +170,31 @@ SELECT
     vote
 FROM recipe_votes
 WHERE recipe_id IN (sqlc.slice(recipe_ids)) AND user_id = ?;
+
+-- name: CreateIngredient :one
+INSERT INTO ingredients (name)
+VALUES (?)
+RETURNING id;
+
+-- name: UpdateIngredient :exec
+UPDATE ingredients
+SET name = ?
+WHERE id = ?;
+
+-- name: DeleteIngredient :exec
+DELETE FROM ingredients
+WHERE id = ?;
+
+-- name: CreateUnit :one
+INSERT INTO units (name, code)
+VALUES (?, ?)
+RETURNING id;
+
+-- name: UpdateUnit :exec
+UPDATE units
+SET name = ?, code = ?
+WHERE id = ?;
+
+-- name: DeleteUnit :exec
+DELETE FROM units
+WHERE id = ?;

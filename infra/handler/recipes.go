@@ -141,3 +141,57 @@ func (h *RecipeHandler) RemoveVote(ctx context.Context, params api.RemoveVotePar
 
 	return h.mapper.ToRecipeVotes(votes), nil
 }
+
+func (h *RecipeHandler) AddIngredient(ctx context.Context, req *api.WriteIngredient) (*api.Ingredient, error) {
+	ingredient := h.mapper.FromWriteIngredient(req)
+
+	result, err := h.Recipes.AddIngredient(ctx, ingredient)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.mapper.ToIngredient(result), nil
+}
+
+func (h *RecipeHandler) UpdateIngredient(ctx context.Context, req *api.WriteIngredient, params api.UpdateIngredientParams) (*api.Ingredient, error) {
+	ingredient := h.mapper.FromWriteIngredient(req)
+	ingredient.ID = params.IngredientId
+
+	result, err := h.Recipes.UpdateIngredient(ctx, ingredient)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.mapper.ToIngredient(result), nil
+}
+
+func (h *RecipeHandler) DeleteIngredient(ctx context.Context, params api.DeleteIngredientParams) error {
+	return h.Recipes.DeleteIngredient(ctx, params.IngredientId)
+}
+
+func (h *RecipeHandler) AddUnit(ctx context.Context, req *api.WriteUnit) (*api.ReadUnit, error) {
+	unit := h.mapper.FromWriteUnit(req)
+
+	result, err := h.Recipes.AddUnit(ctx, unit)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.mapper.ToUnit(result), nil
+}
+
+func (h *RecipeHandler) UpdateUnit(ctx context.Context, req *api.WriteUnit, params api.UpdateUnitParams) (*api.ReadUnit, error) {
+	unit := h.mapper.FromWriteUnit(req)
+	unit.ID = params.UnitId
+
+	result, err := h.Recipes.UpdateUnit(ctx, unit)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.mapper.ToUnit(result), nil
+}
+
+func (h *RecipeHandler) DeleteUnit(ctx context.Context, params api.DeleteUnitParams) error {
+	return h.Recipes.DeleteUnit(ctx, params.UnitId)
+}

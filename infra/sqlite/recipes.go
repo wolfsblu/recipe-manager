@@ -388,3 +388,52 @@ func (s *Store) GetUserVote(ctx context.Context, recipeID int64, userID int64) (
 		UserID:   userID,
 	})
 }
+
+func (s *Store) CreateIngredient(ctx context.Context, ingredient domain.Ingredient) (domain.Ingredient, error) {
+	id, err := s.query().CreateIngredient(ctx, ingredient.Name)
+	if err != nil {
+		return domain.Ingredient{}, err
+	}
+	return domain.Ingredient{
+		ID:   id,
+		Name: ingredient.Name,
+	}, nil
+}
+
+func (s *Store) UpdateIngredient(ctx context.Context, ingredient domain.Ingredient) error {
+	return s.query().UpdateIngredient(ctx, database.UpdateIngredientParams{
+		Name: ingredient.Name,
+		ID:   ingredient.ID,
+	})
+}
+
+func (s *Store) DeleteIngredient(ctx context.Context, id int64) error {
+	return s.query().DeleteIngredient(ctx, id)
+}
+
+func (s *Store) CreateUnit(ctx context.Context, unit domain.Unit) (domain.Unit, error) {
+	id, err := s.query().CreateUnit(ctx, database.CreateUnitParams{
+		Name: unit.Name,
+		Code: unit.Code,
+	})
+	if err != nil {
+		return domain.Unit{}, err
+	}
+	return domain.Unit{
+		ID:   id,
+		Name: unit.Name,
+		Code: unit.Code,
+	}, nil
+}
+
+func (s *Store) UpdateUnit(ctx context.Context, unit domain.Unit) error {
+	return s.query().UpdateUnit(ctx, database.UpdateUnitParams{
+		Name: unit.Name,
+		Code: unit.Code,
+		ID:   unit.ID,
+	})
+}
+
+func (s *Store) DeleteUnit(ctx context.Context, id int64) error {
+	return s.query().DeleteUnit(ctx, id)
+}

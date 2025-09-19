@@ -8,8 +8,8 @@ import (
 	"github.com/wolfsblu/recipe-manager/domain"
 )
 
-func (m *APIMapper) ToIngredient(ingredient domain.Ingredient) api.Ingredient {
-	return api.Ingredient{
+func (m *APIMapper) ToIngredient(ingredient domain.Ingredient) *api.Ingredient {
+	return &api.Ingredient{
 		ID:   ingredient.ID,
 		Name: ingredient.Name,
 	}
@@ -20,8 +20,8 @@ func (m *APIMapper) ToReadStepIngredient(ingredient domain.StepIngredient) api.R
 	apiIngredient := m.ToIngredient(ingredient.Ingredient)
 
 	return api.ReadStepIngredient{
-		Ingredient: apiIngredient,
-		Unit:       unit,
+		Ingredient: *apiIngredient,
+		Unit:       *unit,
 		Amount:     ingredient.Amount,
 	}
 }
@@ -42,7 +42,7 @@ func (m *APIMapper) ToReadRecipeStep(step domain.RecipeStep) (api.ReadRecipeStep
 func (m *APIMapper) ToIngredients(ingredients []domain.Ingredient) ([]api.Ingredient, error) {
 	result := make([]api.Ingredient, len(ingredients))
 	for i, ingredient := range ingredients {
-		result[i] = m.ToIngredient(ingredient)
+		result[i] = *m.ToIngredient(ingredient)
 	}
 	return result, nil
 }
@@ -116,8 +116,8 @@ func (m *APIMapper) ToRecipes(recipes []domain.Recipe) ([]api.ReadRecipe, error)
 	return result, nil
 }
 
-func (m *APIMapper) ToUnit(unit domain.Unit) api.ReadUnit {
-	return api.ReadUnit{
+func (m *APIMapper) ToUnit(unit domain.Unit) *api.ReadUnit {
+	return &api.ReadUnit{
 		ID:   unit.ID,
 		Name: unit.Name,
 		Code: ToNilString(unit.Code),
@@ -127,7 +127,7 @@ func (m *APIMapper) ToUnit(unit domain.Unit) api.ReadUnit {
 func (m *APIMapper) ToUnits(units []domain.Unit) []api.ReadUnit {
 	result := make([]api.ReadUnit, len(units))
 	for i, unit := range units {
-		result[i] = m.ToUnit(unit)
+		result[i] = *m.ToUnit(unit)
 	}
 	return result
 }

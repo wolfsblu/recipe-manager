@@ -27,3 +27,17 @@ func (s *RecipeService) validateVote(vote int64) error {
 	}
 	return nil
 }
+
+func (s *RecipeService) validateIngredient(ingredient Ingredient) error {
+	if ingredient.Name == "" {
+		return ErrInvalidIngredient
+	}
+	return nil
+}
+
+func (s *RecipeService) validateUnit(unit Unit) error {
+	if unit.Name == "" {
+		return ErrInvalidUnit
+	}
+	return nil
+}

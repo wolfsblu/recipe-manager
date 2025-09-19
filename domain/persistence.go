@@ -27,6 +27,12 @@ type RecipeStore interface {
 	RemoveVote(ctx context.Context, recipeID int64, userID int64) error
 	GetRecipeVotes(ctx context.Context, recipeID int64) (int64, error)
 	GetUserVote(ctx context.Context, recipeID int64, userID int64) (int64, error)
+	CreateIngredient(ctx context.Context, ingredient Ingredient) (Ingredient, error)
+	UpdateIngredient(ctx context.Context, ingredient Ingredient) error
+	DeleteIngredient(ctx context.Context, id int64) error
+	CreateUnit(ctx context.Context, unit Unit) (Unit, error)
+	UpdateUnit(ctx context.Context, unit Unit) error
+	DeleteUnit(ctx context.Context, id int64) error
 }
 
 type UserStore interface {
