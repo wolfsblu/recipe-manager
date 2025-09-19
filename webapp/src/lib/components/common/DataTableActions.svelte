@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang="ts" generics="T">
     import { Button } from "$lib/components/ui/button/index.js";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import MoreHorizontalIcon from '@lucide/svelte/icons/more-horizontal';
@@ -6,12 +6,12 @@
     import TrashIcon from '@lucide/svelte/icons/trash-2';
 
     interface Props {
-        ingredient: { id: number; name: string };
-        onEdit: (ingredient: { id: number; name: string }) => void;
-        onDelete: (ingredient: { id: number; name: string }) => void;
+        item: T;
+        onEdit: (item: T) => void;
+        onDelete: (item: T) => void;
     }
 
-    let { ingredient, onEdit, onDelete }: Props = $props();
+    let { item, onEdit, onDelete }: Props = $props();
 </script>
 
 <div class="flex justify-end">
@@ -24,16 +24,16 @@
                 </Button>
             {/snippet}
         </DropdownMenu.Trigger>
-    <DropdownMenu.Content align="end">
-        <DropdownMenu.Item onclick={() => onEdit(ingredient)}>
-            <EditIcon class="mr-2 h-4 w-4" />
-            Edit
-        </DropdownMenu.Item>
-        <DropdownMenu.Separator />
-        <DropdownMenu.Item onclick={() => onDelete(ingredient)} class="text-destructive">
-            <TrashIcon class="mr-2 h-4 w-4" />
-            Delete
-        </DropdownMenu.Item>
-    </DropdownMenu.Content>
+        <DropdownMenu.Content align="end">
+            <DropdownMenu.Item onclick={() => onEdit(item)}>
+                <EditIcon class="mr-2 h-4 w-4" />
+                Edit
+            </DropdownMenu.Item>
+            <DropdownMenu.Separator />
+            <DropdownMenu.Item onclick={() => onDelete(item)} class="text-destructive">
+                <TrashIcon class="mr-2 h-4 w-4" />
+                Delete
+            </DropdownMenu.Item>
+        </DropdownMenu.Content>
     </DropdownMenu.Root>
 </div>
