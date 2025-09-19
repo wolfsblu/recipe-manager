@@ -16,10 +16,17 @@
 
     const sidebar = useSidebar();
 
+    const handleMobileClose = () => {
+        if (sidebar.isMobile) {
+            sidebar.setOpenMobile(false);
+        }
+    };
+
     const onLogout = async () => {
         await logout()
         toast.success("Logged out")
         await goto("/")
+        handleMobileClose();
     }
 </script>
 
@@ -60,11 +67,11 @@
                 </DropdownMenu.Label>
                 <DropdownMenu.Separator />
                 <DropdownMenu.Group>
-                    <DropdownMenu.Item>
+                    <DropdownMenu.Item onclick={handleMobileClose}>
                         <BadgeCheckIcon />
                         Account
                     </DropdownMenu.Item>
-                    <DropdownMenu.Item>
+                    <DropdownMenu.Item onclick={handleMobileClose}>
                         <BellIcon />
                         Notifications
                     </DropdownMenu.Item>

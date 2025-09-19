@@ -17,6 +17,15 @@
     import { goto } from '$app/navigation'
     import { isAuthenticated } from "$lib/api/auth/user.svelte";
     import { dialogStore } from "$lib/stores/dialog.svelte";
+    import { useSidebar } from "$lib/components/ui/sidebar/context.svelte.js";
+
+    const sidebar = useSidebar();
+
+    const handleNavClick = () => {
+        if (sidebar.isMobile) {
+            sidebar.setOpenMobile(false);
+        }
+    };
 
     const onAddRecipe = () => goto("/recipes/add");
     const onAddIngredient = () => dialogStore.openAddIngredientDialog();
@@ -29,7 +38,7 @@
             <Sidebar.MenuItem>
                 <Sidebar.MenuButton>
                     {#snippet child({ props })}
-                        <a href="/" {...props}>
+                        <a href="/" {...props} onclick={handleNavClick}>
                             <UtensilsIcon class="!size-5" />
                             <span class="text-base font-semibold">Recipe Manager</span>
                         </a>
@@ -46,7 +55,7 @@
                     <Sidebar.MenuItem>
                         <Sidebar.MenuButton>
                             {#snippet child({ props })}
-                                <a href="/recipes" {...props}>
+                                <a href="/recipes" {...props} onclick={handleNavClick}>
                                     <ChefIcon />
                                     <span>Recipes</span>
                                 </a>
@@ -59,7 +68,7 @@
                     <Sidebar.MenuItem>
                         <Sidebar.MenuButton>
                             {#snippet child({ props })}
-                                <a href="/ingredients" {...props}>
+                                <a href="/ingredients" {...props} onclick={handleNavClick}>
                                     <SaladIcon />
                                     <span>Ingredients</span>
                                 </a>
@@ -72,7 +81,7 @@
                     <Sidebar.MenuItem>
                         <Sidebar.MenuButton>
                             {#snippet child({ props })}
-                                <a href="/units" {...props}>
+                                <a href="/units" {...props} onclick={handleNavClick}>
                                     <RulerIcon />
                                     <span>Units</span>
                                 </a>
@@ -85,7 +94,7 @@
                     <Sidebar.MenuItem>
                         <Sidebar.MenuButton>
                             {#snippet child({ props })}
-                                <a href="/mealplan" {...props}>
+                                <a href="/mealplan" {...props} onclick={handleNavClick}>
                                     <CalendarIcon />
                                     <span>Meal Plan</span>
                                 </a>
@@ -95,7 +104,7 @@
                     <Sidebar.MenuItem>
                         <Sidebar.MenuButton>
                             {#snippet child({ props })}
-                                <a href="/shopping" {...props}>
+                                <a href="/shopping" {...props} onclick={handleNavClick}>
                                     <ShoppingIcon />
                                     <span>Shopping List</span>
                                 </a>
@@ -114,7 +123,7 @@
                 <Sidebar.MenuItem>
                     <Sidebar.MenuButton>
                         {#snippet child({ props })}
-                            <a href="/auth/login" {...props}>
+                            <a href="/auth/login" {...props} onclick={handleNavClick}>
                                 <LoginIcon />
                                 <span>Login</span>
                             </a>

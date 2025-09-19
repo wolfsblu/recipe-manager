@@ -77,8 +77,8 @@
                 }),
             enableSorting: false,
             enableHiding: false,
-            size: 10,
-            minSize: 10,
+            size: 40,
+            minSize: 40,
         },
         ...userColumns,
         {
