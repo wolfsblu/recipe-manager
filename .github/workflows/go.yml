@@ -70,6 +70,6 @@ jobs:
           username: ${{ secrets.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            podman pull ghcr.io/${{ github.repository }}:${{ github.sha }}
+            podman pull ghcr.io/${{ github.repository }}:${{ steps.push.outputs.digest }}
             systemctl daemon-reload
             systemctl restart recipes
