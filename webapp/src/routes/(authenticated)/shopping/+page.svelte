@@ -153,15 +153,9 @@
                             </div>
                         {/if}
 
-                        {#if items.length === 0 && status !== 'shopping'}
-                            <div
-                                class="flex flex-col items-center justify-center h-32 text-muted-foreground"
-                                in:fade={{ duration: 300, delay: 200 }}
-                                out:fade={{ duration: 200 }}
-                            >
-                                <IconComponent
-                                    class="h-8 w-8 mb-2 opacity-50 transition-all duration-300"
-                                />
+                        {#if items.length === 0}
+                            <div class="flex flex-col items-center justify-center h-32 text-muted-foreground">
+                                <IconComponent />
                                 <p class="text-sm">No items</p>
                             </div>
                         {/if}
