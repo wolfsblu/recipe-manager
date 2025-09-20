@@ -27,9 +27,20 @@
         }
     };
 
-    const onAddRecipe = () => goto("/recipes/add");
-    const onAddIngredient = () => dialogStore.openAddIngredientDialog();
-    const onAddUnit = () => dialogStore.openAddUnitDialog();
+    const onAddRecipe = () => {
+        goto("/recipes/add");
+        handleNavClick();
+    };
+    const onAddIngredient = async () => {
+        await goto("/ingredients");
+        dialogStore.openAddIngredientDialog();
+        handleNavClick();
+    };
+    const onAddUnit = async () => {
+        await goto("/units");
+        dialogStore.openAddUnitDialog();
+        handleNavClick();
+    };
 </script>
 
 <Sidebar.Root variant="inset" collapsible="icon">
