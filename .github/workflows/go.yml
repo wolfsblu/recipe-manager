@@ -74,6 +74,6 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
             set -euo pipefail
-            podman pull ${{ env.REGISTRY }}/${{ github.repository }}@${{ needs.build-and-push-image.outputs.digest }}
+            podman pull ${{ env.REGISTRY }}/${{ github.repository }}:latest
             systemctl daemon-reload
             systemctl restart recipes
