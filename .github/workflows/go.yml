@@ -24,6 +24,9 @@ jobs:
       attestations: write
       id-token: write
 
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
