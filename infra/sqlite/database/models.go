@@ -89,6 +89,22 @@ type RolePermission struct {
 	PermissionID int64
 }
 
+type ShoppingList struct {
+	ID     int64
+	UserID int64
+	Name   string
+}
+
+type ShoppingListItem struct {
+	ID             int64
+	ShoppingListID int64
+	Ingredient     string
+	Quantity       *string
+	Unit           *string
+	Done           bool
+	SortOrder      int64
+}
+
 type Tag struct {
 	ID   int64
 	Name string

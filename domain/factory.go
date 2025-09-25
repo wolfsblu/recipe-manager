@@ -13,3 +13,9 @@ func NewUserService(notifier NotificationSender, store UserStore) *UserService {
 		sender: notifier,
 	}
 }
+
+func NewShoppingService(store ShoppingListStore) *ShoppingService {
+	return &ShoppingService{
+		store: store,
+	}
+}

@@ -18,6 +18,8 @@ tags:
     description: Everything about your units
   - name: Tags
     description: Everything about your tags
+  - name: Shopping Lists
+    description: Everything about your shopping lists
 security:
   - cookieAuth: []
 paths:
@@ -442,6 +444,166 @@ paths:
           $ref: '#/components/responses/TagList'
         default:
           $ref: '#/components/responses/Error'
+  /shopping-lists:
+    get:
+      tags:
+        - Shopping Lists
+      summary: Get all shopping lists for the user
+      operationId: getShoppingLists
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/ShoppingLists'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Shopping Lists
+      summary: Create a new shopping list
+      operationId: createShoppingList
+      requestBody:
+        $ref: '#/components/requestBodies/WriteShoppingList'
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/ShoppingList'
+        default:
+          $ref: '#/components/responses/Error'
+  '/shopping-lists/{shoppingListId}':
+    get:
+      tags:
+        - Shopping Lists
+      summary: Get a shopping list by ID
+      operationId: getShoppingListById
+      parameters:
+        - name: shoppingListId
+          in: path
+          description: ID of the shopping list to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/ShoppingList'
+        default:
+          $ref: '#/components/responses/Error'
+    put:
+      tags:
+        - Shopping Lists
+      summary: Update a shopping list
+      operationId: updateShoppingList
+      parameters:
+        - name: shoppingListId
+          in: path
+          description: ID of the shopping list to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        $ref: '#/components/requestBodies/WriteShoppingList'
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/ShoppingList'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Shopping Lists
+      summary: Delete a shopping list
+      operationId: deleteShoppingList
+      parameters:
+        - name: shoppingListId
+          in: path
+          description: ID of the shopping list to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Successful operation
+        default:
+          $ref: '#/components/responses/Error'
+  '/shopping-lists/{shoppingListId}/items':
+    post:
+      tags:
+        - Shopping Lists
+      summary: Add an item to a shopping list
+      operationId: addShoppingListItem
+      parameters:
+        - name: shoppingListId
+          in: path
+          description: ID of the shopping list
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        $ref: '#/components/requestBodies/WriteShoppingListItem'
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/ShoppingListItem'
+        default:
+          $ref: '#/components/responses/Error'
+  '/shopping-lists/{shoppingListId}/items/{itemId}':
+    put:
+      tags:
+        - Shopping Lists
+      summary: Update a shopping list item
+      operationId: updateShoppingListItem
+      parameters:
+        - name: shoppingListId
+          in: path
+          description: ID of the shopping list
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: itemId
+          in: path
+          description: ID of the item to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        $ref: '#/components/requestBodies/WriteShoppingListItem'
+      responses:
+        '200':
+          description: Successful operation
+          $ref: '#/components/responses/ShoppingListItem'
+        default:
+          $ref: '#/components/responses/Error'
+    delete:
+      tags:
+        - Shopping Lists
+      summary: Delete a shopping list item
+      operationId: deleteShoppingListItem
+      parameters:
+        - name: shoppingListId
+          in: path
+          description: ID of the shopping list
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: itemId
+          in: path
+          description: ID of the item to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Successful operation
+        default:
+          $ref: '#/components/responses/Error'
 components:
   headers:
     SessionCookie:
@@ -792,6 +954,97 @@ components:
           enum: [1, -1, 0]
           examples:
             - 1
+    ReadShoppingList:
+      type: object
+      required:
+        - id
+        - name
+        - items
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+            - 1
+        name:
+          type: string
+          examples:
+            - Weekly Shopping List
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadShoppingListItem'
+    WriteShoppingList:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          examples:
+            - Weekly Shopping List
+    ReadShoppingListItem:
+      type: object
+      required:
+        - id
+        - ingredient
+        - quantity
+        - unit
+        - done
+        - sortOrder
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+            - 1
+        ingredient:
+          type: string
+          examples:
+            - Milk
+        quantity:
+          type: string
+          nullable: true
+          examples:
+            - 1
+        unit:
+          type: string
+          nullable: true
+          examples:
+            - gallon
+        done:
+          type: boolean
+          examples:
+            - false
+        sortOrder:
+          type: integer
+          format: int64
+          examples:
+            - 0
+    WriteShoppingListItem:
+      type: object
+      required:
+        - ingredient
+      properties:
+        ingredient:
+          type: string
+          examples:
+            - Milk
+        quantity:
+          type: string
+          nullable: true
+          examples:
+            - 1
+        unit:
+          type: string
+          nullable: true
+          examples:
+            - gallon
+        done:
+          type: boolean
+          default: false
+          examples:
+            - false
   requestBodies:
     Credentials:
       description: User credentials
@@ -842,6 +1095,20 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/WriteUnit'
+    WriteShoppingList:
+      description: Shopping list object to create or update
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WriteShoppingList'
+    WriteShoppingListItem:
+      description: Shopping list item object to create or update
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WriteShoppingListItem'
   responses:
     Error:
       description: Something went wrong
@@ -928,3 +1195,23 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ReadUnit'
+    ShoppingLists:
+      description: A list of shopping lists
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ReadShoppingList'
+    ShoppingList:
+      description: Shopping list object returned as result
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ReadShoppingList'
+    ShoppingListItem:
+      description: Shopping list item object returned as result
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ReadShoppingListItem'

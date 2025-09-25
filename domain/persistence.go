@@ -50,3 +50,15 @@ type UserStore interface {
 	UpdatePasswordByToken(ctx context.Context, token, hashedPassword string) error
 	UpdateUser(ctx context.Context, user *User) error
 }
+
+type ShoppingListStore interface {
+	Transactioner
+	GetShoppingListsByUser(ctx context.Context, userID int64) ([]ShoppingList, error)
+	GetShoppingListByID(ctx context.Context, listID int64) (ShoppingList, error)
+	CreateShoppingList(ctx context.Context, userID int64, name string) (ShoppingList, error)
+	UpdateShoppingList(ctx context.Context, listID int64, name string) (ShoppingList, error)
+	DeleteShoppingList(ctx context.Context, listID int64) error
+	CreateShoppingListItem(ctx context.Context, listID int64, item ShoppingListItem) (ShoppingListItem, error)
+	UpdateShoppingListItem(ctx context.Context, itemID int64, item ShoppingListItem) (ShoppingListItem, error)
+	DeleteShoppingListItem(ctx context.Context, itemID int64) error
+}

@@ -80,3 +80,12 @@ func FromOptNilString(s api.OptNilString) *string {
 	}
 	return nil
 }
+
+func (m *APIMapper) FromWriteShoppingListItem(req *api.WriteShoppingListItem) domain.ShoppingListItem {
+	return domain.ShoppingListItem{
+		Ingredient: req.Ingredient,
+		Quantity:   FromOptNilString(req.Quantity),
+		Unit:       FromOptNilString(req.Unit),
+		Done:       req.Done.Value,
+	}
+}

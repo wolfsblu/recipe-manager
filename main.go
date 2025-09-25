@@ -25,9 +25,10 @@ func main() {
 
 	recipeService := domain.NewRecipeService(mailer, sqliteStore)
 	userService := domain.NewUserService(mailer, sqliteStore)
+	shoppingService := domain.NewShoppingService(sqliteStore)
 
 	securityHandler := handler.NewSecurityHandler(userService)
-	apiHandler := handler.NewAPIHandler(recipeService, userService)
+	apiHandler := handler.NewAPIHandler(recipeService, userService, shoppingService)
 	uploadHandler, err := handler.NewUploadHandler(userService)
 	if err != nil {
 		log.Fatal("failed to initialize upload handler: ", err)

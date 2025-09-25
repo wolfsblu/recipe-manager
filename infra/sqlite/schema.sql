@@ -127,8 +127,30 @@ CREATE TABLE recipe_votes
     UNIQUE (recipe_id, user_id)
 );
 
+CREATE TABLE shopping_lists
+(
+    id      INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    name    TEXT    NOT NULL DEFAULT 'Shopping List'
+);
+
+CREATE TABLE shopping_list_items
+(
+    id               INTEGER PRIMARY KEY,
+    shopping_list_id INTEGER NOT NULL REFERENCES shopping_lists (id) ON DELETE CASCADE,
+    ingredient       TEXT    NOT NULL,
+    quantity         TEXT,
+    unit             TEXT,
+    done             BOOLEAN NOT NULL DEFAULT 0,
+    sort_order       INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (shopping_list_id, sort_order)
+);
+
 CREATE INDEX idx_meal_plan_sort_order ON meal_plan (sort_order);
 CREATE INDEX idx_recipe_ingredients_sort_order ON recipe_ingredients (sort_order);
 CREATE INDEX idx_recipe_steps_sort_order ON recipe_steps (sort_order);
 CREATE INDEX idx_recipe_votes_recipe_id ON recipe_votes (recipe_id);
 CREATE INDEX idx_recipe_votes_user_id ON recipe_votes (user_id);
+CREATE INDEX idx_shopping_lists_user_id ON shopping_lists (user_id);
+CREATE INDEX idx_shopping_list_items_shopping_list_id ON shopping_list_items (shopping_list_id);
+CREATE INDEX idx_shopping_list_items_sort_order ON shopping_list_items (sort_order);

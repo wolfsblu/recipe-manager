@@ -171,3 +171,50 @@ func ToNilString(s *string) api.NilString {
 		Null:  true,
 	}
 }
+
+func (m *APIMapper) ToShoppingListItem(item domain.ShoppingListItem) (*api.ReadShoppingListItem, error) {
+	return &api.ReadShoppingListItem{
+		ID:         item.ID,
+		Ingredient: item.Ingredient,
+		Quantity:   ToNilString(item.Quantity),
+		Unit:       ToNilString(item.Unit),
+		Done:       item.Done,
+		SortOrder:  item.SortOrder,
+	}, nil
+}
+
+func (m *APIMapper) ToShoppingListItems(items []domain.ShoppingListItem) ([]api.ReadShoppingListItem, error) {
+	result := make([]api.ReadShoppingListItem, len(items))
+	for i, item := range items {
+		mapped, err := m.ToShoppingListItem(item)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = *mapped
+	}
+	return result, nil
+}
+
+func (m *APIMapper) ToShoppingList(list domain.ShoppingList) (*api.ReadShoppingList, error) {
+	items, err := m.ToShoppingListItems(list.Items)
+	if err != nil {
+		return nil, err
+	}
+	return &api.ReadShoppingList{
+		ID:    list.ID,
+		Name:  list.Name,
+		Items: items,
+	}, nil
+}
+
+func (m *APIMapper) ToShoppingLists(lists []domain.ShoppingList) ([]api.ReadShoppingList, error) {
+	result := make([]api.ReadShoppingList, len(lists))
+	for i, list := range lists {
+		mapped, err := m.ToShoppingList(list)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = *mapped
+	}
+	return result, nil
+}
