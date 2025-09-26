@@ -11,12 +11,16 @@
     import { toast } from "svelte-sonner";
     import { scale } from "svelte/transition";
     import { quintOut } from "svelte/easing";
+    import TagCombobox from './TagCombobox.svelte';
 
-    let { recipe } = $props()
+    let { recipe, availableTags } = $props()
 
     // Reactive state for voting
     let votes = $state(recipe.votes)
     let isVoting = $state(false)
+    
+    // Reactive state for tags
+    let tags = $state(recipe.tags || [])
 
     const handleVote = async (voteValue: 1 | -1) => {
         if (isVoting) return
@@ -71,6 +75,13 @@
         const roundedHours = Math.round(hours * 100) / 100;
 
         return `${roundedHours}h`;
+    }
+    
+    const handleTagAdded = (tagId: number) => {
+        const newTag = availableTags.find(tag => tag.id === tagId);
+        if (newTag && !tags.some(tag => tag.id === tagId)) {
+            tags = [...tags, newTag];
+        }
     }
 </script>
 
@@ -141,18 +152,25 @@
                 <span>Ingredients</span>
                 <Badge>12</Badge>
             </div>
-            {#if recipe.tags}
                 <Separator />
-            {/if}
         </div>
     </div>
     <ScrollArea class="whitespace-nowrap pb-4 px-4" orientation="horizontal">
         <div class="flex w-max gap-x-1">
-            {#each recipe.tags as tag}
-                <Badge variant="secondary" class="text-muted-foreground">
+            {#each tags as tag}
+                <Badge variant="secondary" class="text-muted-foreground rounded-full">
                     {tag.name}
                 </Badge>
             {/each}
+            <TagCombobox
+                options={availableTags
+                    .filter(tag => !tags.some(t => t.id === tag.id))
+                    .map(tag => ({ value: tag.id, label: tag.name }))}
+                search="Search tags..."
+                empty="No tags found"
+                onSelect={handleTagAdded}
+            />
         </div>
     </ScrollArea>
 </div>
+
