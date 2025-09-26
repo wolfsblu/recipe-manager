@@ -100,7 +100,7 @@
     const doneItems = $derived(currentList ? currentList.items.filter(item => item.done).length : 0);
 </script>
 
-<div class="flex items-center justify-between mb-6">
+<div class="flex items-center justify-between">
     <div class="flex items-center gap-4">
         <DropdownMenu.Root bind:open={dropdownOpen}>
             <DropdownMenu.Trigger>

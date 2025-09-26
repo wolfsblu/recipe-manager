@@ -139,7 +139,7 @@
 {#if !hasLists}
     <EmptyShoppingListState onCreateList={handleCreateList} />
 {:else}
-    <div class="container mx-auto p-5">
+    <div class="flex flex-col gap-5 h-full p-5">
         <ShoppingListSelector onCreateNewList={handleCreateList} />
         
         {#if currentList}
