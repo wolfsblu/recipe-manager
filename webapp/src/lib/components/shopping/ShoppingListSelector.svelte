@@ -176,16 +176,12 @@
         <Dialog.Header>
             <Dialog.Title>Rename Shopping List</Dialog.Title>
         </Dialog.Header>
-
-        <div class="mb-4">
-            <Input
-                type="text"
-                bind:value={editingName}
-                onkeypress={handleKeyPress}
-                placeholder="List name"
-            />
-        </div>
-
+        <Input
+            type="text"
+            bind:value={editingName}
+            onkeypress={handleKeyPress}
+            placeholder="List name"
+        />
         <Dialog.Footer>
             <Button onclick={saveEdit} disabled={!editingName.trim()}>
                 Save
