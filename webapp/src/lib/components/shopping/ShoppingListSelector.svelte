@@ -170,28 +170,29 @@
     </Button>
 </div>
 
-<!-- Edit Modal Overlay -->
-{#if editingListId}
-    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onclick={cancelEdit}>
-        <div class="bg-background border rounded-lg p-4 max-w-sm w-full mx-4" onclick={(e) => e.stopPropagation()}>
-            <h3 class="font-semibold mb-3">Rename Shopping List</h3>
-            <div class="flex gap-2">
-                <Input
-                    type="text"
-                    bind:value={editingName}
-                    onkeypress={handleKeyPress}
-                    placeholder="List name"
-                />
-                <Button onclick={saveEdit} disabled={!editingName.trim()}>
-                    <CheckIcon />
-                </Button>
-                <Button variant="outline" onclick={cancelEdit}>
-                    <XIcon />
-                </Button>
-            </div>
+<!-- Edit Dialog -->
+<Dialog.Root open={editingListId !== null} onOpenChange={(open) => { if (!open) cancelEdit(); }}>
+    <Dialog.Content class="sm:max-w-[425px]">
+        <Dialog.Header>
+            <Dialog.Title>Rename Shopping List</Dialog.Title>
+        </Dialog.Header>
+
+        <div class="mb-4">
+            <Input
+                type="text"
+                bind:value={editingName}
+                onkeypress={handleKeyPress}
+                placeholder="List name"
+            />
         </div>
-    </div>
-{/if}
+
+        <Dialog.Footer>
+            <Button onclick={saveEdit} disabled={!editingName.trim()}>
+                Save
+            </Button>
+        </Dialog.Footer>
+    </Dialog.Content>
+</Dialog.Root>
 
 <!-- Delete Confirmation Dialog -->
 <Dialog.Root open={showDeleteDialog} onOpenChange={(open) => { if (!open) cancelDelete(); }}>
