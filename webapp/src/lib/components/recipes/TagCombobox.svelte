@@ -7,7 +7,6 @@
     import * as Popover from "$lib/components/ui/popover/index.js";
     import { useId } from "bits-ui";
     import VirtualList from 'svelte-tiny-virtual-list';
-    import AddTagPlaceholder from './AddTagPlaceholder.svelte';
 
     let {
         empty = 'No tags found.',
