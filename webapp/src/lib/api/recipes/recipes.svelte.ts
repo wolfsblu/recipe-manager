@@ -47,6 +47,21 @@ export const updateRecipe = async (id: number, recipe: any) => {
     return response.data
 }
 
+export const patchRecipe = async (id: number, patch: any) => {
+    const response = await client.PATCH("/recipes/{recipeId}", {
+        params: {
+            path: {
+                recipeId: id
+            }
+        },
+        body: patch
+    })
+    if (response.error) {
+        throw response.error
+    }
+    return response.data
+}
+
 export const deleteRecipe = async (id: number) => {
     const response = await client.DELETE("/recipes/{recipeId}", {
         params: {

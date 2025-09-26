@@ -7,7 +7,7 @@
     import { Button } from "$lib/components/ui/button/index.js";
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
-    import { addVote, removeVote } from "$lib/api/recipes/recipes.svelte.js";
+    import { addVote, removeVote, patchRecipe } from "$lib/api/recipes/recipes.svelte.js";
     import { toast } from "svelte-sonner";
     import { scale } from "svelte/transition";
     import { quintOut } from "svelte/easing";
@@ -77,10 +77,22 @@
         return `${roundedHours}h`;
     }
     
-    const handleTagAdded = (tagId: number) => {
+    const handleTagAdded = async (tagId: number) => {
         const newTag = availableTags.find(tag => tag.id === tagId);
-        if (newTag && !tags.some(tag => tag.id === tagId)) {
-            tags = [...tags, newTag];
+        if (!newTag || tags.some(tag => tag.id === tagId)) {
+            return;
+        }
+
+        const previousTags = [...tags];
+        tags = [...tags, newTag];
+
+        try {
+            const updatedTagIds = tags.map(tag => tag.id);
+            await patchRecipe(recipe.id, { tags: updatedTagIds });
+            toast.success(`Added tag: ${newTag.name}`);
+        } catch (error) {
+            tags = previousTags;
+            toast.error("Failed to add tag. Please try again.");
         }
     }
 </script>
