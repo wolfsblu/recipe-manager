@@ -162,14 +162,6 @@
                 </DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>
-
-        {#if currentList}
-            <div class="flex items-center gap-2">
-                <Badge variant="secondary">
-                    {doneItems}/{totalItems} completed
-                </Badge>
-            </div>
-        {/if}
     </div>
 
     <Button onclick={onCreateNewList}>

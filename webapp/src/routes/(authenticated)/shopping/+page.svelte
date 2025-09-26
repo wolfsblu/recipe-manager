@@ -149,7 +149,7 @@
                     {@const items = isDone ? doneItems : todoItems}
                     {@const IconComponent = config.icon}
 
-                    <Card class="h-fit gap-0 py-0">
+                    <Card class="h-full gap-0 py-0">
                         <CardHeader class="px-3 border-b pb-0!">
                             <CardTitle class="pt-4 pb-2 flex items-center gap-2">
                                 <IconComponent class="h-5 w-5"/>
@@ -161,14 +161,14 @@
                                 </Badge>
                             </CardTitle>
                         </CardHeader>
-                        <CardContent class="p-1">
+                        <CardContent class="h-full p-1">
                             <div
-                                class="rounded-lg border-2 border-dashed border-transparent transition-all duration-200"
+                                class="h-full rounded-lg border-2 border-dashed border-transparent transition-all duration-200"
                                 role="region"
                                 aria-label="{config.title}"
                             >
                                 <div
-                                    class="space-y-2 min-h-[100px] p-1"
+                                    class="flex flex-col space-y-2 min-h-[100px] p-1 h-full"
                                     role="list"
                                     aria-label="{config.title} items"
                                 >
@@ -205,7 +205,7 @@
                                     {/if}
 
                                     {#if items.length === 0}
-                                        <div class="flex flex-col items-center justify-center h-32 text-muted-foreground">
+                                        <div class="flex flex-col items-center justify-center flex-1 text-muted-foreground min-h-32">
                                             <IconComponent/>
                                             <p class="text-sm">No items</p>
                                         </div>
