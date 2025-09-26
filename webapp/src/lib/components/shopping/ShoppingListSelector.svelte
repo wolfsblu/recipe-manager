@@ -96,8 +96,6 @@
 
     const currentList = $derived(shoppingStore.currentList);
     const lists = $derived(shoppingStore.lists);
-    const totalItems = $derived(currentList ? currentList.items.length : 0);
-    const doneItems = $derived(currentList ? currentList.items.filter(item => item.done).length : 0);
 </script>
 
 <div class="flex items-center justify-between">
