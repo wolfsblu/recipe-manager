@@ -194,7 +194,11 @@ export interface paths {
         delete: operations["deleteRecipe"];
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Partially update a recipe
+         * @description Apply partial updates to a recipe by merging the provided fields
+         */
+        patch: operations["patchRecipe"];
         trace?: never;
     };
     "/recipes/{recipeId}/vote": {
@@ -512,32 +516,35 @@ export interface components {
             /** @example abd87ec862b6b8ecc2cf45c170d887d21e835a35f8537ea35ff1af102faa5920 */
             token: string;
         };
-        BaseRecipe: {
+        RecipeBaseFields: {
             /** @example Spaghetti Carbonara */
-            name: string;
+            name?: string;
             /**
              * @description The HTML description of the recipe
              * @example <p>My tasty spaghetti recipe</p>
              */
-            description: string;
+            description?: string;
             /**
              * Format: int64
              * @description How many servings you'll get with this recipe
              * @example 4
              */
-            servings: number;
+            servings?: number;
             /**
              * Format: int64
              * @description How long it takes to prepare this recipe (in minutes)
              * @example 45
              */
-            minutes: number;
+            minutes?: number;
             images?: string[];
         };
-        WriteRecipe: components["schemas"]["BaseRecipe"] & {
-            steps: components["schemas"]["WriteRecipeStep"][];
+        RecipeWriteFields: components["schemas"]["RecipeBaseFields"] & {
+            steps?: components["schemas"]["WriteRecipeStep"][];
             tags?: number[];
         };
+        BaseRecipe: components["schemas"]["RecipeBaseFields"] & Record<string, never>;
+        WriteRecipe: components["schemas"]["RecipeWriteFields"] & components["schemas"]["BaseRecipe"] & Record<string, never>;
+        PatchRecipe: components["schemas"]["RecipeWriteFields"];
         Vote: {
             /**
              * Format: int64
@@ -1071,6 +1078,28 @@ export interface operations {
                 };
                 content?: never;
             };
+            default: components["responses"]["Error"];
+        };
+    };
+    patchRecipe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the recipe to patch */
+                recipeId: number;
+            };
+            cookie?: never;
+        };
+        /** @description Partial recipe data to merge */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PatchRecipe"];
+            };
+        };
+        responses: {
+            /** @description successful operation */
+            200: components["responses"]["Recipe"];
             default: components["responses"]["Error"];
         };
     };

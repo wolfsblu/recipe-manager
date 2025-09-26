@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/ogen-go/ogen/json"
 	"github.com/wolfsblu/recipe-manager/api"
 	"github.com/wolfsblu/recipe-manager/domain"
 	"github.com/wolfsblu/recipe-manager/infra/config"
@@ -194,4 +195,35 @@ func (h *RecipeHandler) UpdateUnit(ctx context.Context, req *api.WriteUnit, para
 
 func (h *RecipeHandler) DeleteUnit(ctx context.Context, params api.DeleteUnitParams) error {
 	return h.Recipes.DeleteUnit(ctx, params.UnitId)
+}
+
+func (h *RecipeHandler) PatchRecipe(ctx context.Context, req *api.RecipeWriteFields, params api.PatchRecipeParams) (*api.ReadRecipe, error) {
+	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+
+	existingRecipe, err := h.Recipes.GetById(ctx, user, params.RecipeId)
+	if err != nil {
+		return nil, err
+	}
+
+	writeRecipe, err := h.mapper.ToWriteRecipe(existingRecipe)
+	if err != nil {
+		return nil, err
+	}
+
+	var mergedWriteRecipe api.WriteRecipe
+	patchedRecipe, err := h.mergePatch(writeRecipe, req)
+	if err := json.Unmarshal(patchedRecipe, &mergedWriteRecipe); err != nil {
+		return nil, err
+	}
+
+	recipe := h.mapper.FromWriteRecipe(&mergedWriteRecipe)
+	recipe.ID = params.RecipeId
+	recipe.CreatedBy = user
+
+	result, err := h.Recipes.UpdateRecipe(ctx, recipe)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.mapper.ToReadRecipe(result)
 }

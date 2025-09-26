@@ -4,11 +4,12 @@ go 1.25.0
 
 require (
 	ariga.io/atlas-go-sdk v0.7.2
+	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
 	github.com/gorilla/securecookie v1.1.2
 	github.com/joho/godotenv v1.5.1
-	github.com/ogen-go/ogen v1.15.0
+	github.com/ogen-go/ogen v1.15.1
 	github.com/swaggest/swgui v1.8.4
 	github.com/tus/tusd/v2 v2.8.0
 	golang.org/x/crypto v0.42.0
@@ -38,7 +39,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
-	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/segmentio/asm v1.2.1 // indirect
 	github.com/tus/lockfile v1.2.0 // indirect
 	github.com/vearutop/statigz v1.5.0 // indirect
 	github.com/zclconf/go-cty v1.17.0 // indirect
