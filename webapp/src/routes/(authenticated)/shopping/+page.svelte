@@ -123,7 +123,7 @@
             bgColor: 'bg-green-50 dark:bg-green-950/20',
             borderColor: 'border-green-200 dark:border-green-800',
         } : {
-            title: 'Shopping List',
+            title: currentList?.name || 'Shopping List',
             icon: ShoppingCartIcon,
             bgColor: 'bg-orange-50 dark:bg-orange-950/20',
             borderColor: 'border-orange-200 dark:border-orange-800',
