@@ -310,6 +310,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/shopping-lists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all shopping lists for the user */
+        get: operations["getShoppingLists"];
+        put?: never;
+        /** Create a new shopping list */
+        post: operations["createShoppingList"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shopping-lists/{shoppingListId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a shopping list by ID */
+        get: operations["getShoppingListById"];
+        /** Update a shopping list */
+        put: operations["updateShoppingList"];
+        post?: never;
+        /** Delete a shopping list */
+        delete: operations["deleteShoppingList"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shopping-lists/{shoppingListId}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an item to a shopping list */
+        post: operations["addShoppingListItem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shopping-lists/{shoppingListId}/items/{itemId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a shopping list item */
+        put: operations["updateShoppingListItem"];
+        post?: never;
+        /** Delete a shopping list item */
+        delete: operations["deleteShoppingListItem"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -500,6 +572,53 @@ export interface components {
              */
             user: 1 | -1 | 0;
         };
+        ReadShoppingList: {
+            /**
+             * Format: int64
+             * @example 1
+             */
+            id: number;
+            /** @example Weekly Shopping List */
+            name: string;
+            items: components["schemas"]["ReadShoppingListItem"][];
+        };
+        WriteShoppingList: {
+            /** @example Weekly Shopping List */
+            name: string;
+        };
+        ReadShoppingListItem: {
+            /**
+             * Format: int64
+             * @example 1
+             */
+            id: number;
+            /** @example Milk */
+            ingredient: string;
+            /** @example 1 */
+            quantity: string | null;
+            /** @example gallon */
+            unit: string | null;
+            /** @example false */
+            done: boolean;
+            /**
+             * Format: int64
+             * @example 0
+             */
+            sortOrder: number;
+        };
+        WriteShoppingListItem: {
+            /** @example Milk */
+            ingredient: string;
+            /** @example 1 */
+            quantity?: string | null;
+            /** @example gallon */
+            unit?: string | null;
+            /**
+             * @default false
+             * @example false
+             */
+            done: boolean;
+        };
     };
     responses: {
         /** @description Something went wrong */
@@ -611,6 +730,33 @@ export interface components {
                 "application/json": components["schemas"]["ReadUnit"];
             };
         };
+        /** @description A list of shopping lists */
+        ShoppingLists: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ReadShoppingList"][];
+            };
+        };
+        /** @description Shopping list object returned as result */
+        ShoppingList: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ReadShoppingList"];
+            };
+        };
+        /** @description Shopping list item object returned as result */
+        ShoppingListItem: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["ReadShoppingListItem"];
+            };
+        };
     };
     parameters: never;
     requestBodies: {
@@ -654,6 +800,18 @@ export interface components {
         WriteUnit: {
             content: {
                 "application/json": components["schemas"]["WriteUnit"];
+            };
+        };
+        /** @description Shopping list object to create or update */
+        WriteShoppingList: {
+            content: {
+                "application/json": components["schemas"]["WriteShoppingList"];
+            };
+        };
+        /** @description Shopping list item object to create or update */
+        WriteShoppingListItem: {
+            content: {
+                "application/json": components["schemas"]["WriteShoppingListItem"];
             };
         };
     };
@@ -1095,6 +1253,150 @@ export interface operations {
         responses: {
             /** @description Successful operation */
             200: components["responses"]["TagList"];
+            default: components["responses"]["Error"];
+        };
+    };
+    getShoppingLists: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["ShoppingLists"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createShoppingList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["WriteShoppingList"];
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["ShoppingList"];
+            default: components["responses"]["Error"];
+        };
+    };
+    getShoppingListById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the shopping list to return */
+                shoppingListId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["ShoppingList"];
+            default: components["responses"]["Error"];
+        };
+    };
+    updateShoppingList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the shopping list to update */
+                shoppingListId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["WriteShoppingList"];
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["ShoppingList"];
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteShoppingList: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the shopping list to delete */
+                shoppingListId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    addShoppingListItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the shopping list */
+                shoppingListId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["WriteShoppingListItem"];
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["ShoppingListItem"];
+            default: components["responses"]["Error"];
+        };
+    };
+    updateShoppingListItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the shopping list */
+                shoppingListId: number;
+                /** @description ID of the item to update */
+                itemId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["WriteShoppingListItem"];
+        responses: {
+            /** @description Successful operation */
+            200: components["responses"]["ShoppingListItem"];
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteShoppingListItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description ID of the shopping list */
+                shoppingListId: number;
+                /** @description ID of the item to delete */
+                itemId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             default: components["responses"]["Error"];
         };
     };
