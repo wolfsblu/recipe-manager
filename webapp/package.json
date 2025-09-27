@@ -15,7 +15,7 @@
 	"devDependencies": {
 		"@inlang/paraglide-js": "^2.0.12",
 		"@internationalized/date": "^3.8.2",
-		"@lucide/svelte": "*",
+		"@lucide/svelte": "^0.544.0",
 		"@sveltejs/adapter-static": "^3.0.8",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
@@ -25,7 +25,7 @@
 		"@thisux/sveltednd": "^0.0.20",
 		"@types/luxon": "^3.6.2",
 		"@types/pluralize": "^0.0.33",
-		"bits-ui": "^2.8.10",
+		"bits-ui": "^2.11.4",
 		"clsx": "^2.1.1",
 		"filepond": "^4.32.8",
 		"filepond-plugin-image-crop": "^2.0.6",

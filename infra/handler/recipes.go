@@ -65,6 +65,11 @@ func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanP
 	return h.mapper.ToMealPlans(mealplan)
 }
 
+func (h *RecipeHandler) CreateMealPlan(ctx context.Context, req *api.WriteMealPlan) error {
+	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	return h.Recipes.CreateMealPlan(ctx, user, req.RecipeId, req.Date)
+}
+
 func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
 	user := ctx.Value(config.CtxKeyUser).(*domain.User)
 	recipes, err := h.Recipes.GetByUser(ctx, user)

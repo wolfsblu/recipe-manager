@@ -44,6 +44,13 @@ type MealPlan struct {
 	Recipes []Recipe
 }
 
+type MealPlanEntry struct {
+	UserID    int64
+	RecipeID  int64
+	Date      time.Time
+	SortOrder int64
+}
+
 type Ingredient struct {
 	ID   int64
 	Name string

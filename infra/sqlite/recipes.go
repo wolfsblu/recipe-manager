@@ -94,6 +94,10 @@ func (s *Store) DeleteRecipe(ctx context.Context, id int64) error {
 	return s.query().DeleteRecipe(ctx, id)
 }
 
+func (s *Store) CreateMealPlan(ctx context.Context, entry domain.MealPlanEntry) error {
+	return s.query().CreateMealPlan(ctx, s.mapper.FromMealPlanEntry(entry))
+}
+
 func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Time, until time.Time) ([]domain.MealPlan, error) {
 	result, err := s.query().GetMealPlan(ctx, database.GetMealPlanParams{
 		UserID:    user.ID,
@@ -104,9 +108,31 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 		return []domain.MealPlan{}, err
 	}
 
+	recipeMap := make(map[int64]domain.Recipe)
+	for _, item := range result {
+		recipe := s.mapper.ToRecipe(item.Recipe)
+		recipeMap[recipe.ID] = recipe
+	}
+
+	recipes := make([]domain.Recipe, 0, len(recipeMap))
+	for _, recipe := range recipeMap {
+		recipes = append(recipes, recipe)
+	}
+
+	populatedRecipes, err := s.populateRecipeRelations(ctx, user, recipes)
+	if err != nil {
+		return []domain.MealPlan{}, err
+	}
+
+	populatedRecipeMap := make(map[int64]domain.Recipe)
+	for _, recipe := range populatedRecipes {
+		populatedRecipeMap[recipe.ID] = recipe
+	}
+
 	grouped := make(map[string][]domain.Recipe)
 	for _, item := range result {
-		grouped[item.MealPlan.Date] = append(grouped[item.MealPlan.Date], s.mapper.ToRecipe(item.Recipe))
+		recipe := populatedRecipeMap[item.Recipe.ID]
+		grouped[item.MealPlan.Date] = append(grouped[item.MealPlan.Date], recipe)
 	}
 
 	i := 0
@@ -174,61 +200,12 @@ func (s *Store) GetRecipeById(ctx context.Context, user *domain.User, id int64) 
 	}
 
 	recipe = s.mapper.ToRecipe(result)
-	recipeIds := []int64{id}
-	steps, err := s.query().GetStepsForRecipes(ctx, recipeIds)
-	if err != nil {
-		return recipe, err
-	}
-	ingredients, err := s.query().GetIngredientsForRecipes(ctx, recipeIds)
-	if err != nil {
-		return recipe, err
-	}
-	databaseTags, err := s.query().GetTagsForRecipes(ctx, recipeIds)
-	if err != nil {
-		return recipe, err
-	}
-	images, err := s.query().GetImagesForRecipes(ctx, recipeIds)
+	populatedRecipes, err := s.populateRecipeRelations(ctx, user, []domain.Recipe{recipe})
 	if err != nil {
 		return recipe, err
 	}
 
-	ingredientsByStep := make(map[int64][]domain.StepIngredient)
-	for _, ing := range ingredients {
-		ingredientsByStep[ing.StepID] = append(ingredientsByStep[ing.StepID], s.mapper.ToStepIngredient(ing))
-	}
-
-	recipeSteps := make([]domain.RecipeStep, len(steps))
-	for i, step := range steps {
-		recipeStep := s.mapper.ToRecipeStep(step)
-		recipeStep.Ingredients = ingredientsByStep[step.ID]
-		recipeSteps[i] = recipeStep
-	}
-
-	recipeTags := make([]domain.Tag, len(databaseTags))
-	for i, databaseTag := range databaseTags {
-		recipeTags[i] = s.mapper.ToTag(databaseTag.Tag)
-	}
-
-	recipeImages := make([]domain.RecipeImage, len(images))
-	for i, image := range images {
-		recipeImages[i] = s.mapper.ToRecipeImage(image)
-		imageUrl, err := url.ParseRequestURI(image.Path)
-		if err != nil {
-			return recipe, err
-		}
-		recipeImages[i].URL = imageUrl
-	}
-
-	votes, err := s.getVotes(ctx, user, []int64{id})
-	if err != nil {
-		return recipe, err
-	}
-
-	recipe.Steps = recipeSteps
-	recipe.Tags = recipeTags
-	recipe.Images = recipeImages
-	recipe.Votes = votes[id]
-	return recipe, nil
+	return populatedRecipes[0], nil
 }
 
 func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipes []domain.Recipe, _ error) {
@@ -237,18 +214,46 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipe
 		return nil, err
 	}
 
-	ids := make([]int64, len(result))
-	for i, item := range result {
-		ids[i] = item.ID
-		recipes = append(recipes, s.mapper.ToRecipe(item))
+	recipes = make([]domain.Recipe, len(result))
+	for i, recipe := range result {
+		recipes[i] = s.mapper.ToRecipe(recipe)
 	}
 
-	tags, err := s.query().GetTagsForRecipes(ctx, ids)
+	return s.populateRecipeRelations(ctx, user, recipes)
+}
+
+func (s *Store) populateRecipeRelations(ctx context.Context, user *domain.User, recipes []domain.Recipe) ([]domain.Recipe, error) {
+	if len(recipes) == 0 {
+		return recipes, nil
+	}
+
+	recipeIds := make([]int64, len(recipes))
+	for i, recipe := range recipes {
+		recipeIds[i] = recipe.ID
+	}
+
+	tags, err := s.query().GetTagsForRecipes(ctx, recipeIds)
 	if err != nil {
 		return nil, err
 	}
 
-	images, err := s.query().GetImagesForRecipes(ctx, ids)
+	images, err := s.query().GetImagesForRecipes(ctx, recipeIds)
+	if err != nil {
+		return nil, err
+	}
+
+	votes, err := s.getVotes(ctx, user, recipeIds)
+	if err != nil {
+		return nil, err
+	}
+
+	var steps []database.GetStepsForRecipesRow
+	var ingredients []database.GetIngredientsForRecipesRow
+	steps, err = s.query().GetStepsForRecipes(ctx, recipeIds)
+	if err != nil {
+		return nil, err
+	}
+	ingredients, err = s.query().GetIngredientsForRecipes(ctx, recipeIds)
 	if err != nil {
 		return nil, err
 	}
@@ -270,20 +275,39 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipe
 		})
 	}
 
-	votes, err := s.getVotes(ctx, user, ids)
-	if err != nil {
-		return nil, err
+	var stepsByRecipe map[int64][]domain.RecipeStep
+	stepsByRecipe = make(map[int64][]domain.RecipeStep)
+
+	ingredientsByStep := make(map[int64][]domain.StepIngredient)
+	for _, ing := range ingredients {
+		ingredientsByStep[ing.StepID] = append(ingredientsByStep[ing.StepID], s.mapper.ToStepIngredient(ing))
 	}
 
-	recipes = make([]domain.Recipe, len(result))
-	for i, recipe := range result {
-		r := s.mapper.ToRecipe(recipe)
-		r.Images = imagesByRecipe[r.ID]
-		r.Tags = tagsByRecipe[r.ID]
-		r.Votes = votes[r.ID]
-		recipes[i] = r
+	stepsByRecipeTemp := make(map[int64][]database.GetStepsForRecipesRow)
+	for _, step := range steps {
+		stepsByRecipeTemp[step.RecipeID] = append(stepsByRecipeTemp[step.RecipeID], step)
 	}
-	return recipes, nil
+
+	for recipeID, recipeSteps := range stepsByRecipeTemp {
+		stepsForRecipe := make([]domain.RecipeStep, len(recipeSteps))
+		for i, step := range recipeSteps {
+			recipeStep := s.mapper.ToRecipeStep(step)
+			recipeStep.Ingredients = ingredientsByStep[step.ID]
+			stepsForRecipe[i] = recipeStep
+		}
+		stepsByRecipe[recipeID] = stepsForRecipe
+	}
+
+	populatedRecipes := make([]domain.Recipe, len(recipes))
+	for i, recipe := range recipes {
+		recipe.Tags = tagsByRecipe[recipe.ID]
+		recipe.Images = imagesByRecipe[recipe.ID]
+		recipe.Votes = votes[recipe.ID]
+		recipe.Steps = stepsByRecipe[recipe.ID]
+		populatedRecipes[i] = recipe
+	}
+
+	return populatedRecipes, nil
 }
 
 func (s *Store) getVotes(ctx context.Context, user *domain.User, recipeIds []int64) (map[int64]domain.RecipeVotes, error) {
