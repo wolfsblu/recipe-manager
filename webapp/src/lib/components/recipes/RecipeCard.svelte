@@ -1,6 +1,6 @@
 <script lang="ts">
-    import fruits from './fruits.jpg'
     import ClockIcon from '@lucide/svelte/icons/clock'
+    import ImageIcon from '@lucide/svelte/icons/image'
     import ChevronUp from '@lucide/svelte/icons/chevron-up'
     import ChevronDown from '@lucide/svelte/icons/chevron-down'
     import { Badge } from "$lib/components/ui/badge/index.js";
@@ -108,7 +108,12 @@
             {#if recipe.images && recipe.images.length > 0}
                 <img loading="lazy" src={recipe.images[0]} alt="Recipe" class="w-full h-52 object-cover" />
             {:else}
-                <img loading="lazy" src={fruits} alt="Fruits" class="w-full h-52 object-cover" />
+                <div class="w-full h-52 bg-muted flex items-center justify-center">
+                    <div class="text-center text-muted-foreground">
+                        <ImageIcon class="w-12 h-12 mx-auto mb-2" />
+                        <p class="text-sm">No image available</p>
+                    </div>
+                </div>
             {/if}
         </a>
 

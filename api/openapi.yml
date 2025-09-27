@@ -893,7 +893,7 @@ components:
           type: string
           description: The HTML description of the recipe
           examples:
-            - <p>My tasty spaghetti recipe</p>
+            - My tasty spaghetti recipe
         servings:
           type: integer
           format: int64
