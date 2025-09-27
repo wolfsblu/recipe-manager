@@ -13,7 +13,7 @@ import (
 )
 
 var errorStatusCodeMap = map[*domain.Error]int{
-	domain.ErrAuthentication:             http.StatusForbidden,
+	domain.ErrAuthentication:             http.StatusUnauthorized,
 	domain.ErrAuthorization:              http.StatusForbidden,
 	domain.ErrCommittingTransaction:      http.StatusInternalServerError,
 	domain.ErrCreatingPasswordResetToken: http.StatusInternalServerError,
@@ -21,8 +21,8 @@ var errorStatusCodeMap = map[*domain.Error]int{
 	domain.ErrCreatingUser:               http.StatusInternalServerError,
 	domain.ErrDeletingPasswordResetToken: http.StatusInternalServerError,
 	domain.ErrDeletingRegistration:       http.StatusInternalServerError,
-	domain.ErrInvalidCredentials:         http.StatusForbidden,
-	domain.ErrPasswordResetTokenNotFound: http.StatusForbidden,
+	domain.ErrInvalidCredentials:         http.StatusUnauthorized,
+	domain.ErrPasswordResetTokenNotFound: http.StatusUnauthorized,
 	domain.ErrRecipeNotFound:             http.StatusNotFound,
 	domain.ErrRegistrationNotFound:       http.StatusNotFound,
 	domain.ErrStartingTransaction:        http.StatusInternalServerError,
