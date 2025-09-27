@@ -76,6 +76,28 @@ func (q *Queries) CreateIngredient(ctx context.Context, name string) (int64, err
 	return id, err
 }
 
+const createMealPlan = `-- name: CreateMealPlan :exec
+INSERT INTO meal_plan (date, user_id, recipe_id, sort_order)
+VALUES (?, ?, ?, ?)
+`
+
+type CreateMealPlanParams struct {
+	Date      string
+	UserID    int64
+	RecipeID  int64
+	SortOrder int64
+}
+
+func (q *Queries) CreateMealPlan(ctx context.Context, arg CreateMealPlanParams) error {
+	_, err := q.db.ExecContext(ctx, createMealPlan,
+		arg.Date,
+		arg.UserID,
+		arg.RecipeID,
+		arg.SortOrder,
+	)
+	return err
+}
+
 const createRecipe = `-- name: CreateRecipe :one
 INSERT INTO recipes (name, servings, minutes, description, created_by)
 VALUES (?, ?, ?, ?, ?)

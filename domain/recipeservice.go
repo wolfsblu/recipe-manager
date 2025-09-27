@@ -25,6 +25,25 @@ func (s *RecipeService) GetMealPlan(ctx context.Context, user *User, from time.T
 	return s.store.GetMealPlan(ctx, user, from, until)
 }
 
+func (s *RecipeService) CreateMealPlan(ctx context.Context, user *User, recipeID int64, date time.Time) error {
+	existingMealPlan, err := s.store.GetMealPlan(ctx, user, date, date)
+	if err != nil {
+		return err
+	}
+
+	var sortOrder int64 = 0
+	if len(existingMealPlan) > 0 && len(existingMealPlan[0].Recipes) > 0 {
+		sortOrder = int64(len(existingMealPlan[0].Recipes))
+	}
+
+	return s.store.CreateMealPlan(ctx, MealPlanEntry{
+		UserID:    user.ID,
+		RecipeID:  recipeID,
+		Date:      date,
+		SortOrder: sortOrder,
+	})
+}
+
 func (s *RecipeService) Delete(ctx context.Context, user *User, id int64) error {
 	if err := s.validateRecipeOwnership(ctx, user, id); err != nil {
 		return err

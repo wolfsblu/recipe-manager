@@ -1,6 +1,8 @@
 package mapper
 
 import (
+	"time"
+
 	"github.com/wolfsblu/recipe-manager/domain"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 )
@@ -61,5 +63,14 @@ func (m *DBMapper) FromUserVotesParams(recipeIds []int64, userID int64) database
 	return database.GetUserVotesForRecipesParams{
 		RecipeIds: recipeIds,
 		UserID:    userID,
+	}
+}
+
+func (m *DBMapper) FromMealPlanEntry(entry domain.MealPlanEntry) database.CreateMealPlanParams {
+	return database.CreateMealPlanParams{
+		Date:      entry.Date.Format(time.DateOnly),
+		UserID:    entry.UserID,
+		RecipeID:  entry.RecipeID,
+		SortOrder: entry.SortOrder,
 	}
 }

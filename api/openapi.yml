@@ -171,6 +171,18 @@ paths:
           $ref: '#/components/responses/MealPlan'
         default:
           $ref: '#/components/responses/Error'
+    post:
+      tags:
+        - Meal Plan
+      summary: Add a recipe to your meal plan
+      operationId: createMealPlan
+      requestBody:
+        $ref: '#/components/requestBodies/WriteMealPlan'
+      responses:
+        '204':
+          description: Recipe added to meal plan successfully
+        default:
+          $ref: '#/components/responses/Error'
   /recipes:
     get:
       tags:
@@ -1083,6 +1095,22 @@ components:
           default: false
           examples:
             - false
+    WriteMealPlan:
+      type: object
+      required:
+        - recipeId
+        - date
+      properties:
+        recipeId:
+          type: integer
+          format: int64
+          examples:
+            - 10
+        date:
+          type: string
+          format: date
+          examples:
+            - '2023-01-01'
   requestBodies:
     Credentials:
       description: User credentials
@@ -1147,6 +1175,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/WriteShoppingListItem'
+    WriteMealPlan:
+      description: Meal plan entry to create
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WriteMealPlan'
   responses:
     Error:
       description: Something went wrong

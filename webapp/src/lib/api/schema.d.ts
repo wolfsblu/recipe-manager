@@ -150,7 +150,8 @@ export interface paths {
         /** Get your meal plan */
         get: operations["getMealPlan"];
         put?: never;
-        post?: never;
+        /** Add a recipe to your meal plan */
+        post: operations["createMealPlan"];
         delete?: never;
         options?: never;
         head?: never;
@@ -626,6 +627,18 @@ export interface components {
              */
             done: boolean;
         };
+        WriteMealPlan: {
+            /**
+             * Format: int64
+             * @example 10
+             */
+            recipeId: number;
+            /**
+             * Format: date
+             * @example 2023-01-01
+             */
+            date: string;
+        };
     };
     responses: {
         /** @description Something went wrong */
@@ -821,6 +834,12 @@ export interface components {
                 "application/json": components["schemas"]["WriteShoppingListItem"];
             };
         };
+        /** @description Meal plan entry to create */
+        WriteMealPlan: {
+            content: {
+                "application/json": components["schemas"]["WriteMealPlan"];
+            };
+        };
     };
     headers: {
         /** @description Sets the session for the logged in user */
@@ -993,6 +1012,25 @@ export interface operations {
         responses: {
             /** @description Successful operation */
             200: components["responses"]["MealPlan"];
+            default: components["responses"]["Error"];
+        };
+    };
+    createMealPlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: components["requestBodies"]["WriteMealPlan"];
+        responses: {
+            /** @description Recipe added to meal plan successfully */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             default: components["responses"]["Error"];
         };
     };

@@ -198,3 +198,7 @@ WHERE id = ?;
 -- name: DeleteUnit :exec
 DELETE FROM units
 WHERE id = ?;
+
+-- name: CreateMealPlan :exec
+INSERT INTO meal_plan (date, user_id, recipe_id, sort_order)
+VALUES (?, ?, ?, ?);

@@ -24,6 +24,7 @@
     import { deleteRecipe } from "$lib/api/recipes/recipes.svelte";
     import { toast } from "svelte-sonner";
     import VoteButtons from "$lib/components/recipes/VoteButtons.svelte";
+    import AddToMealPlanButton from "$lib/components/recipes/AddToMealPlanButton.svelte";
 
     let { data }: { data: PageData } = $props();
     const { recipe } = data;
@@ -111,6 +112,8 @@
                         >
                             <EditIcon class="w-5 h-5" />
                         </Button>
+
+                        <AddToMealPlanButton recipeId={recipe.id} />
 
                         <Button
                             variant="ghost"
