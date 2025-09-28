@@ -54,6 +54,7 @@ CREATE TABLE users
     password_hash TEXT      NOT NULL,
     is_confirmed  BOOLEAN   NOT NULL DEFAULT 0,
     role_id       INTEGER   NOT NULL REFERENCES roles (id) ON DELETE CASCADE,
+    locale        TEXT      NOT NULL DEFAULT 'en',
     created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
