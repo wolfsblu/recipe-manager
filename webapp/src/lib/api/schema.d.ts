@@ -158,6 +158,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/mealplan/{recipeId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a recipe from your meal plan */
+        delete: operations["deleteMealPlan"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/recipes": {
         parameters: {
             query?: never;
@@ -522,7 +539,7 @@ export interface components {
             name?: string;
             /**
              * @description The HTML description of the recipe
-             * @example <p>My tasty spaghetti recipe</p>
+             * @example My tasty spaghetti recipe
              */
             description?: string;
             /**
@@ -1025,6 +1042,31 @@ export interface operations {
         requestBody: components["requestBodies"]["WriteMealPlan"];
         responses: {
             /** @description Recipe added to meal plan successfully */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    deleteMealPlan: {
+        parameters: {
+            query: {
+                /** @description Date to remove the recipe from meal plan */
+                date: string;
+            };
+            header?: never;
+            path: {
+                /** @description ID of the recipe to remove from meal plan */
+                recipeId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recipe removed from meal plan successfully */
             204: {
                 headers: {
                     [name: string]: unknown;

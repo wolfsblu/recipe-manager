@@ -44,6 +44,10 @@ func (s *RecipeService) CreateMealPlan(ctx context.Context, user *User, recipeID
 	})
 }
 
+func (s *RecipeService) DeleteMealPlan(ctx context.Context, user *User, recipeID int64, date time.Time) error {
+	return s.store.DeleteMealPlan(ctx, user.ID, recipeID, date)
+}
+
 func (s *RecipeService) Delete(ctx context.Context, user *User, id int64) error {
 	if err := s.validateRecipeOwnership(ctx, user, id); err != nil {
 		return err

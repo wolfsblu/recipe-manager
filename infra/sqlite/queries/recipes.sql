@@ -202,3 +202,7 @@ WHERE id = ?;
 -- name: CreateMealPlan :exec
 INSERT INTO meal_plan (date, user_id, recipe_id, sort_order)
 VALUES (?, ?, ?, ?);
+
+-- name: DeleteMealPlan :exec
+DELETE FROM meal_plan
+WHERE user_id = ? AND recipe_id = ? AND date = ?;

@@ -3,11 +3,18 @@
     import RecipeCard from '../recipes/RecipeCard.svelte';
     import MealPlanButtonsOverlay from '../recipes/MealPlanButtonsOverlay.svelte';
     import CalendarIcon from '@lucide/svelte/icons/calendar';
+    import pluralize from 'pluralize';
     import type { components } from '$lib/api/schema';
 
     type MealPlanDay = components['schemas']['ReadMealPlan'];
 
     let { mealPlanDay, availableTags = [] }: { mealPlanDay: MealPlanDay; availableTags?: any[] } = $props();
+
+    let recipes = $state(mealPlanDay.recipes || []);
+
+    const handleRecipeDeleted = (recipeId: number) => {
+        recipes = recipes.filter(recipe => recipe.id !== recipeId);
+    };
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -64,20 +71,20 @@
                 </div>
             </div>
         </div>
-        {#if mealPlanDay.recipes && mealPlanDay.recipes.length > 0}
+        {#if recipes && recipes.length > 0}
             <Badge variant="secondary" class="text-sm">
-                {mealPlanDay.recipes.length} {mealPlanDay.recipes.length === 1 ? 'recipe' : 'recipes'}
+                {recipes.length} {pluralize('recipe', recipes.length)}
             </Badge>
         {/if}
     </div>
 
     <!-- Recipes Grid -->
-    {#if mealPlanDay.recipes && mealPlanDay.recipes.length > 0}
+    {#if recipes && recipes.length > 0}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {#each mealPlanDay.recipes as recipe}
+            {#each recipes as recipe}
                 <RecipeCard {recipe} {availableTags}>
                     {#snippet overlay()}
-                        <MealPlanButtonsOverlay {recipe} />
+                        <MealPlanButtonsOverlay {recipe} date={mealPlanDay.date} onDeleted={handleRecipeDeleted} />
                     {/snippet}
                 </RecipeCard>
             {/each}

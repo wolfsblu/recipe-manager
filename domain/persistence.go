@@ -18,6 +18,7 @@ type RecipeStore interface {
 	DeleteRecipe(ctx context.Context, id int64) error
 	GetMealPlan(ctx context.Context, user *User, from time.Time, until time.Time) ([]MealPlan, error)
 	CreateMealPlan(ctx context.Context, entry MealPlanEntry) error
+	DeleteMealPlan(ctx context.Context, userID int64, recipeID int64, date time.Time) error
 	GetIngredients(ctx context.Context) ([]Ingredient, error)
 	GetUnits(ctx context.Context) ([]Unit, error)
 	GetTags(ctx context.Context) ([]Tag, error)

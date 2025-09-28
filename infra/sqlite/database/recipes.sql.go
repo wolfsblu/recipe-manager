@@ -233,6 +233,22 @@ func (q *Queries) DeleteIngredient(ctx context.Context, id int64) error {
 	return err
 }
 
+const deleteMealPlan = `-- name: DeleteMealPlan :exec
+DELETE FROM meal_plan
+WHERE user_id = ? AND recipe_id = ? AND date = ?
+`
+
+type DeleteMealPlanParams struct {
+	UserID   int64
+	RecipeID int64
+	Date     string
+}
+
+func (q *Queries) DeleteMealPlan(ctx context.Context, arg DeleteMealPlanParams) error {
+	_, err := q.db.ExecContext(ctx, deleteMealPlan, arg.UserID, arg.RecipeID, arg.Date)
+	return err
+}
+
 const deleteRecipe = `-- name: DeleteRecipe :exec
 DELETE
 FROM recipes

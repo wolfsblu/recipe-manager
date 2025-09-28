@@ -183,6 +183,33 @@ paths:
           description: Recipe added to meal plan successfully
         default:
           $ref: '#/components/responses/Error'
+  '/mealplan/{recipeId}':
+    delete:
+      tags:
+        - Meal Plan
+      summary: Remove a recipe from your meal plan
+      operationId: deleteMealPlan
+      parameters:
+        - name: recipeId
+          in: path
+          description: ID of the recipe to remove from meal plan
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: date
+          in: query
+          description: Date to remove the recipe from meal plan
+          required: true
+          schema:
+            type: string
+            format: date
+            example: '2023-01-01'
+      responses:
+        '204':
+          description: Recipe removed from meal plan successfully
+        default:
+          $ref: '#/components/responses/Error'
   /recipes:
     get:
       tags:

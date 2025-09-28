@@ -70,6 +70,11 @@ func (h *RecipeHandler) CreateMealPlan(ctx context.Context, req *api.WriteMealPl
 	return h.Recipes.CreateMealPlan(ctx, user, req.RecipeId, req.Date)
 }
 
+func (h *RecipeHandler) DeleteMealPlan(ctx context.Context, params api.DeleteMealPlanParams) error {
+	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	return h.Recipes.DeleteMealPlan(ctx, user, params.RecipeId, params.Date)
+}
+
 func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
 	user := ctx.Value(config.CtxKeyUser).(*domain.User)
 	recipes, err := h.Recipes.GetByUser(ctx, user)

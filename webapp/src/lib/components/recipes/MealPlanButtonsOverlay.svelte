@@ -3,12 +3,18 @@
     import ShoppingCart from '@lucide/svelte/icons/shopping-cart'
     import { Button } from "$lib/components/ui/button/index.js";
     import { toast } from "svelte-sonner";
+    import { deleteMealPlan } from "$lib/api/mealplan/mealplan.svelte.js";
 
-    let { recipe } = $props()
+    let { recipe, date, onDeleted } = $props()
 
     const handleDeleteFromMealPlan = async (e: Event) => {
-        // TODO: Implement delete from meal plan functionality
-        toast.success("Removed from meal plan");
+        try {
+            await deleteMealPlan(recipe.id, date);
+            toast.success("Removed from meal plan");
+            onDeleted?.(recipe.id);
+        } catch (error) {
+            toast.error("Failed to remove from meal plan. Please try again.");
+        }
     }
 
     const handleAddToShoppingList = async (e: Event) => {

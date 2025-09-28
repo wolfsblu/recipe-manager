@@ -98,6 +98,14 @@ func (s *Store) CreateMealPlan(ctx context.Context, entry domain.MealPlanEntry) 
 	return s.query().CreateMealPlan(ctx, s.mapper.FromMealPlanEntry(entry))
 }
 
+func (s *Store) DeleteMealPlan(ctx context.Context, userID int64, recipeID int64, date time.Time) error {
+	return s.query().DeleteMealPlan(ctx, database.DeleteMealPlanParams{
+		UserID:   userID,
+		RecipeID: recipeID,
+		Date:     date.Format(time.DateOnly),
+	})
+}
+
 func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Time, until time.Time) ([]domain.MealPlan, error) {
 	result, err := s.query().GetMealPlan(ctx, database.GetMealPlanParams{
 		UserID:    user.ID,
