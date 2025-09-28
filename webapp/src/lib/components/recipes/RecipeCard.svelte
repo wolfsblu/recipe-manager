@@ -1,62 +1,17 @@
 <script lang="ts">
     import ClockIcon from '@lucide/svelte/icons/clock'
     import ImageIcon from '@lucide/svelte/icons/image'
-    import ChevronUp from '@lucide/svelte/icons/chevron-up'
-    import ChevronDown from '@lucide/svelte/icons/chevron-down'
     import { Badge } from "$lib/components/ui/badge/index.js";
-    import { Button } from "$lib/components/ui/button/index.js";
     import { ScrollArea } from "$lib/components/ui/scroll-area/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
-    import { addVote, removeVote, patchRecipe } from "$lib/api/recipes/recipes.svelte.js";
+    import { patchRecipe } from "$lib/api/recipes/recipes.svelte.js";
     import { toast } from "svelte-sonner";
-    import { scale } from "svelte/transition";
-    import { quintOut } from "svelte/easing";
     import TagCombobox from './TagCombobox.svelte';
 
-    let { recipe, availableTags } = $props()
+    let { recipe, availableTags, overlay } = $props()
 
-    // Reactive state for voting
-    let votes = $state(recipe.votes)
-    let isVoting = $state(false)
-    
     // Reactive state for tags
     let tags = $state(recipe.tags || [])
-
-    const handleVote = async (voteValue: 1 | -1) => {
-        if (isVoting) return
-
-        isVoting = true
-        const previousVotes = { ...votes }
-
-        try {
-            const data = await addVote(recipe.id, voteValue)
-            votes = data
-            toast.success(`${voteValue === 1 ? 'Upvoted' : 'Downvoted'} recipe`)
-        } catch (error) {
-            votes = previousVotes
-            toast.error("Failed to vote. Please try again.")
-        } finally {
-            isVoting = false
-        }
-    }
-
-    const handleRemoveVote = async () => {
-        if (isVoting) return
-
-        isVoting = true
-        const previousVotes = { ...votes }
-
-        try {
-            const data = await removeVote(recipe.id)
-            votes = data
-            toast.success("Vote removed")
-        } catch (error) {
-            votes = previousVotes
-            toast.error("Failed to remove vote. Please try again.")
-        } finally {
-            isVoting = false
-        }
-    }
 
     const formatMinutesAsHours = (minutes: number) => {
         if (!minutes || minutes < 0) {
@@ -117,43 +72,11 @@
             {/if}
         </a>
 
-        <!-- Voting overlay -->
-        <div class="absolute top-2 right-2 z-10 flex flex-col items-center gap-1 bg-secondary rounded-full px-1 py-2 opacity-90">
-            <Button
-                variant="ghost"
-                size="sm"
-                class="h-6 w-6 p-0 hover:bg-transparent"
-                disabled={isVoting}
-                onclick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    votes.user === 1 ? handleRemoveVote() : handleVote(1);
-                }}
-            >
-                <ChevronUp class={`h-3 w-3 ${votes.user === 1 ? 'text-green-600' : 'text-muted-foreground'}`} />
-            </Button>
-            {#if votes.total !== 0}
-                <span
-                    class="text-sm font-bold text-muted-foreground min-w-4 text-center"
-                    transition:scale={{ duration: 300, start: 0.5, easing: quintOut }}
-                >
-                    {votes.total}
-                </span>
-            {/if}
-            <Button
-                variant="ghost"
-                size="sm"
-                class="h-6 w-6 p-0 hover:bg-transparent"
-                disabled={isVoting}
-                onclick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    votes.user === -1 ? handleRemoveVote() : handleVote(-1);
-                }}
-            >
-                <ChevronDown class={`h-3 w-3 ${votes.user === -1 ? 'text-red-600' : 'text-muted-foreground'}`} />
-            </Button>
-        </div>
+        {#if overlay}
+            <div class="absolute top-2 right-2 z-10 flex flex-col items-center gap-1 bg-secondary rounded-full px-1 py-2 opacity-90">
+                {@render overlay?.()}
+            </div>
+        {/if}
     </div>
     <div class="pt-3 px-4 pb-2 space-y-2">
         <a href="/recipes/{recipe.id}" class="inline-block font-semibold text-base">

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Badge } from "$lib/components/ui/badge/index.js";
     import RecipeCard from '../recipes/RecipeCard.svelte';
+    import MealPlanButtonsOverlay from '../recipes/MealPlanButtonsOverlay.svelte';
     import CalendarIcon from '@lucide/svelte/icons/calendar';
     import type { components } from '$lib/api/schema';
 
@@ -74,7 +75,11 @@
     {#if mealPlanDay.recipes && mealPlanDay.recipes.length > 0}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {#each mealPlanDay.recipes as recipe}
-                <RecipeCard {recipe} {availableTags} />
+                <RecipeCard {recipe} {availableTags}>
+                    {#snippet overlay()}
+                        <MealPlanButtonsOverlay {recipe} />
+                    {/snippet}
+                </RecipeCard>
             {/each}
         </div>
     {:else}
