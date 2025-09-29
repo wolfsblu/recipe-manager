@@ -6,9 +6,10 @@ import (
 	"github.com/wolfsblu/recipe-manager/domain/permissions"
 )
 
-type Credentials struct {
+type UserDetails struct {
 	Email        string
 	PasswordHash string
+	Locale       string
 }
 
 type Permission struct {
@@ -27,7 +28,7 @@ type User struct {
 	ID        int64
 	Confirmed bool
 	Role      Role
-	Credentials
+	UserDetails
 }
 
 type PasswordResetToken struct {

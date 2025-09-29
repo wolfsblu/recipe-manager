@@ -18,9 +18,10 @@ func (m *DBMapper) ToUserFromGetUserRow(r database.GetUserRow) domain.User {
 	return domain.User{
 		ID:        r.ID,
 		Confirmed: r.IsConfirmed,
-		Credentials: domain.Credentials{
+		UserDetails: domain.UserDetails{
 			Email:        r.Email,
 			PasswordHash: r.PasswordHash,
+			Locale:       r.Locale,
 		},
 		Role: domain.Role{
 			ID:   r.ID,
@@ -40,9 +41,10 @@ func (m *DBMapper) ToUser(r database.User) domain.User {
 	return domain.User{
 		ID:        r.ID,
 		Confirmed: r.IsConfirmed,
-		Credentials: domain.Credentials{
+		UserDetails: domain.UserDetails{
 			Email:        r.Email,
 			PasswordHash: r.PasswordHash,
+			Locale:       r.Locale,
 		},
 	}
 }

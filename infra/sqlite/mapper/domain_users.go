@@ -12,11 +12,12 @@ func (m *DBMapper) FromUserForPasswordResetToken(user *domain.User, token string
 	}
 }
 
-func (m *DBMapper) FromCredentials(credentials domain.Credentials, roleID int64) database.CreateUserParams {
+func (m *DBMapper) FromUserDetails(userDetails domain.UserDetails, roleID int64) database.CreateUserParams {
 	return database.CreateUserParams{
-		Email:        credentials.Email,
-		PasswordHash: credentials.PasswordHash,
+		Email:        userDetails.Email,
+		PasswordHash: userDetails.PasswordHash,
 		RoleID:       roleID,
+		Locale:       userDetails.Locale,
 	}
 }
 

@@ -10,6 +10,7 @@
     import UploadProgress from '$lib/components/ui/upload/UploadProgress.svelte';
     import UploadError from '$lib/components/ui/upload/UploadError.svelte';
     import UploadSuccess from '$lib/components/ui/upload/UploadSuccess.svelte';
+    import * as m from "$lib/paraglide/messages.js";
 
     let {
         value = $bindable<string[] | undefined>(),
@@ -38,14 +39,14 @@
             try {
                 await uploadService.uploadFile(file);
             } catch (error) {
-                toast.error(`${file.name} failed to upload!`);
+                toast.error(m.recipes_imageUpload_uploadFailed({ fileName: file.name }));
             }
         });
         await Promise.allSettled(promises);
     };
 
     const onFileRejected: FileDropZoneProps['onFileRejected'] = async ({ reason, file }) => {
-        toast.error(`${file.name} failed to upload!`, { description: reason });
+        toast.error(m.recipes_imageUpload_uploadFailed({ fileName: file.name }), { description: reason });
     };
 
     const handleDrop = (state: DragDropState<any>) => {
@@ -128,7 +129,7 @@
                         <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                         </svg>
-                        <span class="text-sm">Add Image</span>
+                        <span class="text-sm">{m.recipes_imageUpload_addImage()}</span>
                     </div>
                 </button>
             {/if}

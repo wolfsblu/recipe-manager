@@ -56,8 +56,8 @@ func (s *UserService) GetUserByEmail(ctx context.Context, email string) (User, e
 	return s.store.GetUserByEmail(ctx, email)
 }
 
-func (s *UserService) RegisterUser(ctx context.Context, credentials Credentials) error {
-	user, err := s.store.GetUserByEmail(ctx, credentials.Email)
+func (s *UserService) RegisterUser(ctx context.Context, userDetails UserDetails) error {
+	user, err := s.store.GetUserByEmail(ctx, userDetails.Email)
 	if err == nil {
 		return ErrUserExists
 	}
@@ -65,7 +65,7 @@ func (s *UserService) RegisterUser(ctx context.Context, credentials Credentials)
 		return err
 	}
 	defer s.store.Rollback()
-	user, err = s.store.CreateUser(ctx, credentials)
+	user, err = s.store.CreateUser(ctx, userDetails)
 	if err != nil {
 		return err
 	}

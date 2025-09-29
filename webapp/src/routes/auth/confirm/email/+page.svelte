@@ -6,6 +6,7 @@
     import {goto} from "$app/navigation";
     import {onDestroy, onMount} from "svelte";
     import {toast} from "svelte-sonner";
+    import * as m from "$lib/paraglide/messages.js";
 
     let redirectHandle = 0
     let redirectDelay = $state(5)
@@ -22,7 +23,7 @@
                 }
             }, 1000)
         } catch (err) {
-            toast.error("Failed to verify your email, please try again")
+            toast.error(m.auth_confirmEmail_errorMessage())
             await goto("/")
         }
     })
@@ -33,12 +34,10 @@
 
 <Alert.Root class="max-w-xl m-auto">
     <SuccessIcon />
-    <Alert.Title>Success! Your account has been confirmed</Alert.Title>
+    <Alert.Title>{m.auth_confirmEmail_successTitle()}</Alert.Title>
     <Alert.Description>
-        Your email address has been successfully verified, you will be redirected
-        to the login page in {redirectDelay} seconds, alternatively click on the
-        button below.
+        {m.auth_confirmEmail_successDescription({ seconds: redirectDelay })}
 
-        <Button href="/auth/login">Login</Button>
+        <Button href="/auth/login">{m.auth_confirmEmail_loginButton()}</Button>
     </Alert.Description>
 </Alert.Root>

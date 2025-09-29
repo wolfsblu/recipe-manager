@@ -7,6 +7,7 @@
     import { patchRecipe } from "$lib/api/recipes/recipes.svelte.js";
     import { toast } from "svelte-sonner";
     import TagCombobox from './TagCombobox.svelte';
+    import * as m from "$lib/paraglide/messages.js";
 
     let { recipe, availableTags, overlay } = $props()
 
@@ -15,11 +16,11 @@
 
     const formatMinutesAsHours = (minutes: number) => {
         if (!minutes || minutes < 0) {
-            return "N/A";
+            return m.common_time_notAvailable();
         }
 
         if (minutes < 60) {
-            return `${minutes}m`;
+            return m.common_time_minutes({ count: minutes });
         }
 
         const hours = minutes / 60;
@@ -29,7 +30,7 @@
         // This avoids trailing zeros for numbers like 1.5 or 2.0.
         const roundedHours = Math.round(hours * 100) / 100;
 
-        return `${roundedHours}h`;
+        return m.common_time_hours({ count: roundedHours });
     }
     
     const handleTagAdded = async (tagId: number) => {
@@ -44,10 +45,10 @@
         try {
             const updatedTagIds = tags.map(tag => tag.id);
             await patchRecipe(recipe.id, { tags: updatedTagIds });
-            toast.success(`Added tag: ${newTag.name}`);
+            toast.success(m.recipes_tags_addSuccess({ tagName: newTag.name }));
         } catch (error) {
             tags = previousTags;
-            toast.error("Failed to add tag. Please try again.");
+            toast.error(m.recipes_tags_addError());
         }
     }
 </script>
@@ -66,7 +67,7 @@
                 <div class="w-full h-52 bg-muted flex items-center justify-center">
                     <div class="text-center text-muted-foreground">
                         <ImageIcon class="w-12 h-12 mx-auto mb-2" />
-                        <p class="text-sm">No image available</p>
+                        <p class="text-sm">{m.recipes_card_noImage()}</p>
                     </div>
                 </div>
             {/if}
@@ -84,12 +85,12 @@
         </a>
         <div class="text-sm text-muted-foreground grid space-y-1">
             <div class="flex justify-between">
-                <span>Servings</span>
+                <span>{m.recipes_card_servings()}</span>
                 <Badge>{recipe.servings}</Badge>
             </div>
             <Separator />
             <div class="flex justify-between">
-                <span>Ingredients</span>
+                <span>{m.recipes_card_ingredients()}</span>
                 <Badge>12</Badge>
             </div>
                 <Separator />
@@ -106,8 +107,8 @@
                 options={availableTags
                     .filter(tag => !tags.some(t => t.id === tag.id))
                     .map(tag => ({ value: tag.id, label: tag.name }))}
-                search="Search tags..."
-                empty="No tags found"
+                search={m.recipes_card_searchTags()}
+                empty={m.recipes_card_noTagsFound()}
                 onSelect={handleTagAdded}
             />
         </div>

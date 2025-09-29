@@ -9,6 +9,7 @@
     import { goto } from "$app/navigation";
     import { updateRecipe } from "$lib/api/recipes/recipes.svelte";
     import { commitImageDeletions, clearImageDeletions } from "$lib/stores/imageDeleteQueue";
+    import * as m from "$lib/paraglide/messages.js";
 
     let { data }: { data: PageData } = $props();
     const { recipe, ingredients, units, tags } = data;
@@ -23,10 +24,10 @@
                 try {
                     await updateRecipe(recipe.id, form.data);
                     await commitImageDeletions();
-                    toast.success("Recipe updated successfully!");
+                    toast.success(m.recipes_edit_successMessage());
                     await goto(`/recipes/${recipe.id}`);
                 } catch (error) {
-                    toast.error("Failed to update recipe");
+                    toast.error(m.recipes_edit_errorMessage());
                 }
             }
         }
@@ -40,22 +41,22 @@
 </script>
 
 <svelte:head>
-    <title>Edit {recipe.name} - Recipe Manager</title>
+    <title>{m.recipes_edit_pageTitle({ recipeName: recipe.name })}</title>
 </svelte:head>
 
 <div class="container mx-auto px-0 md:px-4 py-6">
     <div class="mb-8 px-4 md:px-0">
-        <h1 class="text-4xl font-bold text-foreground mb-2">Edit Recipe</h1>
-        <p class="text-lg text-muted-foreground">Update your "{recipe.name}" recipe</p>
+        <h1 class="text-4xl font-bold text-foreground mb-2">{m.recipes_edit_title()}</h1>
+        <p class="text-lg text-muted-foreground">{m.recipes_edit_subtitle({ recipeName: recipe.name })}</p>
     </div>
 
-    <RecipeForm 
-        {form} 
-        {ingredients} 
-        {units} 
-        {tags} 
+    <RecipeForm
+        {form}
+        {ingredients}
+        {units}
+        {tags}
         isEditing={true}
-        submitText="Update Recipe"
+        submitText={m.recipes_edit_submitButton()}
         onCancel={handleCancel}
     />
 </div>

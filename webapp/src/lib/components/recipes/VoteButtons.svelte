@@ -6,6 +6,7 @@
     import { addVote, removeVote } from "$lib/api/recipes/recipes.svelte";
     import { toast } from "svelte-sonner";
     import type { components } from "$lib/api/schema";
+    import * as m from "$lib/paraglide/messages.js";
 
     type RecipeVotes = components["schemas"]["RecipeVotes"];
 
@@ -46,18 +47,19 @@
                 // Remove vote if clicking the same button
                 const response = await removeVote(recipeId);
                 currentVotes = response;
-                toast.success("Vote removed");
+                toast.success(m.recipes_voting_voteRemoved());
             } else {
                 // Add or change vote
                 const voteValue = getVoteValue(voteType);
                 const response = await addVote(recipeId, voteValue);
                 currentVotes = response;
-                toast.success(`${voteType === 'up' ? 'Upvoted' : 'Downvoted'} recipe`);
+                toast.success(voteType === 'up' ? m.recipes_voting_upvoted() : m.recipes_voting_downvoted());
             }
         } catch (error) {
             console.error('Voting error:', error);
             currentVotes = previousVotes;
-            toast.error("Failed to vote. Please try again.");
+            const errorMessage = userVote === voteType ? m.recipes_voting_removeVoteError() : m.recipes_voting_voteError();
+            toast.error(errorMessage);
         } finally {
             isLoading = false;
         }
@@ -76,7 +78,7 @@
             onclick={() => handleVote('up')}
             disabled={isLoading}
             class={userVote === 'up' ? 'text-green-600 hover:text-green-700' : ''}
-            title="Upvote recipe"
+            title={m.recipes_voting_upvote()}
         >
             <ChevronUpIcon class={iconSize} />
         </Button>
@@ -91,7 +93,7 @@
             onclick={() => handleVote('down')}
             disabled={isLoading}
             class={userVote === 'down' ? 'text-red-600 hover:text-red-700' : ''}
-            title="Downvote recipe"
+            title={m.recipes_voting_downvote()}
         >
             <ChevronDownIcon class={iconSize} />
         </Button>
@@ -104,7 +106,7 @@
             onclick={() => handleVote('up')}
             disabled={isLoading}
             class={userVote === 'up' ? 'text-green-600 hover:text-green-700' : ''}
-            title="Upvote recipe"
+            title={m.recipes_voting_upvote()}
         >
             <ChevronUpIcon class={iconSize} />
         </Button>
@@ -119,7 +121,7 @@
             onclick={() => handleVote('down')}
             disabled={isLoading}
             class={userVote === 'down' ? 'text-red-600 hover:text-red-700' : ''}
-            title="Downvote recipe"
+            title={m.recipes_voting_downvote()}
         >
             <ChevronDownIcon class={iconSize} />
         </Button>

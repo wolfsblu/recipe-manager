@@ -408,6 +408,10 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        UserRegistration: components["schemas"]["Credentials"] & {
+            /** @example en */
+            locale: string;
+        };
         Credentials: {
             /** @example test@example.com */
             email: string;
@@ -797,6 +801,12 @@ export interface components {
     };
     parameters: never;
     requestBodies: {
+        /** @description User registration credentials */
+        UserRegistration: {
+            content: {
+                "application/json": components["schemas"]["UserRegistration"];
+            };
+        };
         /** @description User credentials */
         Credentials: {
             content: {
@@ -923,7 +933,7 @@ export interface operations {
             cookie?: never;
         };
         /** @description The new user credentials */
-        requestBody: components["requestBodies"]["Credentials"];
+        requestBody: components["requestBodies"]["UserRegistration"];
         responses: {
             /** @description Registration was successful */
             204: {

@@ -25,6 +25,7 @@
     import { toast } from "svelte-sonner";
     import VoteButtons from "$lib/components/recipes/VoteButtons.svelte";
     import AddToMealPlanButton from "$lib/components/recipes/AddToMealPlanButton.svelte";
+    import * as m from "$lib/paraglide/messages.js";
 
     let { data }: { data: PageData } = $props();
     const { recipe } = data;
@@ -43,25 +44,25 @@
         showDeleteDialog = false;
         try {
             await deleteRecipe(recipe.id);
-            toast.success("Recipe deleted successfully!");
+            toast.success(m.recipes_detail_deleteSuccess());
             await goto("/recipes");
         } catch (error) {
-            toast.error("Failed to delete recipe");
+            toast.error(m.recipes_detail_deleteError());
         }
     }
 
     const formatMinutesAsHours = (minutes: number) => {
         if (!minutes || minutes < 0) {
-            return "N/A";
+            return m.common_time_notAvailable();
         }
 
         if (minutes < 60) {
-            return `${minutes}m`;
+            return m.common_time_minutes({ count: minutes });
         }
 
         const hours = minutes / 60;
         const roundedHours = Math.round(hours * 100) / 100;
-        return `${roundedHours}h`;
+        return m.common_time_hours({ count: roundedHours });
     }
 
     const ingredients = Array.from(
@@ -91,7 +92,7 @@
 </script>
 
 <svelte:head>
-    <title>{recipe.name} - Recipe Manager</title>
+    <title>{m.recipes_detail_pageTitle({ recipeName: recipe.name })}</title>
 </svelte:head>
 
 <div class="container mx-auto px-4 py-6">
@@ -108,7 +109,7 @@
                             variant="ghost"
                             size="sm"
                             onclick={handleEdit}
-                            title="Edit recipe"
+                            title={m.recipes_detail_editButton()}
                         >
                             <EditIcon class="w-5 h-5" />
                         </Button>
@@ -119,7 +120,7 @@
                             variant="ghost"
                             size="sm"
                             onclick={handleDelete}
-                            title="Delete recipe"
+                            title={m.recipes_detail_deleteButton()}
                         >
                             <TrashIcon class="w-5 h-5" />
                         </Button>
@@ -137,7 +138,7 @@
                         <div class="w-full h-full bg-muted flex items-center justify-center">
                             <div class="text-center text-muted-foreground">
                                 <ImageIcon class="w-16 h-16 mx-auto mb-2" />
-                                <p>No image available</p>
+                                <p>{m.recipes_detail_noImage()}</p>
                             </div>
                         </div>
                     {/if}
@@ -172,7 +173,7 @@
                         <CardContent class="p-4 flex items-center gap-3">
                             <ClockIcon class="w-5 h-5 text-primary" />
                             <div>
-                                <p class="text-sm text-muted-foreground">Cook Time</p>
+                                <p class="text-sm text-muted-foreground">{m.recipes_detail_cookTime()}</p>
                                 <p class="text-lg font-semibold">{formatMinutesAsHours(recipe.minutes)}</p>
                             </div>
                         </CardContent>
@@ -182,7 +183,7 @@
                         <CardContent class="p-4 flex items-center gap-3">
                             <UsersIcon class="w-5 h-5 text-primary" />
                             <div>
-                                <p class="text-sm text-muted-foreground">Servings</p>
+                                <p class="text-sm text-muted-foreground">{m.recipes_detail_servings()}</p>
                                 <p class="text-lg font-semibold">{recipe.servings}</p>
                             </div>
                         </CardContent>
@@ -192,7 +193,7 @@
                         <CardContent class="p-4 flex items-center gap-3">
                             <StepsIcon class="w-5 h-5 text-primary" />
                             <div>
-                                <p class="text-sm text-muted-foreground">Steps</p>
+                                <p class="text-sm text-muted-foreground">{m.recipes_detail_steps()}</p>
                                 <p class="text-lg font-semibold">{recipe.steps.length}</p>
                             </div>
                         </CardContent>
@@ -202,7 +203,7 @@
                         <CardContent class="p-4 flex items-center gap-3">
                             <IngredientIcon class="w-5 h-5 text-primary" />
                             <div>
-                                <p class="text-sm text-muted-foreground">Ingredients</p>
+                                <p class="text-sm text-muted-foreground">{m.recipes_detail_ingredients()}</p>
                                 <p class="text-lg font-semibold">
                                     {recipe.steps.reduce((total, step) => total + (step.ingredients?.length || 0), 0)}
                                 </p>
@@ -232,13 +233,13 @@
 
     {#if recipe.steps && recipe.steps.length > 0 && ingredients.length > 0}
         <h2 class="font-bold text-2xl text-foreground mb-3">
-            Ingredients
+            {m.recipes_detail_ingredientsTitle()}
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {#each ingredients as ingredient}
                 <div class="border flex items-center justify-between px-3 py-2 bg-muted/30 rounded-lg">
                     <span class="font-medium text-muted-foreground">
-                        {ingredient.ingredient?.name || 'Unknown ingredient'}
+                        {ingredient.ingredient?.name || m.recipes_detail_unknownIngredient()}
                     </span>
                     <Badge variant="outline" class="text-sm text-muted-foreground">
                         {ingredient.amount}
@@ -251,7 +252,7 @@
 
     <Separator class="my-6" />
 
-    <h2 class="font-bold text-2xl text-foreground mb-3">Instructions</h2>
+    <h2 class="font-bold text-2xl text-foreground mb-3">{m.recipes_detail_instructionsTitle()}</h2>
     {#if recipe.steps && recipe.steps.length > 0}
         <!-- Instructions Section -->
         <div class="space-y-6">
@@ -263,7 +264,7 @@
                                 <div class="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
                                     {stepIndex + 1}
                                 </div>
-                                Step {stepIndex + 1}
+                                {m.recipes_detail_stepLabel({ number: stepIndex + 1 })}
                             </CardTitle>
                         </CardHeader>
                         <CardContent class="py-0">
@@ -272,13 +273,13 @@
                                     <div>
                                         <h4 class="font-semibold mb-3 flex items-center gap-2">
                                             <IngredientIcon class="w-4 h-4" />
-                                            Ingredients
+                                            {m.recipes_form_ingredients()}
                                         </h4>
                                         <div class="space-y-1">
                                             {#each step.ingredients as ingredient}
                                                 <div class="flex items-center justify-between px-3 py-2 bg-muted/30 rounded-lg">
                                                     <span class="font-medium text-muted-foreground">
-                                                        {ingredient.ingredient?.name || 'Unknown ingredient'}
+                                                        {ingredient.ingredient?.name || m.recipes_detail_unknownIngredient()}
                                                     </span>
                                                     <Badge variant="outline" class="text-sm text-muted-foreground">
                                                         {ingredient.amount}
@@ -293,14 +294,14 @@
                                 <div>
                                     <h4 class="font-semibold mb-3 flex items-center gap-2">
                                         <ChefHatIcon class="w-4 h-4" />
-                                        Instructions
+                                        {m.recipes_form_instructions()}
                                     </h4>
                                     {#if step.instructions}
                                         <div class="prose prose-sm max-w-none">
                                             <p class="text-muted-foreground leading-relaxed whitespace-pre-wrap">{step.instructions}</p>
                                         </div>
                                     {:else}
-                                        <p class="text-muted-foreground italic">No instructions provided for this step.</p>
+                                        <p class="text-muted-foreground italic">{m.recipes_detail_noInstructions()}</p>
                                     {/if}
                                 </div>
                             </div>
@@ -313,7 +314,7 @@
         <Card>
             <CardContent class="p-8 text-center">
                 <ChefHatIcon class="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <p class="text-lg text-muted-foreground">No cooking instructions available for this recipe.</p>
+                <p class="text-lg text-muted-foreground">{m.recipes_detail_noCookingInstructions()}</p>
             </CardContent>
         </Card>
     {/if}
@@ -323,15 +324,15 @@
 <AlertDialog.Root bind:open={showDeleteDialog}>
     <AlertDialog.Content>
         <AlertDialog.Header>
-            <AlertDialog.Title>Delete Recipe</AlertDialog.Title>
+            <AlertDialog.Title>{m.recipes_detail_deleteDialog_title()}</AlertDialog.Title>
             <AlertDialog.Description>
-                Are you sure you want to delete "{recipe.name}"? This action cannot be undone.
+                {m.recipes_detail_deleteDialog_description({ recipeName: recipe.name })}
             </AlertDialog.Description>
         </AlertDialog.Header>
         <AlertDialog.Footer>
-            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <AlertDialog.Cancel>{m.recipes_detail_deleteDialog_cancel()}</AlertDialog.Cancel>
             <AlertDialog.Action onclick={confirmDelete}>
-                Delete
+                {m.recipes_detail_deleteDialog_delete()}
             </AlertDialog.Action>
         </AlertDialog.Footer>
     </AlertDialog.Content>

@@ -21,8 +21,8 @@ func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User)
 	return token, nil
 }
 
-func (s *Store) CreateUser(ctx context.Context, credentials domain.Credentials) (user domain.User, _ error) {
-	result, err := s.query().CreateUser(ctx, s.mapper.FromCredentials(credentials, int64(roles.User)))
+func (s *Store) CreateUser(ctx context.Context, userDetails domain.UserDetails) (user domain.User, _ error) {
+	result, err := s.query().CreateUser(ctx, s.mapper.FromUserDetails(userDetails, int64(roles.User)))
 	if err != nil {
 		return user, domain.WrapError(domain.ErrCreatingUser, err)
 	}

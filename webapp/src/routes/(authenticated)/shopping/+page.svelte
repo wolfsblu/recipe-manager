@@ -13,7 +13,8 @@
     import { fly, scale } from 'svelte/transition';
     import { elasticOut, quintOut } from 'svelte/easing';
     import { toast } from 'svelte-sonner';
-    
+    import * as m from "$lib/paraglide/messages.js";
+
     import { shoppingStore } from '$lib/stores/shopping.svelte';
     import { addShoppingListItem, updateShoppingListItem, deleteShoppingListItem } from '$lib/api/shopping/shopping.svelte';
     import ShoppingListSelector from '$lib/components/shopping/ShoppingListSelector.svelte';
@@ -65,7 +66,7 @@
             newItemQuantity = '';
             newItemUnit = '';
         } catch (error) {
-            toast.error('Failed to add item');
+            toast.error(m.shopping_errors_addItem());
         } finally {
             isAddingItem = false;
         }
@@ -87,7 +88,7 @@
             );
             shoppingStore.updateItemInList(shoppingStore.currentListId, updatedItem);
         } catch (error) {
-            toast.error('Failed to update item');
+            toast.error(m.shopping_errors_updateItem());
         }
     };
 
@@ -98,7 +99,7 @@
             await deleteShoppingListItem(shoppingStore.currentListId, itemId);
             shoppingStore.removeItemFromList(shoppingStore.currentListId, itemId);
         } catch (error) {
-            toast.error('Failed to delete item');
+            toast.error(m.shopping_errors_deleteItem());
         }
     };
 
@@ -118,12 +119,12 @@
 
     const getColumnConfig = (isDone: boolean) => {
         return isDone ? {
-            title: 'Done',
+            title: m.shopping_list_done(),
             icon: CheckIcon,
             bgColor: 'bg-green-50 dark:bg-green-950/20',
             borderColor: 'border-green-200 dark:border-green-800',
         } : {
-            title: currentList?.name || 'Shopping List',
+            title: currentList?.name || m.shopping_list_title(),
             icon: ShoppingCartIcon,
             bgColor: 'bg-orange-50 dark:bg-orange-950/20',
             borderColor: 'border-orange-200 dark:border-orange-800',
@@ -133,7 +134,7 @@
 
 
 <svelte:head>
-    <title>Shopping Lists</title>
+    <title>{m.shopping_title()}</title>
 </svelte:head>
 
 {#if !hasLists}
@@ -180,24 +181,24 @@
                                                 <div class="w-full grid grid-cols-2 md:grid-cols-[2fr_4fr_6fr_min-content] items-center gap-2">
                                                     <Input
                                                         bind:value={newItemQuantity}
-                                                        placeholder="1"
+                                                        placeholder={m.shopping_list_addItemPlaceholder_quantity()}
                                                         disabled={isAddingItem}
                                                     />
                                                     <Input
                                                         bind:value={newItemUnit}
-                                                        placeholder="kg"
+                                                        placeholder={m.shopping_list_addItemPlaceholder_unit()}
                                                         disabled={isAddingItem}
                                                     />
                                                     <Input
                                                         bind:value={newItemName}
-                                                        placeholder="Potatoes"
+                                                        placeholder={m.shopping_list_addItemPlaceholder_name()}
                                                         class="col-span-2 md:col-span-1"
                                                         disabled={isAddingItem}
                                                         required
                                                     />
                                                     <Button type="submit" variant="ghost" class="col-span-2 md:col-span-1" disabled={isAddingItem || !newItemName.trim()}>
                                                         <PlusIcon/>
-                                                        <span class="md:hidden">{isAddingItem ? 'Adding...' : 'Add Item'}</span>
+                                                        <span class="md:hidden">{isAddingItem ? m.shopping_list_adding() : m.shopping_list_addButton()}</span>
                                                     </Button>
                                                 </div>
                                             </form>
@@ -207,7 +208,7 @@
                                     {#if items.length === 0}
                                         <div class="flex flex-col items-center justify-center flex-1 text-muted-foreground min-h-32">
                                             <IconComponent/>
-                                            <p class="text-sm">No items</p>
+                                            <p class="text-sm">{m.shopping_list_noItems()}</p>
                                         </div>
                                     {/if}
                                     {#each items as item (item.id)}
@@ -231,7 +232,7 @@
                                                             size="sm"
                                                             variant="ghost"
                                                             onclick={() => toggleItemStatus(item)}
-                                                            title="Got it"
+                                                            title={m.shopping_list_gotIt()}
                                                         >
                                                             <CheckIcon/>
                                                         </Button>
@@ -240,7 +241,7 @@
                                                             size="sm"
                                                             variant="ghost"
                                                             onclick={() => toggleItemStatus(item)}
-                                                            title="Need more"
+                                                            title={m.shopping_list_needMore()}
                                                         >
                                                             <ShoppingCartIcon/>
                                                         </Button>
@@ -250,7 +251,7 @@
                                                         size="sm"
                                                         onclick={() => removeItem(item.id)}
                                                         class="text-destructive hover:text-destructive"
-                                                        title="Remove item"
+                                                        title={m.shopping_list_removeItem()}
                                                     >
                                                         <TrashIcon/>
                                                     </Button>

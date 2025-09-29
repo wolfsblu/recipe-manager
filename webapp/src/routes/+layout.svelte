@@ -18,6 +18,9 @@
 
     let { data, children }: LayoutProps = $props();
     commandContext.set(new UseBoolean(false))
+    import { setLocale } from "$lib/paraglide/runtime";
+
+    // Change locale to German
 
     const breadcrumbs = $derived(page.data.breadcrumbs || data.breadcrumbs)
 </script>

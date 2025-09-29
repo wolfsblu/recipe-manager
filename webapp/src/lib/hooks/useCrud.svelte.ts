@@ -1,5 +1,6 @@
 import { invalidateAll } from '$app/navigation';
 import { toast } from 'svelte-sonner';
+import * as m from "$lib/paraglide/messages.js";
 
 interface CrudOperations<T> {
     add: (item: Omit<T, 'id'>) => Promise<any>;
@@ -31,7 +32,7 @@ export function useCrud<T extends CrudItem>(operations: CrudOperations<T>) {
             await invalidateAll();
             return true;
         } catch (error) {
-            toast.error('Failed to add item. Please try again.');
+            toast.error(m.crud_addError());
             return false;
         } finally {
             isSubmitting = false;
@@ -40,7 +41,7 @@ export function useCrud<T extends CrudItem>(operations: CrudOperations<T>) {
 
     const handleEdit = async (item: Omit<T, 'id'>) => {
         if (!editingItem || isSubmitting) return;
-        
+
         isSubmitting = true;
         try {
             await operations.update(editingItem.id, item);
@@ -49,7 +50,7 @@ export function useCrud<T extends CrudItem>(operations: CrudOperations<T>) {
             await invalidateAll();
             return true;
         } catch (error) {
-            toast.error('Failed to update item. Please try again.');
+            toast.error(m.crud_updateError());
             return false;
         } finally {
             isSubmitting = false;
@@ -58,7 +59,7 @@ export function useCrud<T extends CrudItem>(operations: CrudOperations<T>) {
 
     const handleDelete = async () => {
         if (!deletingItem || isSubmitting) return;
-        
+
         isSubmitting = true;
         try {
             await operations.delete(deletingItem.id);
@@ -67,7 +68,7 @@ export function useCrud<T extends CrudItem>(operations: CrudOperations<T>) {
             await invalidateAll();
             return true;
         } catch (error) {
-            toast.error('Failed to delete item. Please try again.');
+            toast.error(m.crud_deleteError());
             return false;
         } finally {
             isSubmitting = false;
@@ -85,19 +86,22 @@ export function useCrud<T extends CrudItem>(operations: CrudOperations<T>) {
             const failures = results.filter(result => result.status === 'rejected');
             if (failures.length > 0) {
                 if (failures.length === items.length) {
-                    toast.error('Failed to delete all selected items. Please try again.');
+                    toast.error(m.crud_deleteError());
                 } else {
-                    toast.error(`Failed to delete ${failures.length} out of ${items.length} items. Please check and try again.`);
+                    toast.error(m.crud_deleteError());
                 }
             } else {
-                toast.success(`Successfully deleted ${items.length} item${items.length > 1 ? 's' : ''}.`);
+                const message = items.length > 1
+                    ? m.crud_deleteSuccess_plural({ count: items.length })
+                    : m.crud_deleteSuccess({ count: items.length });
+                toast.success(message);
             }
-            
+
             showBulkDeleteDialog = false;
             await invalidateAll();
             return failures.length === 0; // Return true only if all deletions succeeded
         } catch (error) {
-            toast.error('Failed to delete items. Please try again.');
+            toast.error(m.crud_deleteError());
             return false;
         } finally {
             isSubmitting = false;

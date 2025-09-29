@@ -74,7 +74,7 @@ paths:
       operationId: register
       requestBody:
         description: The new user credentials
-        $ref: '#/components/requestBodies/Credentials'
+        $ref: '#/components/requestBodies/UserRegistration'
       responses:
         '204':
           description: Registration was successful
@@ -684,6 +684,17 @@ components:
       in: cookie
       name: SESSID
   schemas:
+    UserRegistration:
+      allOf:
+        - $ref: '#/components/schemas/Credentials'
+        - type: object
+          required:
+            - locale
+          properties:
+            locale:
+              type: string
+              examples:
+                - en
     Credentials:
       type: object
       required:
@@ -1139,6 +1150,13 @@ components:
           examples:
             - '2023-01-01'
   requestBodies:
+    UserRegistration:
+      description: User registration credentials
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserRegistration'
     Credentials:
       description: User credentials
       required: true

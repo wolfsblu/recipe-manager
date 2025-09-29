@@ -9,6 +9,7 @@
     import { renderSnippet } from "$lib/components/ui/data-table/index.js";
     import { dialogStore, addIngredientDialogOpen } from "$lib/stores/dialog.svelte";
     import type { PageProps } from './$types';
+    import * as m from "$lib/paraglide/messages.js";
 
     type Ingredient = {
         id: number;
@@ -83,8 +84,8 @@
 <DataTable
     data={data.ingredients}
     searchColumn="name"
-    searchPlaceholder="Filter ingredients"
-    entityName="Ingredient"
+    searchPlaceholder={m.ingredients_searchPlaceholder()}
+    entityName={m.ingredients_entityName()}
     {columns}
     onAdd={crud.openAddDialog}
     onEdit={openEditDialog}
@@ -96,26 +97,26 @@
 <Dialog.Root bind:open={crud.showAddDialog}>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>Add New Ingredient</Dialog.Title>
+            <Dialog.Title>{m.ingredients_addDialog_title()}</Dialog.Title>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
             <div class="grid grid-cols-4 items-center gap-4">
-                <label for="name" class="text-right">Name</label>
+                <label for="name" class="text-right">{m.ingredients_addDialog_nameLabel()}</label>
                 <Input
                     id="name"
                     class="col-span-3"
                     bind:value={newIngredientName}
-                    placeholder="Enter ingredient name"
+                    placeholder={m.ingredients_addDialog_namePlaceholder()}
                     onkeydown={(e) => e.key === 'Enter' && handleAddSubmit()}
                 />
             </div>
         </div>
         <Dialog.Footer>
             <Button variant="outline" onclick={() => crud.showAddDialog = false} disabled={crud.isSubmitting}>
-                Cancel
+                {m.ingredients_addDialog_cancel()}
             </Button>
             <Button onclick={handleAddSubmit} disabled={!newIngredientName.trim() || crud.isSubmitting}>
-                {crud.isSubmitting ? 'Adding...' : 'Add Ingredient'}
+                {crud.isSubmitting ? m.ingredients_addDialog_adding() : m.ingredients_addDialog_button()}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>
@@ -125,26 +126,26 @@
 <Dialog.Root bind:open={crud.showEditDialog}>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>Edit Ingredient</Dialog.Title>
+            <Dialog.Title>{m.ingredients_editDialog_title()}</Dialog.Title>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
             <div class="grid grid-cols-4 items-center gap-4">
-                <label for="edit-name" class="text-right">Name</label>
+                <label for="edit-name" class="text-right">{m.ingredients_editDialog_nameLabel()}</label>
                 <Input
                     id="edit-name"
                     class="col-span-3"
                     bind:value={editIngredientName}
-                    placeholder="Enter ingredient name"
+                    placeholder={m.ingredients_editDialog_namePlaceholder()}
                     onkeydown={(e) => e.key === 'Enter' && handleEditSubmit()}
                 />
             </div>
         </div>
         <Dialog.Footer>
             <Button variant="outline" onclick={() => crud.showEditDialog = false} disabled={crud.isSubmitting}>
-                Cancel
+                {m.ingredients_editDialog_cancel()}
             </Button>
             <Button onclick={handleEditSubmit} disabled={!editIngredientName.trim() || crud.isSubmitting}>
-                {crud.isSubmitting ? 'Saving...' : 'Save Changes'}
+                {crud.isSubmitting ? m.ingredients_editDialog_saving() : m.ingredients_editDialog_button()}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>
@@ -154,17 +155,17 @@
 <Dialog.Root bind:open={crud.showDeleteDialog}>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>Delete Ingredient</Dialog.Title>
+            <Dialog.Title>{m.ingredients_deleteDialog_title()}</Dialog.Title>
         </Dialog.Header>
         <div class="py-4">
-            <p>Are you sure you want to delete "{crud.deletingItem?.name}"? This action cannot be undone.</p>
+            <p>{m.ingredients_deleteDialog_description({ name: crud.deletingItem?.name || '' })}</p>
         </div>
         <Dialog.Footer>
             <Button variant="outline" onclick={() => crud.showDeleteDialog = false} disabled={crud.isSubmitting}>
-                Cancel
+                {m.ingredients_deleteDialog_cancel()}
             </Button>
             <Button variant="destructive" onclick={crud.handleDelete} disabled={crud.isSubmitting}>
-                {crud.isSubmitting ? 'Deleting...' : 'Delete'}
+                {crud.isSubmitting ? m.ingredients_deleteDialog_deleting() : m.ingredients_deleteDialog_button()}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>

@@ -4,8 +4,8 @@ VALUES (?, ?)
 RETURNING *;
 
 -- name: CreateUser :one
-INSERT INTO users (email, password_hash, role_id)
-VALUES (?, ?, ?)
+INSERT INTO users (email, password_hash, role_id, locale)
+VALUES (?, ?, ?, ?)
 RETURNING *;
 
 -- name: CreateUserRegistration :one

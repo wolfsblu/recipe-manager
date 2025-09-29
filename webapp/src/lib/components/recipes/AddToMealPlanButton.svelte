@@ -15,6 +15,7 @@
     import { cn } from "$lib/utils.js";
     import { buttonVariants } from "$lib/components/ui/button/index.js";
     import { createMealPlan } from "$lib/api/mealplan/mealplan.svelte";
+    import * as m from "$lib/paraglide/messages.js";
 
     let { recipeId }: { recipeId: number } = $props();
 
@@ -27,7 +28,7 @@
 
     const handleAddToMealPlan = async () => {
         if (!selectedDate) {
-            toast.error("Please select a date");
+            toast.error(m.recipes_mealPlan_selectDate());
             return;
         }
 
@@ -38,10 +39,10 @@
             await createMealPlan(recipeId, dateString);
 
             const formattedDate = df.format(selectedDate.toDate(getLocalTimeZone()));
-            toast.success(`Recipe added to meal plan for ${formattedDate}`);
+            toast.success(m.recipes_mealPlan_successMessage({ date: formattedDate }));
             open = false;
         } catch (error) {
-            toast.error("Failed to add recipe to meal plan");
+            toast.error(m.recipes_mealPlan_errorMessage());
         }
     };
 </script>
@@ -51,7 +52,7 @@
         <Button
             variant="ghost"
             size="sm"
-            title="Add to meal plan"
+            title={m.recipes_mealPlan_addButton()}
         >
             <CalendarIcon class="w-5 h-5" />
         </Button>
@@ -59,9 +60,9 @@
     <Popover.Content class="w-80 p-4" align="center">
         <div class="space-y-4">
             <div class="space-y-2">
-                <h4 class="font-medium">Add to Meal Plan</h4>
+                <h4 class="font-medium">{m.recipes_mealPlan_title()}</h4>
                 <p class="text-sm text-muted-foreground">
-                    Select a date to add this recipe to your meal plan.
+                    {m.recipes_mealPlan_description()}
                 </p>
             </div>
 
@@ -75,7 +76,7 @@
                         )}
                     >
                         <CalendarIcon class="mr-2 h-4 w-4" />
-                        {selectedDate ? df.format(selectedDate.toDate(getLocalTimeZone())) : "Pick a date"}
+                        {selectedDate ? df.format(selectedDate.toDate(getLocalTimeZone())) : m.recipes_mealPlan_pickDate()}
                     </Popover.Trigger>
                     <Popover.Content class="w-auto p-0">
                         <Calendar
@@ -89,11 +90,11 @@
 
             <div class="flex justify-end gap-2">
                 <Button variant="outline" size="sm" onclick={() => open = false}>
-                    Cancel
+                    {m.recipes_mealPlan_cancel()}
                 </Button>
                 <Button size="sm" onclick={handleAddToMealPlan} disabled={!selectedDate}>
                     <PlusIcon />
-                    Add
+                    {m.recipes_mealPlan_add()}
                 </Button>
             </div>
         </div>

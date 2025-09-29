@@ -70,14 +70,15 @@ func (h *UserHandler) Logout(_ context.Context) (*api.LogoutOK, error) {
 	}, nil
 }
 
-func (h *UserHandler) Register(ctx context.Context, c *api.Credentials) error {
+func (h *UserHandler) Register(ctx context.Context, c *api.UserRegistration) error {
 	hash, err := security.CreateHash(c.Password, security.DefaultHashParams)
 	if err != nil {
 		return domain.WrapError(domain.ErrCreatingUser, err)
 	}
-	return h.Users.RegisterUser(ctx, domain.Credentials{
+	return h.Users.RegisterUser(ctx, domain.UserDetails{
 		Email:        c.Email,
 		PasswordHash: hash,
+		Locale:       c.Locale,
 	})
 }
 

@@ -18,6 +18,7 @@
     import { isAuthenticated } from "$lib/api/auth/user.svelte";
     import { dialogStore } from "$lib/stores/dialog.svelte";
     import { useSidebar } from "$lib/components/ui/sidebar/context.svelte.js";
+    import * as m from "$lib/paraglide/messages.js";
 
     const sidebar = useSidebar();
 
@@ -51,7 +52,7 @@
                     {#snippet child({ props })}
                         <a href="/" {...props} onclick={handleNavClick}>
                             <UtensilsIcon class="!size-5" />
-                            <span class="text-base font-semibold">Recipe Manager</span>
+                            <span class="text-base font-semibold">{m.navigation_appName()}</span>
                         </a>
                     {/snippet}
                 </Sidebar.MenuButton>
@@ -68,7 +69,7 @@
                             {#snippet child({ props })}
                                 <a href="/recipes" {...props} onclick={handleNavClick}>
                                     <ChefIcon />
-                                    <span>Recipes</span>
+                                    <span>{m.navigation_recipes()}</span>
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
@@ -81,7 +82,7 @@
                             {#snippet child({ props })}
                                 <a href="/ingredients" {...props} onclick={handleNavClick}>
                                     <SaladIcon />
-                                    <span>Ingredients</span>
+                                    <span>{m.navigation_ingredients()}</span>
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
@@ -94,7 +95,7 @@
                             {#snippet child({ props })}
                                 <a href="/units" {...props} onclick={handleNavClick}>
                                     <RulerIcon />
-                                    <span>Units</span>
+                                    <span>{m.navigation_units()}</span>
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
@@ -107,7 +108,7 @@
                             {#snippet child({ props })}
                                 <a href="/mealplan" {...props} onclick={handleNavClick}>
                                     <CalendarIcon />
-                                    <span>Meal Plan</span>
+                                    <span>{m.navigation_mealPlan()}</span>
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
@@ -117,7 +118,7 @@
                             {#snippet child({ props })}
                                 <a href="/shopping" {...props} onclick={handleNavClick}>
                                     <ShoppingIcon />
-                                    <span>Shopping List</span>
+                                    <span>{m.navigation_shoppingList()}</span>
                                 </a>
                             {/snippet}
                         </Sidebar.MenuButton>
@@ -136,7 +137,7 @@
                         {#snippet child({ props })}
                             <a href="/auth/login" {...props} onclick={handleNavClick}>
                                 <LoginIcon />
-                                <span>Login</span>
+                                <span>{m.navigation_login()}</span>
                             </a>
                         {/snippet}
                     </Sidebar.MenuButton>

@@ -14,6 +14,7 @@
         setMessage,
     } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
+    import * as m from "$lib/paraglide/messages.js";
 
     let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 
@@ -26,7 +27,7 @@
                 try {
                     await resetPassword(email)
                 } finally {
-                    toast.success("Successfully requested password reset")
+                    toast.success(m.auth_reset_successMessage())
                     await goto("/auth/login")
                 }
                 setMessage(form, "Reset requested successfully");
@@ -39,8 +40,8 @@
 
 <Card.Root class="m-auto w-full max-w-sm">
     <Card.Header>
-        <Card.Title class="text-2xl">Reset Password</Card.Title>
-        <Card.Description>Enter your email below to reset your password</Card.Description>
+        <Card.Title class="text-2xl">{m.auth_reset_title()}</Card.Title>
+        <Card.Description>{m.auth_reset_description()}</Card.Description>
     </Card.Header>
     <Card.Content>
         <form method="POST" use:enhance>
@@ -49,20 +50,20 @@
                     <Form.Field {form} name="email">
                         <Form.Control>
                             {#snippet children({ props })}
-                                <Form.Label>Email</Form.Label>
-                                <Input {...props} bind:value={$formData.email} placeholder="mail@example.com" />
+                                <Form.Label>{m.auth_reset_email()}</Form.Label>
+                                <Input {...props} bind:value={$formData.email} placeholder={m.auth_reset_emailPlaceholder()} />
                             {/snippet}
                         </Form.Control>
                         <Form.Description />
                         <Form.FieldErrors />
                     </Form.Field>
                 </div>
-                <Button type="submit" class="w-full">Reset</Button>
+                <Button type="submit" class="w-full">{m.auth_reset_button()}</Button>
             </div>
             <div class="mt-4 text-center text-sm">
-                Already have an account?
-                <a href="/auth/login" class="underline">Login</a> or
-                <a href="/auth/register" class="underline">create an account</a>
+                {m.auth_reset_haveAccount()}
+                <a href="/auth/login" class="underline">{m.auth_register_loginLink()}</a> {m.auth_reset_orText()}
+                <a href="/auth/register" class="underline">{m.auth_reset_createAccount()}</a>
             </div>
         </form>
     </Card.Content>

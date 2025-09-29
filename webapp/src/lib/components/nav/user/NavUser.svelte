@@ -13,6 +13,7 @@
     import avatarFallback from "$lib/components/nav/user/avatar.png";
     import {toast} from "svelte-sonner";
     import {goto} from "$app/navigation";
+    import * as m from "$lib/paraglide/messages.js";
 
     const sidebar = useSidebar();
 
@@ -24,7 +25,7 @@
 
     const onLogout = async () => {
         await logout()
-        toast.success("Logged out")
+        toast.success(m.navigation_logoutSuccess())
         await goto("/")
         handleMobileClose();
     }
@@ -69,17 +70,17 @@
                 <DropdownMenu.Group>
                     <DropdownMenu.Item onclick={handleMobileClose}>
                         <BadgeCheckIcon />
-                        Account
+                        {m.navigation_account()}
                     </DropdownMenu.Item>
                     <DropdownMenu.Item onclick={handleMobileClose}>
                         <BellIcon />
-                        Notifications
+                        {m.navigation_notifications()}
                     </DropdownMenu.Item>
                 </DropdownMenu.Group>
                 <DropdownMenu.Separator />
                 <DropdownMenu.Item onclick={onLogout}>
                     <LogOutIcon />
-                    Log out
+                    {m.navigation_logout()}
                 </DropdownMenu.Item>
             </DropdownMenu.Content>
         </DropdownMenu.Root>

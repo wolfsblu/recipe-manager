@@ -14,6 +14,7 @@
         setMessage,
     } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
+    import * as m from "$lib/paraglide/messages.js";
 
     let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 
@@ -25,10 +26,10 @@
             if (form.valid) {
                 try {
                     await login(form.data)
-                    toast.success("Signed in successfully")
+                    toast.success(m.auth_login_successMessage())
                     await goto("/")
                 } catch (error) {
-                    toast.error("Failed to login, please verify your credentials")
+                    toast.error(m.auth_login_errorMessage())
                 }
                 setMessage(form, "Login successful");
             }
@@ -40,8 +41,8 @@
 
 <Card.Root class="m-auto w-full max-w-sm">
     <Card.Header>
-        <Card.Title class="text-2xl">Login</Card.Title>
-        <Card.Description>Enter your email below to login to your account</Card.Description>
+        <Card.Title class="text-2xl">{m.auth_login_title()}</Card.Title>
+        <Card.Description>{m.auth_login_description()}</Card.Description>
     </Card.Header>
     <Card.Content>
         <form method="POST" use:enhance>
@@ -50,8 +51,8 @@
                     <Form.Field {form} name="email">
                         <Form.Control>
                             {#snippet children({ props })}
-                                <Form.Label>Email</Form.Label>
-                                <Input {...props} bind:value={$formData.email} placeholder="mail@example.com" />
+                                <Form.Label>{m.auth_login_email()}</Form.Label>
+                                <Input {...props} bind:value={$formData.email} placeholder={m.auth_login_emailPlaceholder()} />
                             {/snippet}
                         </Form.Control>
                         <Form.Description />
@@ -63,23 +64,23 @@
                         <Form.Control>
                             {#snippet children({ props })}
                                 <div class="flex items-center">
-                                    <Form.Label>Password</Form.Label>
+                                    <Form.Label>{m.auth_login_password()}</Form.Label>
                                     <a href="/auth/reset" class="ml-auto inline-block text-sm underline">
-                                        Forgot password?
+                                        {m.auth_login_forgotPassword()}
                                     </a>
                                 </div>
-                                <Input {...props} type="password" bind:value={$formData.password} placeholder="●●●●●●●" />
+                                <Input {...props} type="password" bind:value={$formData.password} placeholder={m.auth_login_passwordPlaceholder()} />
                             {/snippet}
                         </Form.Control>
                         <Form.Description />
                         <Form.FieldErrors />
                     </Form.Field>
                 </div>
-                <Button type="submit" class="w-full">Login</Button>
+                <Button type="submit" class="w-full">{m.auth_login_button()}</Button>
             </div>
             <div class="mt-4 text-center text-sm">
-                Don't have an account?
-                <a href="/auth/register" class="underline"> Sign up </a>
+                {m.auth_login_noAccount()}
+                <a href="/auth/register" class="underline"> {m.auth_login_signUp()} </a>
             </div>
         </form>
     </Card.Content>

@@ -9,6 +9,7 @@
     import { renderSnippet } from "$lib/components/ui/data-table/index.js";
     import { dialogStore, addUnitDialogOpen } from "$lib/stores/dialog.svelte";
     import type { PageProps } from './$types';
+    import * as m from "$lib/paraglide/messages.js";
 
     type Unit = {
         id: number;
@@ -32,7 +33,7 @@
     const columns = [
         {
             accessorKey: "name",
-            header: "Name",
+            header: m.units_name(),
             cell: ({ row }: any) => {
                 const nameSnippet = createRawSnippet<[string]>((getName) => {
                     const name = getName();
@@ -46,7 +47,7 @@
         },
         {
             accessorKey: "symbol",
-            header: "Symbol",
+            header: m.units_symbol(),
             cell: ({ row }: any) => {
                 const symbolSnippet = createRawSnippet<[string]>((getSymbol) => {
                     const symbol = getSymbol();
@@ -114,8 +115,8 @@
 <DataTable
     data={data.units}
     searchColumn="name"
-    searchPlaceholder="Filter units"
-    entityName="Unit"
+    searchPlaceholder={m.units_searchPlaceholder()}
+    entityName={m.units_entityName()}
     {columns}
     onAdd={crud.openAddDialog}
     onEdit={openEditDialog}
@@ -127,36 +128,36 @@
 <Dialog.Root bind:open={crud.showAddDialog}>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>Add New Unit</Dialog.Title>
+            <Dialog.Title>{m.units_addDialog_title()}</Dialog.Title>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
             <div class="grid grid-cols-4 items-center gap-4">
-                <label for="name" class="text-right">Name</label>
+                <label for="name" class="text-right">{m.units_addDialog_nameLabel()}</label>
                 <Input
                     id="name"
                     class="col-span-3"
                     bind:value={newUnitName}
-                    placeholder="Enter unit name"
+                    placeholder={m.units_addDialog_namePlaceholder()}
                     onkeydown={(e) => e.key === 'Enter' && handleAddSubmit()}
                 />
             </div>
             <div class="grid grid-cols-4 items-center gap-4">
-                <label for="symbol" class="text-right">Symbol</label>
+                <label for="symbol" class="text-right">{m.units_addDialog_symbolLabel()}</label>
                 <Input
                     id="symbol"
                     class="col-span-3"
                     bind:value={newUnitSymbol}
-                    placeholder="Enter unit symbol (optional)"
+                    placeholder={m.units_addDialog_symbolPlaceholder()}
                     onkeydown={(e) => e.key === 'Enter' && handleAddSubmit()}
                 />
             </div>
         </div>
         <Dialog.Footer>
             <Button variant="outline" onclick={() => crud.showAddDialog = false} disabled={crud.isSubmitting}>
-                Cancel
+                {m.units_addDialog_cancel()}
             </Button>
             <Button onclick={handleAddSubmit} disabled={!newUnitName.trim() || crud.isSubmitting}>
-                {crud.isSubmitting ? 'Adding...' : 'Add Unit'}
+                {crud.isSubmitting ? m.units_addDialog_adding() : m.units_addDialog_button()}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>
@@ -166,36 +167,36 @@
 <Dialog.Root bind:open={crud.showEditDialog}>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>Edit Unit</Dialog.Title>
+            <Dialog.Title>{m.units_editDialog_title()}</Dialog.Title>
         </Dialog.Header>
         <div class="grid gap-4 py-4">
             <div class="grid grid-cols-4 items-center gap-4">
-                <label for="edit-name" class="text-right">Name</label>
+                <label for="edit-name" class="text-right">{m.units_editDialog_nameLabel()}</label>
                 <Input
                     id="edit-name"
                     class="col-span-3"
                     bind:value={editUnitName}
-                    placeholder="Enter unit name"
+                    placeholder={m.units_editDialog_namePlaceholder()}
                     onkeydown={(e) => e.key === 'Enter' && handleEditSubmit()}
                 />
             </div>
             <div class="grid grid-cols-4 items-center gap-4">
-                <label for="edit-symbol" class="text-right">Symbol</label>
+                <label for="edit-symbol" class="text-right">{m.units_editDialog_symbolLabel()}</label>
                 <Input
                     id="edit-symbol"
                     class="col-span-3"
                     bind:value={editUnitSymbol}
-                    placeholder="Enter unit symbol (optional)"
+                    placeholder={m.units_editDialog_symbolPlaceholder()}
                     onkeydown={(e) => e.key === 'Enter' && handleEditSubmit()}
                 />
             </div>
         </div>
         <Dialog.Footer>
             <Button variant="outline" onclick={() => crud.showEditDialog = false} disabled={crud.isSubmitting}>
-                Cancel
+                {m.units_editDialog_cancel()}
             </Button>
             <Button onclick={handleEditSubmit} disabled={!editUnitName.trim() || crud.isSubmitting}>
-                {crud.isSubmitting ? 'Saving...' : 'Save Changes'}
+                {crud.isSubmitting ? m.units_editDialog_saving() : m.units_editDialog_button()}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>
@@ -205,17 +206,17 @@
 <Dialog.Root bind:open={crud.showDeleteDialog}>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>Delete Unit</Dialog.Title>
+            <Dialog.Title>{m.units_deleteDialog_title()}</Dialog.Title>
         </Dialog.Header>
         <div class="py-4">
-            <p>Are you sure you want to delete "{crud.deletingItem?.name}"? This action cannot be undone.</p>
+            <p>{m.units_deleteDialog_description({ name: crud.deletingItem?.name || '' })}</p>
         </div>
         <Dialog.Footer>
             <Button variant="outline" onclick={() => crud.showDeleteDialog = false} disabled={crud.isSubmitting}>
-                Cancel
+                {m.units_deleteDialog_cancel()}
             </Button>
             <Button variant="destructive" onclick={crud.handleDelete} disabled={crud.isSubmitting}>
-                {crud.isSubmitting ? 'Deleting...' : 'Delete'}
+                {crud.isSubmitting ? m.units_deleteDialog_deleting() : m.units_deleteDialog_button()}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>

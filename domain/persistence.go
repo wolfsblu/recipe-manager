@@ -40,7 +40,7 @@ type RecipeStore interface {
 type UserStore interface {
 	Transactioner
 	CreatePasswordResetToken(ctx context.Context, user *User) (PasswordResetToken, error)
-	CreateUser(ctx context.Context, credentials Credentials) (User, error)
+	CreateUser(ctx context.Context, userDetails UserDetails) (User, error)
 	CreateUserRegistration(ctx context.Context, user *User) (UserRegistration, error)
 	DeletePasswordResetsBefore(ctx context.Context, before time.Time) error
 	DeleteRegistrationByUser(ctx context.Context, user *User) error

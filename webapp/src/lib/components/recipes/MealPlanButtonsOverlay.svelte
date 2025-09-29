@@ -5,6 +5,7 @@
     import * as Dialog from "$lib/components/ui/dialog/index.js";
     import { toast } from "svelte-sonner";
     import { deleteMealPlan } from "$lib/api/mealplan/mealplan.svelte.js";
+    import * as m from "$lib/paraglide/messages.js";
 
     let { recipe, date, onDeleted } = $props()
 
@@ -17,17 +18,17 @@
     const handleConfirmDelete = async () => {
         try {
             await deleteMealPlan(recipe.id, date);
-            toast.success("Removed from meal plan");
+            toast.success(m.recipes_mealPlan_removedSuccess());
             onDeleted?.(recipe.id);
             dialogOpen = false;
         } catch (error) {
-            toast.error("Failed to remove from meal plan. Please try again.");
+            toast.error(m.recipes_mealPlan_removedError());
         }
     }
 
     const handleAddToShoppingList = async (e: Event) => {
         // TODO: Implement add to shopping list functionality
-        toast.success("Added to shopping list");
+        toast.success(m.shopping_addToList());
     }
 </script>
 
@@ -53,19 +54,19 @@
 <Dialog.Root bind:open={dialogOpen}>
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
-            <Dialog.Title>Remove Recipe from Meal Plan</Dialog.Title>
+            <Dialog.Title>{m.recipes_mealPlan_removeDialog_title()}</Dialog.Title>
             <Dialog.Description>
-                Are you sure you want to remove "{recipe.name}" from your meal plan? This action cannot be undone.
+                {m.recipes_mealPlan_removeDialog_description({ recipeName: recipe.name, date })}
             </Dialog.Description>
         </Dialog.Header>
         <Dialog.Footer>
             <Dialog.Close asChild>
                 <Button variant="outline">
-                    Cancel
+                    {m.recipes_mealPlan_removeDialog_cancel()}
                 </Button>
             </Dialog.Close>
             <Button variant="destructive" onclick={handleConfirmDelete}>
-                Remove
+                {m.recipes_mealPlan_removeDialog_remove()}
             </Button>
         </Dialog.Footer>
     </Dialog.Content>

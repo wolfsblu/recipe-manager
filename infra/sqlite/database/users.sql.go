@@ -29,19 +29,25 @@ func (q *Queries) CreatePasswordResetToken(ctx context.Context, arg CreatePasswo
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (email, password_hash, role_id)
-VALUES (?, ?, ?)
-RETURNING id, email, password_hash, is_confirmed, role_id, created_at
+INSERT INTO users (email, password_hash, role_id, locale)
+VALUES (?, ?, ?, ?)
+RETURNING id, email, password_hash, is_confirmed, role_id, locale, created_at
 `
 
 type CreateUserParams struct {
 	Email        string
 	PasswordHash string
 	RoleID       int64
+	Locale       string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.PasswordHash, arg.RoleID)
+	row := q.db.QueryRowContext(ctx, createUser,
+		arg.Email,
+		arg.PasswordHash,
+		arg.RoleID,
+		arg.Locale,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -49,6 +55,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.PasswordHash,
 		&i.IsConfirmed,
 		&i.RoleID,
+		&i.Locale,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -117,7 +124,7 @@ func (q *Queries) DeleteRegistrationsBefore(ctx context.Context, createdAt time.
 }
 
 const getPasswordResetToken = `-- name: GetPasswordResetToken :one
-SELECT password_resets.user_id, password_resets.token, password_resets.created_at, users.id, users.email, users.password_hash, users.is_confirmed, users.role_id, users.created_at
+SELECT password_resets.user_id, password_resets.token, password_resets.created_at, users.id, users.email, users.password_hash, users.is_confirmed, users.role_id, users.locale, users.created_at
 FROM password_resets
          INNER JOIN users ON users.id = password_resets.user_id
 WHERE token = ?
@@ -141,6 +148,7 @@ func (q *Queries) GetPasswordResetToken(ctx context.Context, token string) (GetP
 		&i.User.PasswordHash,
 		&i.User.IsConfirmed,
 		&i.User.RoleID,
+		&i.User.Locale,
 		&i.User.CreatedAt,
 	)
 	return i, err
@@ -197,7 +205,7 @@ func (q *Queries) GetPermissionsByRole(ctx context.Context, roleID int64) ([]Get
 }
 
 const getUser = `-- name: GetUser :one
-SELECT users.id, users.email, users.password_hash, users.is_confirmed, users.role_id, users.created_at,
+SELECT users.id, users.email, users.password_hash, users.is_confirmed, users.role_id, users.locale, users.created_at,
        roles.name as role_name
 FROM users
 INNER JOIN roles ON users.role_id = roles.id
@@ -211,6 +219,7 @@ type GetUserRow struct {
 	PasswordHash string
 	IsConfirmed  bool
 	RoleID       int64
+	Locale       string
 	CreatedAt    time.Time
 	RoleName     string
 }
@@ -224,6 +233,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (GetUserRow, error) {
 		&i.PasswordHash,
 		&i.IsConfirmed,
 		&i.RoleID,
+		&i.Locale,
 		&i.CreatedAt,
 		&i.RoleName,
 	)
@@ -231,7 +241,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (GetUserRow, error) {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password_hash, is_confirmed, role_id, created_at
+SELECT id, email, password_hash, is_confirmed, role_id, locale, created_at
 FROM users
 WHERE email = ?
 LIMIT 1
@@ -246,13 +256,14 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.PasswordHash,
 		&i.IsConfirmed,
 		&i.RoleID,
+		&i.Locale,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const getUserRegistration = `-- name: GetUserRegistration :one
-SELECT user_registrations.user_id, user_registrations.token, user_registrations.created_at, users.id, users.email, users.password_hash, users.is_confirmed, users.role_id, users.created_at
+SELECT user_registrations.user_id, user_registrations.token, user_registrations.created_at, users.id, users.email, users.password_hash, users.is_confirmed, users.role_id, users.locale, users.created_at
 FROM user_registrations
          INNER JOIN users ON users.id = user_registrations.user_id
 WHERE token = ?
@@ -276,6 +287,7 @@ func (q *Queries) GetUserRegistration(ctx context.Context, token string) (GetUse
 		&i.User.PasswordHash,
 		&i.User.IsConfirmed,
 		&i.User.RoleID,
+		&i.User.Locale,
 		&i.User.CreatedAt,
 	)
 	return i, err

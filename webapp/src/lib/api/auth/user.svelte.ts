@@ -5,6 +5,10 @@ export interface Credentials {
     password: string
 }
 
+export interface UserRegistration extends Credentials {
+    locale: string
+}
+
 export interface User {
     id: number
     email: string
@@ -67,11 +71,12 @@ export const logout = async () => {
     Object.assign(user, getDefaultUser())
 }
 
-export const register = async (credentials: Credentials) => {
+export const register = async (userRegistration: UserRegistration) => {
     const response = await client.POST("/register", {
         body: {
-            email: credentials.email,
-            password: credentials.password,
+            email: userRegistration.email,
+            password: userRegistration.password,
+            locale: userRegistration.locale,
         }
     })
     if (response.error) {

@@ -122,6 +122,7 @@ type User struct {
 	PasswordHash string
 	IsConfirmed  bool
 	RoleID       int64
+	Locale       string
 	CreatedAt    time.Time
 }
 

@@ -14,6 +14,7 @@
         setMessage,
     } from "sveltekit-superforms";
     import { zodClient } from "sveltekit-superforms/adapters";
+    import * as m from "$lib/paraglide/messages.js";
 
     let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 
@@ -27,10 +28,10 @@
                     const urlParams = new URLSearchParams(window.location.search);
                     const token = urlParams.get("token") ?? ""
                     await confirmPassword(form.data.password, token)
-                    toast.success("Password was reset successfully")
+                    toast.success(m.auth_confirmPassword_successMessage())
                     await goto("/auth/login")
                 } catch (e) {
-                    toast.error("Failed to reset password, please try again")
+                    toast.error(m.auth_confirmPassword_errorMessage())
                     await goto("/")
                 }
                 setMessage(form, "Reset performed successfully");
@@ -43,8 +44,8 @@
 
 <Card.Root class="m-auto w-full max-w-sm">
     <Card.Header>
-        <Card.Title class="text-2xl">Reset Password</Card.Title>
-        <Card.Description>Enter your new password below</Card.Description>
+        <Card.Title class="text-2xl">{m.auth_confirmPassword_title()}</Card.Title>
+        <Card.Description>{m.auth_confirmPassword_description()}</Card.Description>
     </Card.Header>
     <Card.Content>
         <form method="POST" use:enhance>
@@ -53,15 +54,15 @@
                     <Form.Field {form} name="password">
                         <Form.Control>
                             {#snippet children({ props })}
-                                <Form.Label>Password</Form.Label>
-                                <Input {...props} bind:value={$formData.password} placeholder="●●●●●●●" />
+                                <Form.Label>{m.auth_confirmPassword_password()}</Form.Label>
+                                <Input {...props} bind:value={$formData.password} placeholder={m.auth_confirmPassword_passwordPlaceholder()} />
                             {/snippet}
                         </Form.Control>
                         <Form.Description />
                         <Form.FieldErrors />
                     </Form.Field>
                 </div>
-                <Button type="submit" class="w-full">Confirm</Button>
+                <Button type="submit" class="w-full">{m.auth_confirmPassword_button()}</Button>
             </div>
         </form>
     </Card.Content>

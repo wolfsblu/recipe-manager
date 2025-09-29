@@ -6,6 +6,7 @@
     import ChefHatIcon from '@lucide/svelte/icons/chef-hat';
     import { goto } from '$app/navigation';
     import type { PageProps } from './$types';
+    import * as m from "$lib/paraglide/messages.js";
 
     const { data }: PageProps = $props();
 
@@ -32,7 +33,7 @@
         <DateRangePicker
             value={dateRange}
             onValueChange={handleDateRangeChange}
-            placeholder="Select date range for meal plan"
+            placeholder={m.mealPlan_dateRangePlaceholder()}
         />
     </div>
 
@@ -49,13 +50,13 @@
             <div class="p-4 bg-muted rounded-full mx-auto w-fit mb-4">
                 <CalendarIcon class="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 class="text-lg font-semibold mb-2">No meal plan found</h3>
+            <h3 class="text-lg font-semibold mb-2">{m.mealPlan_empty_title()}</h3>
             <p class="text-muted-foreground mb-4">
-                Start planning your meals by adding recipes to specific dates.
+                {m.mealPlan_empty_description()}
             </p>
             <Button href="/recipes">
                 <ChefHatIcon />
-                Browse Recipes
+                {m.mealPlan_empty_button()}
             </Button>
         </div>
     {/if}
