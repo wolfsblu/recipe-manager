@@ -10,10 +10,8 @@
 
     let { mealPlanDay, availableTags = [] }: { mealPlanDay: MealPlanDay; availableTags?: any[] } = $props();
 
-    let recipes = $state(mealPlanDay.recipes || []);
-
     const handleRecipeDeleted = (recipeId: number) => {
-        recipes = recipes.filter(recipe => recipe.id !== recipeId);
+        mealPlanDay.recipes = mealPlanDay.recipes?.filter(recipe => recipe.id !== recipeId) || [];
     };
 
     const formatDate = (dateString: string) => {
@@ -71,17 +69,17 @@
                 </div>
             </div>
         </div>
-        {#if recipes && recipes.length > 0}
+        {#if mealPlanDay.recipes && mealPlanDay.recipes.length > 0}
             <Badge variant="secondary" class="text-sm">
-                {recipes.length} {pluralize('recipe', recipes.length)}
+                {mealPlanDay.recipes.length} {pluralize('recipe', mealPlanDay.recipes.length)}
             </Badge>
         {/if}
     </div>
 
     <!-- Recipes Grid -->
-    {#if recipes && recipes.length > 0}
+    {#if mealPlanDay.recipes && mealPlanDay.recipes.length > 0}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {#each recipes as recipe}
+            {#each mealPlanDay.recipes as recipe}
                 <RecipeCard {recipe} {availableTags}>
                     {#snippet overlay()}
                         <MealPlanButtonsOverlay {recipe} date={mealPlanDay.date} onDeleted={handleRecipeDeleted} />

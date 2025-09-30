@@ -1,8 +1,9 @@
 <script lang="ts">
     import { Button } from '$lib/components/ui/button';
-    import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
+    import { Card, CardContent } from '$lib/components/ui/card';
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart';
     import PlusIcon from '@lucide/svelte/icons/plus';
+    import * as m from "$lib/paraglide/messages.js";
 
     interface Props {
         onCreateList: () => void;
@@ -11,24 +12,22 @@
     let { onCreateList }: Props = $props();
 </script>
 
-<div class="min-h-[80vh] flex items-center justify-center p-5">
+<div class="flex-grow flex items-center justify-center">
     <Card class="max-w-md w-full">
-        <CardHeader class="text-center">
-            <div class="flex justify-center mb-4">
-                <div class="p-4 bg-muted rounded-full">
+        <CardContent>
+            <div class="text-center">
+                <div class="p-4 bg-muted rounded-full mx-auto w-fit mb-4">
                     <ShoppingCartIcon class="h-8 w-8 text-muted-foreground" />
                 </div>
+                <h3 class="text-lg font-semibold mb-2">{m.shopping_empty_title()}</h3>
+                <p class="text-muted-foreground mb-4">
+                    {m.shopping_empty_description()}
+                </p>
+                <Button onclick={onCreateList}>
+                    <PlusIcon />
+                    {m.shopping_empty_button()}
+                </Button>
             </div>
-            <CardTitle class="text-xl">No Shopping Lists</CardTitle>
-        </CardHeader>
-        <CardContent class="text-center space-y-4">
-            <p class="text-muted-foreground">
-                You haven't created any shopping lists yet. Create your first shopping list to start organizing your shopping items.
-            </p>
-            <Button onclick={onCreateList} class="w-full">
-                <PlusIcon />
-                Create Your First Shopping List
-            </Button>
         </CardContent>
     </Card>
 </div>
