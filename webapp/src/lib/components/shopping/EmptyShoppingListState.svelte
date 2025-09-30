@@ -12,7 +12,7 @@
     let { onCreateList }: Props = $props();
 </script>
 
-<div class="flex-grow flex items-center justify-center">
+<div class="flex-grow flex items-center justify-center px-5">
     <Card class="max-w-md w-full">
         <CardContent>
             <div class="text-center">
