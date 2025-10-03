@@ -3,6 +3,7 @@ package sqlite
 import (
 	"context"
 	"net/url"
+	"sort"
 	"time"
 
 	"github.com/wolfsblu/recipe-manager/domain"
@@ -156,6 +157,10 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 		}
 		i++
 	}
+
+	sort.Slice(mealPlan, func(i, j int) bool {
+		return mealPlan[i].Date.Before(mealPlan[j].Date)
+	})
 	return mealPlan, nil
 }
 
