@@ -14,6 +14,13 @@
     // Reactive state for tags
     let tags = $state(recipe.tags || [])
 
+    // Calculate total number of ingredients
+    const totalIngredients = $derived(
+        recipe.steps?.reduce((total, step) =>
+            total + (step.ingredients?.length || 0), 0
+        ) || 0
+    )
+
     const formatMinutesAsHours = (minutes: number) => {
         if (!minutes || minutes < 0) {
             return m.common_time_notAvailable();
@@ -91,9 +98,9 @@
             <Separator />
             <div class="flex justify-between">
                 <span>{m.recipes_card_ingredients()}</span>
-                <Badge>12</Badge>
+                <Badge>{totalIngredients}</Badge>
             </div>
-                <Separator />
+            <Separator />
         </div>
     </div>
     <ScrollArea class="whitespace-nowrap pb-4 px-4" orientation="horizontal">
