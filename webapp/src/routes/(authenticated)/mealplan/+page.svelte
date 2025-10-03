@@ -4,6 +4,7 @@
     import MealPlanDay from "$lib/components/mealplan/MealPlanDay.svelte";
     import DateRangePicker from "$lib/components/ui/date-range-picker.svelte";
     import CalendarIcon from '@lucide/svelte/icons/calendar';
+    import CalendarCheckIcon from '@lucide/svelte/icons/calendar-check';
     import ChefHatIcon from '@lucide/svelte/icons/chef-hat';
     import { goto } from '$app/navigation';
     import type { PageProps } from './$types';
@@ -29,18 +30,33 @@
             goto(`/mealplan?from=${newRange.from}&until=${newRange.to}`, { replaceState: true });
         }
     };
+
+    const handleThisWeekClick = () => {
+        const today = new Date();
+        const nextWeek = new Date(today);
+        nextWeek.setDate(today.getDate() + 7);
+
+        const from = today.toISOString().split('T')[0];
+        const until = nextWeek.toISOString().split('T')[0];
+
+        goto(`/mealplan?from=${from}&until=${until}`, { replaceState: true });
+    };
 </script>
 
 <div class="flex flex-col gap-5 p-5 h-full">
     <!-- Meal Plan Content -->
     {#if daysWithRecipes.length > 0}
         <!-- Date Range Picker -->
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center gap-2">
             <DateRangePicker
                 value={dateRange}
                 onValueChange={handleDateRangeChange}
                 placeholder={m.mealPlan_dateRangePlaceholder()}
             />
+            <Button onclick={handleThisWeekClick} title="Go to current week">
+                <CalendarCheckIcon />
+                <span class="hidden md:inline">{m.mealPlan_thisWeek()}</span>
+            </Button>
         </div>
 
         <div class="space-y-6">

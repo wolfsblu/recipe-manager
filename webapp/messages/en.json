@@ -135,6 +135,7 @@
   "recipes_tags_addError": "Failed to add tag. Please try again.",
   "mealPlan_title": "Meal Plan",
   "mealPlan_dateRangePlaceholder": "Select date range for meal plan",
+  "mealPlan_thisWeek": "This Week",
   "mealPlan_empty_title": "No meal plan found",
   "mealPlan_empty_description": "Start planning your meals by adding recipes to specific dates.",
   "mealPlan_empty_button": "Browse Recipes",

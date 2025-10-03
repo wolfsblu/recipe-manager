@@ -135,6 +135,7 @@
   "recipes_tags_addError": "Tag konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut.",
   "mealPlan_title": "Essensplan",
   "mealPlan_dateRangePlaceholder": "Datumsbereich für Essensplan auswählen",
+  "mealPlan_thisWeek": "Diese Woche",
   "mealPlan_empty_title": "Kein Essensplan gefunden",
   "mealPlan_empty_description": "Beginnen Sie mit der Planung Ihrer Mahlzeiten, indem Sie Rezepte zu bestimmten Daten hinzufügen.",
   "mealPlan_empty_button": "Rezepte durchsuchen",
