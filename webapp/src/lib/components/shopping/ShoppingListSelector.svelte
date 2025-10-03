@@ -111,45 +111,16 @@
                     </Button>
                 {/snippet}
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content>
-                <DropdownMenu.Label>Your Shopping Lists</DropdownMenu.Label>
-                <DropdownMenu.Separator />
-                
+            <DropdownMenu.Content class="w-[var(--bits-dropdown-menu-anchor-width)] min-w-[var(--bits-dropdown-menu-anchor-width)]">
                 {#each lists as list (list.id)}
-                    <DropdownMenu.Item 
+                    <DropdownMenu.Item
                         class="flex items-center justify-between cursor-pointer"
                         onclick={() => handleSelectList(list.id)}
                     >
-                        <div class="flex items-center gap-2">
-                            <span class="truncate">{list.name}</span>
-                            {#if list.id === currentList?.id}
-                                <CheckIcon class="h-4 w-4 text-primary" />
-                            {/if}
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                onclick={(e) => {
-                                    e.stopPropagation();
-                                    startEdit(list.id, list.name);
-                                }}
-                                title="Rename list"
-                            >
-                                <EditIcon />
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant="ghost"
-                                onclick={(e) => {
-                                    e.stopPropagation();
-                                    showDeleteConfirmation(list.id, list.name);
-                                }}
-                                title="Delete list"
-                            >
-                                <TrashIcon />
-                            </Button>
-                        </div>
+                        <span class="truncate">{list.name}</span>
+                        {#if list.id === currentList?.id}
+                            <CheckIcon class="h-4 w-4 text-primary" />
+                        {/if}
                     </DropdownMenu.Item>
                 {/each}
                 
@@ -162,10 +133,25 @@
         </DropdownMenu.Root>
     </div>
 
-    <Button onclick={onCreateNewList}>
-        <PlusIcon />
-        New List
-    </Button>
+    {#if currentList}
+        <div class="flex items-center gap-2">
+            <Button
+                onclick={() => startEdit(currentList.id, currentList.name)}
+                title="Rename list"
+            >
+                <EditIcon />
+                <span class="hidden md:inline">Rename</span>
+            </Button>
+            <Button
+                variant="destructive"
+                onclick={() => showDeleteConfirmation(currentList.id, currentList.name)}
+                title="Delete list"
+            >
+                <TrashIcon />
+                <span class="hidden md:inline">Delete</span>
+            </Button>
+        </div>
+    {/if}
 </div>
 
 <!-- Edit Dialog -->
