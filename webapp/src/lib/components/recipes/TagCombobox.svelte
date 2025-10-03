@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Badge } from '$lib/components/ui/badge';
-    import PlusIcon from '@lucide/svelte/icons/plus';
+    import Tag from '@lucide/svelte/icons/tag';
     import CheckIcon from "@lucide/svelte/icons/check";
     import { tick } from "svelte";
     import * as Command from "$lib/components/ui/command/index.js";
@@ -71,7 +71,7 @@
 <Popover.Root bind:open onOpenChangeComplete={resetSearchQuery}>
     <Popover.Trigger id={triggerId} asChild class="flex cursor-pointer">
         <Badge class="rounded-full" {onclick}>
-            <PlusIcon /> Tag
+            <Tag /> Tag
         </Badge>
     </Popover.Trigger>
     <Popover.Content class="w-64 p-0">
