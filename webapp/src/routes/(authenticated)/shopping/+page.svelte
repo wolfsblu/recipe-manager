@@ -7,6 +7,7 @@
     import { Badge } from '$lib/components/ui/badge';
     import ShoppingCartIcon from '@lucide/svelte/icons/shopping-cart';
     import CheckIcon from '@lucide/svelte/icons/check';
+    import CheckCheckIcon from '@lucide/svelte/icons/check-check';
     import PlusIcon from '@lucide/svelte/icons/plus';
     import TrashIcon from '@lucide/svelte/icons/trash-2';
     import { toast } from 'svelte-sonner';
@@ -108,6 +109,45 @@
         shoppingStore.setCurrentListId(newList.id);
     };
 
+    const handleMarkAllAsDone = async () => {
+        if (!shoppingStore.currentListId || todoItems.length === 0) return;
+
+        const listId = shoppingStore.currentListId;
+        const count = todoItems.length;
+        try {
+            for (const item of todoItems) {
+                const updatedItem = await updateShoppingListItem(listId, item.id, {
+                    ingredient: item.ingredient,
+                    quantity: item.quantity,
+                    unit: item.unit,
+                    done: true
+                });
+                shoppingStore.updateItemInList(listId, updatedItem);
+            }
+
+            toast.success(`Marked ${count} items as done`);
+        } catch (error) {
+            toast.error('Failed to mark items as done');
+        }
+    };
+
+    const handleDeleteAllDone = async () => {
+        if (!shoppingStore.currentListId || doneItems.length === 0) return;
+
+        const listId = shoppingStore.currentListId;
+        const count = doneItems.length;
+        try {
+            for (const item of doneItems) {
+                await deleteShoppingListItem(listId, item.id);
+                shoppingStore.removeItemFromList(listId, item.id);
+            }
+
+            toast.success(`Deleted ${count} done items`);
+        } catch (error) {
+            toast.error('Failed to delete done items');
+        }
+    };
+
     const formatQuantity = (quantity: string | null, unit: string | null) => {
         if (!quantity) return '';
         return unit ? `${quantity} ${unit}` : quantity;
@@ -153,12 +193,37 @@
 
                     <Card class="h-full gap-0 py-0">
                         <CardHeader class="px-3 border-b pb-0!">
-                            <CardTitle class="pt-4 pb-2 flex items-center gap-2">
+                            <CardTitle class="pt-4 pb-2 flex items-center gap-2 min-h-[52px]">
                                 <IconComponent class="h-5 w-5"/>
                                 {config.title}
                                 <Badge variant="secondary" class="font-semibold text-sm rounded-full">
                                     {items.length}
                                 </Badge>
+                                <div class="ml-auto">
+                                    {#if !isDone}
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onclick={handleMarkAllAsDone}
+                                            title="Mark all as done"
+                                            disabled={items.length === 0}
+                                            class={items.length === 0 ? 'invisible' : ''}
+                                        >
+                                            <CheckCheckIcon />
+                                        </Button>
+                                    {:else}
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onclick={handleDeleteAllDone}
+                                            title="Delete all done items"
+                                            disabled={items.length === 0}
+                                            class={items.length === 0 ? 'invisible' : ''}
+                                        >
+                                            <TrashIcon />
+                                        </Button>
+                                    {/if}
+                                </div>
                             </CardTitle>
                         </CardHeader>
                         <CardContent class="h-full p-1">
