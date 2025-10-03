@@ -59,7 +59,7 @@
 
     const handleConfirmAddToList = async () => {
         if (!selectedListId) {
-            toast.error("Please select a shopping list");
+            toast.error(m.shopping_mealPlan_errorNoList());
             return;
         }
 
@@ -77,10 +77,10 @@
                 });
             }
 
-            toast.success(`Added ${allIngredients.length} ingredients to shopping list`);
+            toast.success(m.shopping_mealPlan_successMessage({ count: allIngredients.length }));
             popoverOpen = false;
         } catch (error) {
-            toast.error("Failed to add ingredients to shopping list");
+            toast.error(m.shopping_mealPlan_errorMessage());
         } finally {
             isAddingToList = false;
         }
@@ -148,20 +148,20 @@
         {:else}
             <div class="space-y-4">
                 <div class="space-y-2">
-                    <h4 class="font-medium leading-none">Add to Shopping List</h4>
+                    <h4 class="font-medium leading-none">{m.shopping_mealPlan_addToList_title()}</h4>
                     <p class="text-sm text-muted-foreground">
-                        Select a shopping list and adjust servings
+                        {m.shopping_mealPlan_addToList_description()}
                     </p>
                 </div>
 
                 <div class="space-y-2">
-                    <Label for="shopping-list">Shopping List</Label>
+                    <Label for="shopping-list">{m.shopping_list_title()}</Label>
                     <DropdownMenu.Root>
                         <DropdownMenu.Trigger>
                             {#snippet child({ props })}
                                 <Button {...props} variant="outline" class="w-full justify-between">
                                     <span class="truncate">
-                                        {selectedList ? selectedList.name : 'Select a list'}
+                                        {selectedList ? selectedList.name : m.shopping_selector_selectList()}
                                     </span>
                                     <ChevronDown class="h-4 w-4 ml-2" />
                                 </Button>
@@ -184,13 +184,13 @@
                 </div>
 
                 <div class="space-y-2">
-                    <Label for="servings">Servings</Label>
+                    <Label for="servings">{m.recipes_form_servings()}</Label>
                     <Input
                         id="servings"
                         type="number"
                         min="1"
                         bind:value={servings}
-                        placeholder="Number of servings"
+                        placeholder={m.recipes_form_servingsPlaceholder()}
                     />
                 </div>
 
@@ -199,7 +199,7 @@
                     onclick={handleConfirmAddToList}
                     disabled={!selectedListId || isAddingToList}
                 >
-                    {isAddingToList ? 'Adding...' : 'Add Ingredients'}
+                    {isAddingToList ? m.shopping_list_adding() : m.shopping_mealPlan_addButton()}
                 </Button>
             </div>
         {/if}
