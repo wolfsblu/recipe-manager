@@ -99,7 +99,7 @@
         <CardContent class="space-y-6 px-4 md:px-6">
             <!-- Image Upload -->
             <div>
-                <label class="text-sm font-medium text-foreground mb-3 block">{m.recipes_form_recipeImages()}</label>
+                <div class="text-sm font-medium text-foreground mb-3 block">{m.recipes_form_recipeImages()}</div>
                 <ImageUpload bind:value={$formData.images} deferDeletion={isEditing} />
             </div>
 
