@@ -9,9 +9,6 @@
     import CheckIcon from '@lucide/svelte/icons/check';
     import PlusIcon from '@lucide/svelte/icons/plus';
     import TrashIcon from '@lucide/svelte/icons/trash-2';
-    import { flip } from 'svelte/animate';
-    import { fly, scale } from 'svelte/transition';
-    import { elasticOut, quintOut } from 'svelte/easing';
     import { toast } from 'svelte-sonner';
     import * as m from "$lib/paraglide/messages.js";
 
@@ -160,15 +157,13 @@
                                 <IconComponent class="h-5 w-5"/>
                                 {config.title}
                                 <Badge variant="secondary" class="font-semibold text-sm rounded-full">
-                                    {#key items.length}
-                                        <span in:scale={{ duration: 200, easing: elasticOut }}>{items.length}</span>
-                                    {/key}
+                                    {items.length}
                                 </Badge>
                             </CardTitle>
                         </CardHeader>
                         <CardContent class="h-full p-1">
                             <div
-                                class="h-full rounded-lg border-2 border-dashed border-transparent transition-all duration-200"
+                                class="h-full rounded-lg border-2 border-dashed border-transparent"
                                 role="region"
                                 aria-label="{config.title}"
                             >
@@ -217,14 +212,10 @@
                                     {/if}
                                     {#each items as item (item.id)}
                                         <div
-                                            class="transition-all duration-200"
                                             role="listitem"
                                             aria-label="Shopping item: {item.ingredient}"
-                                            in:fly={{ x: !isDone ? -200 : 200, duration: 400, easing: quintOut }}
-                                            out:fly={{ x: !isDone ? 200 : -200, duration: 300, easing: quintOut }}
-                                            animate:flip={{ duration: 600, easing: quintOut }}
                                         >
-                                            <div class="border flex items-center justify-between px-2 py-1.5 bg-muted/30 dark:bg-muted rounded-lg transition-all duration-200">
+                                            <div class="border flex items-center justify-between px-2 py-1.5 bg-muted/30 dark:bg-muted rounded-lg">
                                                 <span class="font-medium text-foreground">{item.ingredient}</span>
 
                                                 <div class="flex items-center gap-0">
