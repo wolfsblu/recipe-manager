@@ -9,7 +9,7 @@
 
     type MealPlanDay = components['schemas']['ReadMealPlan'];
 
-    let { mealPlanDay, availableTags = [], shoppingLists = [] }: {
+    let { mealPlanDay = $bindable(), availableTags = [], shoppingLists = [] }: {
         mealPlanDay: MealPlanDay;
         availableTags?: any[];
         shoppingLists?: ReadShoppingList[];

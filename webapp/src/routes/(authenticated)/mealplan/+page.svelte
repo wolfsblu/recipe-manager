@@ -11,17 +11,21 @@
 
     let { data }: PageProps = $props();
 
+    let mealPlan = $state(data.mealPlan);
+
     let dateRange = $derived({
         from: data.from,
         to: data.until
     });
 
-    // Filter out days with no recipes
-    let daysWithRecipes = $derived((data.mealPlan || []).filter(day => day.recipes && day.recipes.length > 0));
+    $effect(() => {
+        mealPlan = data.mealPlan;
+    });
+
+    let daysWithRecipes = $derived((mealPlan || []).filter(day => day.recipes && day.recipes.length > 0));
 
     const handleDateRangeChange = async (newRange: { from: string; to: string }) => {
         if (newRange.from && newRange.to) {
-            // Client-side navigation updates data without page reload
             goto(`/mealplan?from=${newRange.from}&until=${newRange.to}`, { replaceState: true });
         }
     };
@@ -40,8 +44,8 @@
         </div>
 
         <div class="space-y-6">
-            {#each data.mealPlan as mealPlanDay}
-                <MealPlanDay {mealPlanDay} availableTags={data.tags} shoppingLists={data.shoppingLists} />
+            {#each mealPlan as mealPlanDay, i}
+                <MealPlanDay bind:mealPlanDay={mealPlan[i]} availableTags={data.tags} shoppingLists={data.shoppingLists} />
             {/each}
         </div>
     {:else}
