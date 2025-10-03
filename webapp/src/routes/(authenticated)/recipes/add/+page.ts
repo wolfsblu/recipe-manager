@@ -1,6 +1,6 @@
 import type { PageLoad } from './$types';
 import {superValidate} from "sveltekit-superforms";
-import {zod} from "sveltekit-superforms/adapters";
+import {zod4} from "sveltekit-superforms/adapters";
 import {formSchema} from "./schema";
 import {getIngredients, getUnits, getTags} from "$lib/api/recipes/recipes.svelte";
 
@@ -22,6 +22,6 @@ export const load: PageLoad = async () => {
         ingredients,
         units,
         tags,
-        form: await superValidate(zod(formSchema)),
+        form: await superValidate(zod4(formSchema)),
     };
 };

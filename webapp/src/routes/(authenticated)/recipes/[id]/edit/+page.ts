@@ -1,7 +1,7 @@
 import type { PageLoad } from './$types';
 import { getRecipe, getIngredients, getUnits, getTags } from "$lib/api/recipes/recipes.svelte.js";
 import { superValidate } from "sveltekit-superforms";
-import { zod } from "sveltekit-superforms/adapters";
+import { zod4 } from "sveltekit-superforms/adapters";
 import { formSchema } from "../../add/schema";
 
 export const prerender = false
@@ -38,7 +38,7 @@ export const load: PageLoad = async ({ params }) => {
                 unitId: ingredient.unit.id,
             })) || []
         })) || []
-    }, zod(formSchema));
+    }, zod4(formSchema));
 
     return {
         breadcrumbs,
