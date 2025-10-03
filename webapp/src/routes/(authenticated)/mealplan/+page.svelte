@@ -70,7 +70,7 @@
                                 <span class="w-full border-t"></span>
                             </div>
                             <div class="relative flex justify-center text-xs">
-                                <span class="bg-card px-2 text-muted-foreground">or pick a different time</span>
+                                <span class="bg-card px-2 text-muted-foreground">{m.mealPlan_empty_orPickPeriod()}</span>
                             </div>
                         </div>
                         <DateRangePicker

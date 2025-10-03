@@ -138,6 +138,7 @@
   "mealPlan_empty_title": "Kein Essensplan gefunden",
   "mealPlan_empty_description": "Beginnen Sie mit der Planung Ihrer Mahlzeiten, indem Sie Rezepte zu bestimmten Daten hinzufügen.",
   "mealPlan_empty_button": "Rezepte durchsuchen",
+  "mealPlan_empty_orPickPeriod": "oder wählen Sie einen anderen Zeitraum",
   "mealPlan_day_today": "Heute",
   "mealPlan_day_tomorrow": "Morgen",
   "mealPlan_day_yesterday": "Gestern",

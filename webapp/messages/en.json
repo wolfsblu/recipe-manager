@@ -138,6 +138,7 @@
   "mealPlan_empty_title": "No meal plan found",
   "mealPlan_empty_description": "Start planning your meals by adding recipes to specific dates.",
   "mealPlan_empty_button": "Browse Recipes",
+  "mealPlan_empty_orPickPeriod": "or pick a different period",
   "mealPlan_day_today": "Today",
   "mealPlan_day_tomorrow": "Tomorrow",
   "mealPlan_day_yesterday": "Yesterday",
