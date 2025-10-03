@@ -9,52 +9,46 @@
     import type { PageProps } from './$types';
     import * as m from "$lib/paraglide/messages.js";
 
-    const { data }: PageProps = $props();
+    let { data }: PageProps = $props();
 
-    let mealPlan = $state(data.mealPlan || []);
-
-    let dateRange = $state({
+    let dateRange = $derived({
         from: data.from,
         to: data.until
     });
 
     // Filter out days with no recipes
-    let daysWithRecipes = $derived(mealPlan.filter(day => day.recipes && day.recipes.length > 0));
+    let daysWithRecipes = $derived((data.mealPlan || []).filter(day => day.recipes && day.recipes.length > 0));
 
     const handleDateRangeChange = async (newRange: { from: string; to: string }) => {
         if (newRange.from && newRange.to) {
-            dateRange = newRange;
-            // Navigate to the same page with new query parameters
-            const url = new URL(window.location.href);
-            url.searchParams.set('from', newRange.from);
-            url.searchParams.set('until', newRange.to);
-            goto(url.toString());
+            // Client-side navigation updates data without page reload
+            goto(`/mealplan?from=${newRange.from}&until=${newRange.to}`, { replaceState: true });
         }
     };
 </script>
 
 <div class="flex flex-col gap-5 p-5 h-full">
-    <!-- Date Range Picker -->
-    <div class="flex justify-between items-center">
-        <DateRangePicker
-            value={dateRange}
-            onValueChange={handleDateRangeChange}
-            placeholder={m.mealPlan_dateRangePlaceholder()}
-        />
-    </div>
-
     <!-- Meal Plan Content -->
     {#if daysWithRecipes.length > 0}
+        <!-- Date Range Picker -->
+        <div class="flex justify-between items-center">
+            <DateRangePicker
+                value={dateRange}
+                onValueChange={handleDateRangeChange}
+                placeholder={m.mealPlan_dateRangePlaceholder()}
+            />
+        </div>
+
         <div class="space-y-6">
-            {#each mealPlan as mealPlanDay, i}
-                <MealPlanDay bind:mealPlanDay={mealPlan[i]} availableTags={data.tags} shoppingLists={data.shoppingLists} />
+            {#each data.mealPlan as mealPlanDay}
+                <MealPlanDay {mealPlanDay} availableTags={data.tags} shoppingLists={data.shoppingLists} />
             {/each}
         </div>
     {:else}
         <!-- Empty State -->
         <div class="flex items-center justify-center flex-grow">
             <Card class="max-w-md w-full">
-                <CardContent>
+                <CardContent class="pt-6">
                     <div class="text-center">
                         <div class="p-4 bg-muted rounded-full mx-auto w-fit mb-4">
                             <CalendarIcon class="h-8 w-8 text-muted-foreground" />
@@ -63,10 +57,23 @@
                         <p class="text-muted-foreground mb-4">
                             {m.mealPlan_empty_description()}
                         </p>
-                        <Button href="/recipes">
+                        <Button href="/recipes" class="w-full">
                             <ChefHatIcon />
                             {m.mealPlan_empty_button()}
                         </Button>
+                        <div class="relative my-4">
+                            <div class="absolute inset-0 flex items-center">
+                                <span class="w-full border-t"></span>
+                            </div>
+                            <div class="relative flex justify-center text-xs">
+                                <span class="bg-card px-2 text-muted-foreground">or pick a different time</span>
+                            </div>
+                        </div>
+                        <DateRangePicker
+                            value={dateRange}
+                            onValueChange={handleDateRangeChange}
+                            placeholder={m.mealPlan_dateRangePlaceholder()}
+                        />
                     </div>
                 </CardContent>
             </Card>

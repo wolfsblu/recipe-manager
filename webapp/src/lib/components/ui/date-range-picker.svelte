@@ -82,7 +82,7 @@
         <Popover.Trigger
             class={cn(
                 buttonVariants({ variant: "outline" }),
-                "w-[280px] justify-start text-left font-normal",
+                "w-full justify-start text-left font-normal",
                 !calendarValue.start && "text-muted-foreground"
             )}
         >
