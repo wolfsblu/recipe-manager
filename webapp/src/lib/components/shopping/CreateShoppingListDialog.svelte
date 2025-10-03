@@ -3,23 +3,23 @@
     import * as Dialog from '$lib/components/ui/dialog';
     import { Input } from '$lib/components/ui/input';
     import { Label } from '$lib/components/ui/label';
-    import { createShoppingList } from '$lib/api/shopping/shopping.svelte';
-    import { shoppingStore } from '$lib/stores/shopping.svelte';
+    import { createShoppingList, type ReadShoppingList } from '$lib/api/shopping/shopping.svelte';
     import { toast } from 'svelte-sonner';
 
     interface Props {
         open: boolean;
         onOpenChange: (open: boolean) => void;
+        onSuccess?: (newList: ReadShoppingList) => void;
     }
 
-    let { open, onOpenChange }: Props = $props();
+    let { open, onOpenChange, onSuccess }: Props = $props();
 
     let listName = $state('');
     let isCreating = $state(false);
 
     const handleSubmit = async (e: Event) => {
         e.preventDefault();
-        
+
         if (!listName.trim()) {
             toast.error('Please enter a shopping list name');
             return;
@@ -28,12 +28,12 @@
         isCreating = true;
         try {
             const newList = await createShoppingList({ name: listName.trim() });
-            shoppingStore.addList(newList);
-            shoppingStore.setCurrentListId(newList.id);
-            
             toast.success('Shopping list created successfully');
+
             listName = '';
+
             onOpenChange(false);
+            onSuccess?.(newList);
         } catch (error) {
             toast.error('Failed to create shopping list');
         } finally {

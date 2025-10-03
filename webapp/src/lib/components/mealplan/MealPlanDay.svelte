@@ -5,10 +5,15 @@
     import CalendarIcon from '@lucide/svelte/icons/calendar';
     import pluralize from 'pluralize';
     import type { components } from '$lib/api/schema';
+    import type { ReadShoppingList } from '$lib/api/shopping/shopping.svelte';
 
     type MealPlanDay = components['schemas']['ReadMealPlan'];
 
-    let { mealPlanDay, availableTags = [] }: { mealPlanDay: MealPlanDay; availableTags?: any[] } = $props();
+    let { mealPlanDay, availableTags = [], shoppingLists = [] }: {
+        mealPlanDay: MealPlanDay;
+        availableTags?: any[];
+        shoppingLists?: ReadShoppingList[];
+    } = $props();
 
     const handleRecipeDeleted = (recipeId: number) => {
         mealPlanDay.recipes = mealPlanDay.recipes?.filter(recipe => recipe.id !== recipeId) || [];
@@ -82,7 +87,7 @@
             {#each mealPlanDay.recipes as recipe}
                 <RecipeCard {recipe} {availableTags}>
                     {#snippet overlay()}
-                        <MealPlanButtonsOverlay {recipe} date={mealPlanDay.date} onDeleted={handleRecipeDeleted} />
+                        <MealPlanButtonsOverlay {recipe} date={mealPlanDay.date} {shoppingLists} onDeleted={handleRecipeDeleted} />
                     {/snippet}
                 </RecipeCard>
             {/each}

@@ -16,11 +16,10 @@
     import * as m from "$lib/paraglide/messages.js";
 
     import { shoppingStore } from '$lib/stores/shopping.svelte';
-    import { addShoppingListItem, updateShoppingListItem, deleteShoppingListItem } from '$lib/api/shopping/shopping.svelte';
+    import { addShoppingListItem, updateShoppingListItem, deleteShoppingListItem, type ReadShoppingList, type ReadShoppingListItem } from '$lib/api/shopping/shopping.svelte';
     import ShoppingListSelector from '$lib/components/shopping/ShoppingListSelector.svelte';
     import CreateShoppingListDialog from '$lib/components/shopping/CreateShoppingListDialog.svelte';
     import EmptyShoppingListState from '$lib/components/shopping/EmptyShoppingListState.svelte';
-    import type { ReadShoppingListItem } from '$lib/api/shopping/shopping.svelte';
 
     interface Props {
         data: PageData;
@@ -105,6 +104,11 @@
 
     const handleCreateList = () => {
         showCreateDialog = true;
+    };
+
+    const handleListCreated = (newList: ReadShoppingList) => {
+        shoppingStore.addList(newList);
+        shoppingStore.setCurrentListId(newList.id);
     };
 
     const formatQuantity = (quantity: string | null, unit: string | null) => {
@@ -272,4 +276,5 @@
 <CreateShoppingListDialog
     open={showCreateDialog}
     onOpenChange={(open) => showCreateDialog = open}
+    onSuccess={handleListCreated}
 />

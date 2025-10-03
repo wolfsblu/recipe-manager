@@ -47,7 +47,7 @@
     {#if daysWithRecipes.length > 0}
         <div class="space-y-6">
             {#each mealPlan as mealPlanDay, i}
-                <MealPlanDay bind:mealPlanDay={mealPlan[i]} availableTags={data.tags} />
+                <MealPlanDay bind:mealPlanDay={mealPlan[i]} availableTags={data.tags} shoppingLists={data.shoppingLists} />
             {/each}
         </div>
     {:else}

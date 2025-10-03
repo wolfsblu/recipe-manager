@@ -1,6 +1,7 @@
 import type { PageLoad } from './$types';
 import { getMealPlan } from "$lib/api/mealplan/mealplan.svelte";
 import { getTags } from "$lib/api/recipes/recipes.svelte";
+import { getShoppingLists } from "$lib/api/shopping/shopping.svelte";
 
 export const load: PageLoad = async ({ url }) => {
     const breadcrumbs = [
@@ -16,15 +17,17 @@ export const load: PageLoad = async ({ url }) => {
     const from = url.searchParams.get('from') || today.toISOString().split('T')[0];
     const until = url.searchParams.get('until') || nextWeek.toISOString().split('T')[0];
 
-    const [mealPlan, tags] = await Promise.all([
+    const [mealPlan, tags, shoppingLists] = await Promise.all([
         getMealPlan(from, until),
-        getTags()
+        getTags(),
+        getShoppingLists().catch(() => [])
     ]);
 
     return {
         breadcrumbs,
         mealPlan,
         tags,
+        shoppingLists,
         from,
         until
     };
