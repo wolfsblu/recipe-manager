@@ -18,6 +18,7 @@
     import ShoppingListSelector from '$lib/components/shopping/ShoppingListSelector.svelte';
     import CreateShoppingListDialog from '$lib/components/shopping/CreateShoppingListDialog.svelte';
     import EmptyShoppingListState from '$lib/components/shopping/EmptyShoppingListState.svelte';
+    import pluralize from 'pluralize';
 
     interface Props {
         data: PageData;
@@ -150,7 +151,13 @@
 
     const formatQuantity = (quantity: string | null, unit: string | null) => {
         if (!quantity) return '';
-        return unit ? `${quantity} ${unit}` : quantity;
+        if (!unit) return quantity;
+
+        // Parse quantity to determine if plural is needed
+        const numericQuantity = parseFloat(quantity);
+        const pluralizedUnit = isNaN(numericQuantity) ? unit : pluralize(unit, numericQuantity);
+
+        return `${quantity} ${pluralizedUnit}`;
     };
 
     const currentList = $derived(shoppingStore.currentList);
