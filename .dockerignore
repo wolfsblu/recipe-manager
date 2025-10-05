@@ -1,4 +1,21 @@
+# Git stuff
+.git
+.gitignore
+.gitattributes
+
+# GitHub Actions workflows
+.github/
+
+# Documentation
+*.md
+
+# Local dev files
 .env*
-.github
-tmp
-Dockerfile
+.idea/
+*.env
+*.vscode/
+tmp/
+
+# Build artifacts (if any)
+/bin
+/vendor

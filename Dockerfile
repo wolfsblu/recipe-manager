@@ -2,12 +2,13 @@ FROM docker.io/node:lts-alpine AS frontend
 
 WORKDIR /webapp
 
-COPY webapp .
-
+COPY webapp/package.json webapp/package-lock.json ./
 RUN --mount=type=cache,target=/webapp/.npm \
     npm set cache /webapp/.npm && \
-    npm ci && \
-    npm run build
+    npm ci
+
+COPY webapp .
+RUN npm run build
 
 FROM docker.io/golang:1.25-alpine AS backend
 
@@ -15,10 +16,13 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod go mod download
+
 COPY . .
 COPY --from=frontend /webapp/dist ./webapp/dist
 
-RUN --mount=type=cache,target=/go/pkg/mod go generate && go build
+RUN --mount=type=cache,target=/go/pkg/mod go generate && go build -o /app/recipe-manager .
 
 FROM scratch
 
