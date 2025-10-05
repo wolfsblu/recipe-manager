@@ -23,6 +23,10 @@
         }
     };
 
+    const onNavigateTo = async (route: string) => {
+        await goto(route);
+        handleMobileClose();
+    }
     const onLogout = async () => {
         await logout()
         toast.success(m.navigation_logoutSuccess())
@@ -68,11 +72,11 @@
                 </DropdownMenu.Label>
                 <DropdownMenu.Separator />
                 <DropdownMenu.Group>
-                    <DropdownMenu.Item onclick={handleMobileClose}>
+                    <DropdownMenu.Item onclick={() => onNavigateTo("/user/account")}>
                         <BadgeCheckIcon />
                         {m.navigation_account()}
                     </DropdownMenu.Item>
-                    <DropdownMenu.Item onclick={handleMobileClose}>
+                    <DropdownMenu.Item onclick={() => onNavigateTo("/user/notifications")}>
                         <BellIcon />
                         {m.navigation_notifications()}
                     </DropdownMenu.Item>
