@@ -116,15 +116,19 @@
         const listId = shoppingStore.currentListId;
         const count = todoItems.length;
         try {
-            for (const item of todoItems) {
-                const updatedItem = await updateShoppingListItem(listId, item.id, {
+            const updatePromises = todoItems.map(item =>
+                updateShoppingListItem(listId, item.id, {
                     ingredient: item.ingredient,
                     quantity: item.quantity,
                     unit: item.unit,
                     done: true
-                });
+                })
+            );
+
+            const updatedItems = await Promise.all(updatePromises);
+            updatedItems.forEach(updatedItem => {
                 shoppingStore.updateItemInList(listId, updatedItem);
-            }
+            });
 
             toast.success(`Marked ${count} items as done`);
         } catch (error) {
@@ -138,10 +142,14 @@
         const listId = shoppingStore.currentListId;
         const count = doneItems.length;
         try {
-            for (const item of doneItems) {
-                await deleteShoppingListItem(listId, item.id);
+            const deletePromises = doneItems.map(item =>
+                deleteShoppingListItem(listId, item.id)
+            );
+
+            await Promise.all(deletePromises);
+            doneItems.forEach(item => {
                 shoppingStore.removeItemFromList(listId, item.id);
-            }
+            });
 
             toast.success(`Deleted ${count} done items`);
         } catch (error) {
