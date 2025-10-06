@@ -31,24 +31,19 @@ type RecipeStore interface {
 }
 
 type UserStore interface {
+	ConfirmRegistration(ctx context.Context, user *User) error
 	CreatePasswordResetToken(ctx context.Context, user *User) (PasswordResetToken, error)
-	CreateUser(ctx context.Context, userDetails UserDetails) (User, error)
-	CreateUserRegistration(ctx context.Context, user *User) (UserRegistration, error)
 	DeletePasswordResetsBefore(ctx context.Context, before time.Time) error
-	DeleteRegistrationByUser(ctx context.Context, user *User) error
 	DeleteRegistrationsBefore(ctx context.Context, before time.Time) error
 	GetPasswordResetTokenByUser(ctx context.Context, user *User) (PasswordResetToken, error)
 	GetRegistrationByToken(ctx context.Context, token string) (UserRegistration, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
+	RegisterUser(ctx context.Context, userDetails UserDetails) (User, UserRegistration, error)
 	UpdatePasswordByToken(ctx context.Context, token, hashedPassword string) error
-	UpdateUser(ctx context.Context, user *User) error
-	// Transaction methods
-	ConfirmUserAndDeleteRegistration(ctx context.Context, user *User) error
-	CreateUserWithRegistration(ctx context.Context, userDetails UserDetails) (User, UserRegistration, error)
 }
 
-type ShoppingListStore interface {
+type ShoppingStore interface {
 	GetShoppingListsByUser(ctx context.Context, userID int64) ([]ShoppingList, error)
 	GetShoppingListByID(ctx context.Context, listID int64) (ShoppingList, error)
 	CreateShoppingList(ctx context.Context, userID int64, name string) (ShoppingList, error)

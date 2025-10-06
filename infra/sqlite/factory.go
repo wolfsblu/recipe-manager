@@ -34,7 +34,7 @@ func NewSqliteStore() (*Store, error) {
 	}
 
 	if err := store.migrate(); err != nil {
-		con.Close()
+		_ = con.Close()
 		return nil, err
 	}
 

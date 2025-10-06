@@ -5,7 +5,7 @@ import (
 )
 
 type ShoppingService struct {
-	store ShoppingListStore
+	store ShoppingStore
 }
 
 func (s *ShoppingService) GetByUser(ctx context.Context, user *User) ([]ShoppingList, error) {

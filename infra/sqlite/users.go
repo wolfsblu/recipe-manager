@@ -21,36 +21,8 @@ func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User)
 	return token, nil
 }
 
-func (s *Store) CreateUser(ctx context.Context, userDetails domain.UserDetails) (user domain.User, _ error) {
-	result, err := s.query().CreateUser(ctx, s.mapper.FromUserDetails(userDetails, int64(roles.User)))
-	if err != nil {
-		return user, domain.WrapError(domain.ErrCreatingUser, err)
-	}
-	return s.mapper.ToUser(result), nil
-}
-
-func (s *Store) CreateUserRegistration(ctx context.Context, user *domain.User) (registration domain.UserRegistration, _ error) {
-	generatedToken := security.GenerateToken(security.DefaultTokenLength)
-	result, err := s.query().CreateUserRegistration(ctx, s.mapper.FromUserForRegistration(user, generatedToken))
-	if err != nil {
-		return registration, domain.WrapError(domain.ErrCreatingRegistrationToken, err)
-	}
-
-	registration = s.mapper.ToUserRegistration(result)
-	registration.User = user
-	return registration, nil
-}
-
 func (s *Store) DeletePasswordResetsBefore(ctx context.Context, before time.Time) error {
 	return s.query().DeletePasswordResetsBefore(ctx, before)
-}
-
-func (s *Store) DeleteRegistrationByUser(ctx context.Context, user *domain.User) error {
-	err := s.query().DeleteRegistrationByUserId(ctx, user.ID)
-	if err != nil {
-		return domain.WrapError(domain.ErrDeletingRegistration, err)
-	}
-	return nil
 }
 
 func (s *Store) DeleteRegistrationsBefore(ctx context.Context, before time.Time) error {
@@ -119,16 +91,7 @@ func (s *Store) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPa
 	})
 }
 
-func (s *Store) UpdateUser(ctx context.Context, user *domain.User) error {
-	err := s.query().UpdateUser(ctx, s.mapper.FromUserForUpdate(user))
-	if err != nil {
-		return domain.WrapError(domain.ErrUpdatingUser, err)
-	}
-	return nil
-}
-
-// ConfirmUserAndDeleteRegistration atomically confirms a user and deletes their registration
-func (s *Store) ConfirmUserAndDeleteRegistration(ctx context.Context, user *domain.User) error {
+func (s *Store) ConfirmRegistration(ctx context.Context, user *domain.User) error {
 	return s.WithTransaction(ctx, func(tx *TxStore) error {
 		if err := tx.query().UpdateUser(ctx, s.mapper.FromUserForUpdate(user)); err != nil {
 			return domain.WrapError(domain.ErrUpdatingUser, err)
@@ -140,21 +103,27 @@ func (s *Store) ConfirmUserAndDeleteRegistration(ctx context.Context, user *doma
 	})
 }
 
-// CreateUserWithRegistration atomically creates a user and their registration token
-func (s *Store) CreateUserWithRegistration(ctx context.Context, userDetails domain.UserDetails) (domain.User, domain.UserRegistration, error) {
+func (s *Store) RegisterUser(ctx context.Context, userDetails domain.UserDetails) (domain.User, domain.UserRegistration, error) {
 	var user domain.User
 	var registration domain.UserRegistration
 
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
 		var err error
-		user, err = tx.CreateUser(ctx, userDetails)
+		userParams := s.mapper.FromUserDetails(userDetails, int64(roles.User))
+		dbUser, err := tx.query().CreateUser(ctx, userParams)
+		user = s.mapper.ToUser(dbUser)
 		if err != nil {
 			return err
 		}
-		registration, err = tx.CreateUserRegistration(ctx, &user)
+
+		generatedToken := security.GenerateToken(security.DefaultTokenLength)
+		registrationParams := s.mapper.FromUserForRegistration(&user, generatedToken)
+		dbRegistration, err := tx.query().CreateUserRegistration(ctx, registrationParams)
+		registration = s.mapper.ToUserRegistration(dbRegistration)
 		if err != nil {
 			return err
 		}
+
 		return nil
 	})
 

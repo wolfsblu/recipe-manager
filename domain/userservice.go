@@ -21,7 +21,7 @@ func (s *UserService) ConfirmUserByToken(ctx context.Context, token string) erro
 	user := registration.User
 	user.Confirmed = true
 
-	return s.store.ConfirmUserAndDeleteRegistration(ctx, user)
+	return s.store.ConfirmRegistration(ctx, user)
 }
 
 func (s *UserService) DeletePasswordResetsOlderThan(ctx context.Context, olderThan time.Duration) error {
@@ -52,7 +52,7 @@ func (s *UserService) RegisterUser(ctx context.Context, userDetails UserDetails)
 		return ErrUserExists
 	}
 
-	_, registration, err := s.store.CreateUserWithRegistration(ctx, userDetails)
+	_, registration, err := s.store.RegisterUser(ctx, userDetails)
 	if err != nil {
 		return err
 	}
