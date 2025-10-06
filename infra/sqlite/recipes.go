@@ -23,25 +23,25 @@ func (s *Store) BrowseRecipes(ctx context.Context) (recipes []domain.Recipe, err
 }
 
 func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.Recipe, error) {
-	if err := s.Begin(ctx); err != nil {
-		return domain.Recipe{}, err
-	}
-	defer s.Rollback()
-
-	recipeId, err := s.query().CreateRecipe(ctx, s.mapper.FromRecipe(recipe))
+	var recipeId int64
+	err := s.WithTransaction(ctx, func(tx *TxStore) error {
+		var err error
+		recipeId, err = tx.query().CreateRecipe(ctx, s.mapper.FromRecipe(recipe))
+		if err != nil {
+			return err
+		}
+		if err = tx.createRecipeSteps(ctx, recipeId, recipe.Steps); err != nil {
+			return err
+		}
+		if err = tx.createRecipeImages(ctx, recipeId, recipe.Images); err != nil {
+			return err
+		}
+		if err = tx.createRecipeTags(ctx, recipeId, recipe.Tags); err != nil {
+			return err
+		}
+		return nil
+	})
 	if err != nil {
-		return domain.Recipe{}, err
-	}
-	if err = s.createRecipeSteps(ctx, recipeId, recipe.Steps); err != nil {
-		return domain.Recipe{}, err
-	}
-	if err = s.createRecipeImages(ctx, recipeId, recipe.Images); err != nil {
-		return domain.Recipe{}, err
-	}
-	if err = s.createRecipeTags(ctx, recipeId, recipe.Tags); err != nil {
-		return domain.Recipe{}, err
-	}
-	if err = s.Commit(); err != nil {
 		return domain.Recipe{}, err
 	}
 	return s.GetRecipeById(ctx, recipe.CreatedBy, recipeId)
@@ -354,40 +354,38 @@ func (s *Store) getVotes(ctx context.Context, user *domain.User, recipeIds []int
 }
 
 func (s *Store) UpdateRecipe(ctx context.Context, recipe domain.Recipe) (domain.Recipe, error) {
-	if err := s.Begin(ctx); err != nil {
-		return domain.Recipe{}, err
-	}
-	defer s.Rollback()
+	err := s.WithTransaction(ctx, func(tx *TxStore) error {
+		err := tx.query().UpdateRecipe(ctx, s.mapper.FromRecipeForUpdate(recipe))
+		if err != nil {
+			return err
+		}
 
-	err := s.query().UpdateRecipe(ctx, s.mapper.FromRecipeForUpdate(recipe))
+		if err = tx.query().DeleteRecipeIngredients(ctx, recipe.ID); err != nil {
+			return err
+		}
+		if err = tx.query().DeleteRecipeSteps(ctx, recipe.ID); err != nil {
+			return err
+		}
+		if err = tx.query().DeleteRecipeImages(ctx, recipe.ID); err != nil {
+			return err
+		}
+		if err = tx.query().DeleteRecipeTags(ctx, recipe.ID); err != nil {
+			return err
+		}
+
+		if err = tx.createRecipeSteps(ctx, recipe.ID, recipe.Steps); err != nil {
+			return err
+		}
+		if err = tx.createRecipeImages(ctx, recipe.ID, recipe.Images); err != nil {
+			return err
+		}
+		if err = tx.createRecipeTags(ctx, recipe.ID, recipe.Tags); err != nil {
+			return err
+		}
+
+		return nil
+	})
 	if err != nil {
-		return domain.Recipe{}, err
-	}
-
-	if err = s.query().DeleteRecipeIngredients(ctx, recipe.ID); err != nil {
-		return domain.Recipe{}, err
-	}
-	if err = s.query().DeleteRecipeSteps(ctx, recipe.ID); err != nil {
-		return domain.Recipe{}, err
-	}
-	if err = s.query().DeleteRecipeImages(ctx, recipe.ID); err != nil {
-		return domain.Recipe{}, err
-	}
-	if err = s.query().DeleteRecipeTags(ctx, recipe.ID); err != nil {
-		return domain.Recipe{}, err
-	}
-
-	if err = s.createRecipeSteps(ctx, recipe.ID, recipe.Steps); err != nil {
-		return domain.Recipe{}, err
-	}
-	if err = s.createRecipeImages(ctx, recipe.ID, recipe.Images); err != nil {
-		return domain.Recipe{}, err
-	}
-	if err = s.createRecipeTags(ctx, recipe.ID, recipe.Tags); err != nil {
-		return domain.Recipe{}, err
-	}
-
-	if err = s.Commit(); err != nil {
 		return domain.Recipe{}, err
 	}
 	return s.GetRecipeById(ctx, recipe.CreatedBy, recipe.ID)

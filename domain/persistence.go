@@ -5,14 +5,7 @@ import (
 	"time"
 )
 
-type Transactioner interface {
-	Begin(ctx context.Context) error
-	Commit() error
-	Rollback()
-}
-
 type RecipeStore interface {
-	Transactioner
 	BrowseRecipes(ctx context.Context) ([]Recipe, error)
 	CreateRecipe(ctx context.Context, recipe Recipe) (Recipe, error)
 	DeleteRecipe(ctx context.Context, id int64) error
@@ -38,7 +31,6 @@ type RecipeStore interface {
 }
 
 type UserStore interface {
-	Transactioner
 	CreatePasswordResetToken(ctx context.Context, user *User) (PasswordResetToken, error)
 	CreateUser(ctx context.Context, userDetails UserDetails) (User, error)
 	CreateUserRegistration(ctx context.Context, user *User) (UserRegistration, error)
@@ -51,10 +43,12 @@ type UserStore interface {
 	GetUserById(ctx context.Context, id int64) (User, error)
 	UpdatePasswordByToken(ctx context.Context, token, hashedPassword string) error
 	UpdateUser(ctx context.Context, user *User) error
+	// Transaction methods
+	ConfirmUserAndDeleteRegistration(ctx context.Context, user *User) error
+	CreateUserWithRegistration(ctx context.Context, userDetails UserDetails) (User, UserRegistration, error)
 }
 
 type ShoppingListStore interface {
-	Transactioner
 	GetShoppingListsByUser(ctx context.Context, userID int64) ([]ShoppingList, error)
 	GetShoppingListByID(ctx context.Context, listID int64) (ShoppingList, error)
 	CreateShoppingList(ctx context.Context, userID int64, name string) (ShoppingList, error)

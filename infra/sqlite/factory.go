@@ -14,8 +14,6 @@ type Store struct {
 	db     *sql.DB
 	path   string
 	q      *database.Queries
-	qtx    *database.Queries
-	tx     *sql.Tx
 	mapper *mapper.DBMapper
 }
 

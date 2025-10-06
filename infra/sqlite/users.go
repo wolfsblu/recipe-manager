@@ -104,23 +104,19 @@ func (s *Store) GetUserById(ctx context.Context, id int64) (user domain.User, _ 
 }
 
 func (s *Store) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPassword string) error {
-	err := s.Begin(ctx)
-	if err != nil {
-		return err
-	}
-	defer s.Rollback()
-
-	token, err := s.query().GetPasswordResetToken(ctx, searchToken)
-	if err != nil {
-		return domain.WrapError(domain.ErrPasswordResetTokenNotFound, err)
-	}
-	if err = s.query().UpdatePasswordByUserId(ctx, s.mapper.FromUserForPasswordUpdate(hashedPassword, token.User.ID)); err != nil {
-		return domain.WrapError(domain.ErrUpdatingPassword, err)
-	}
-	if err = s.query().DeletePasswordResetTokenByUserId(ctx, token.User.ID); err != nil {
-		return domain.WrapError(domain.ErrDeletingPasswordResetToken, err)
-	}
-	return s.Commit()
+	return s.WithTransaction(ctx, func(tx *TxStore) error {
+		token, err := tx.query().GetPasswordResetToken(ctx, searchToken)
+		if err != nil {
+			return domain.WrapError(domain.ErrPasswordResetTokenNotFound, err)
+		}
+		if err = tx.query().UpdatePasswordByUserId(ctx, s.mapper.FromUserForPasswordUpdate(hashedPassword, token.User.ID)); err != nil {
+			return domain.WrapError(domain.ErrUpdatingPassword, err)
+		}
+		if err = tx.query().DeletePasswordResetTokenByUserId(ctx, token.User.ID); err != nil {
+			return domain.WrapError(domain.ErrDeletingPasswordResetToken, err)
+		}
+		return nil
+	})
 }
 
 func (s *Store) UpdateUser(ctx context.Context, user *domain.User) error {
@@ -129,4 +125,38 @@ func (s *Store) UpdateUser(ctx context.Context, user *domain.User) error {
 		return domain.WrapError(domain.ErrUpdatingUser, err)
 	}
 	return nil
+}
+
+// ConfirmUserAndDeleteRegistration atomically confirms a user and deletes their registration
+func (s *Store) ConfirmUserAndDeleteRegistration(ctx context.Context, user *domain.User) error {
+	return s.WithTransaction(ctx, func(tx *TxStore) error {
+		if err := tx.query().UpdateUser(ctx, s.mapper.FromUserForUpdate(user)); err != nil {
+			return domain.WrapError(domain.ErrUpdatingUser, err)
+		}
+		if err := tx.query().DeleteRegistrationByUserId(ctx, user.ID); err != nil {
+			return domain.WrapError(domain.ErrDeletingRegistration, err)
+		}
+		return nil
+	})
+}
+
+// CreateUserWithRegistration atomically creates a user and their registration token
+func (s *Store) CreateUserWithRegistration(ctx context.Context, userDetails domain.UserDetails) (domain.User, domain.UserRegistration, error) {
+	var user domain.User
+	var registration domain.UserRegistration
+
+	err := s.WithTransaction(ctx, func(tx *TxStore) error {
+		var err error
+		user, err = tx.CreateUser(ctx, userDetails)
+		if err != nil {
+			return err
+		}
+		registration, err = tx.CreateUserRegistration(ctx, &user)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	return user, registration, err
 }

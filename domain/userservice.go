@@ -21,17 +21,7 @@ func (s *UserService) ConfirmUserByToken(ctx context.Context, token string) erro
 	user := registration.User
 	user.Confirmed = true
 
-	if err := s.store.Begin(ctx); err != nil {
-		return err
-	}
-	defer s.store.Rollback()
-	if err = s.store.UpdateUser(ctx, user); err != nil {
-		return err
-	}
-	if err = s.store.DeleteRegistrationByUser(ctx, user); err != nil {
-		return err
-	}
-	return s.store.Commit()
+	return s.store.ConfirmUserAndDeleteRegistration(ctx, user)
 }
 
 func (s *UserService) DeletePasswordResetsOlderThan(ctx context.Context, olderThan time.Duration) error {
@@ -57,25 +47,16 @@ func (s *UserService) GetUserByEmail(ctx context.Context, email string) (User, e
 }
 
 func (s *UserService) RegisterUser(ctx context.Context, userDetails UserDetails) error {
-	user, err := s.store.GetUserByEmail(ctx, userDetails.Email)
+	_, err := s.store.GetUserByEmail(ctx, userDetails.Email)
 	if err == nil {
 		return ErrUserExists
 	}
-	if err := s.store.Begin(ctx); err != nil {
-		return err
-	}
-	defer s.store.Rollback()
-	user, err = s.store.CreateUser(ctx, userDetails)
+
+	_, registration, err := s.store.CreateUserWithRegistration(ctx, userDetails)
 	if err != nil {
 		return err
 	}
-	registration, err := s.store.CreateUserRegistration(ctx, &user)
-	if err != nil {
-		return err
-	}
-	if err = s.store.Commit(); err != nil {
-		return err
-	}
+
 	go func() {
 		_ = s.sender.SendUserRegistration(registration)
 	}()
