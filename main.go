@@ -22,6 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to initialize sqlite store: ", err)
 	}
+	defer sqliteStore.Close()
 
 	recipeService := domain.NewRecipeService(mailer, sqliteStore)
 	userService := domain.NewUserService(mailer, sqliteStore)
