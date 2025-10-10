@@ -26,7 +26,7 @@ func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 	var recipeId int64
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
 		var err error
-		recipeId, err = tx.query().CreateRecipe(ctx, s.mapper.FromRecipe(recipe))
+		recipeId, err = tx.query().CreateRecipe(ctx, tx.mapper.FromRecipe(recipe))
 		if err != nil {
 			return err
 		}
@@ -355,7 +355,7 @@ func (s *Store) getVotes(ctx context.Context, user *domain.User, recipeIds []int
 
 func (s *Store) UpdateRecipe(ctx context.Context, recipe domain.Recipe) (domain.Recipe, error) {
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
-		err := tx.query().UpdateRecipe(ctx, s.mapper.FromRecipeForUpdate(recipe))
+		err := tx.query().UpdateRecipe(ctx, tx.mapper.FromRecipeForUpdate(recipe))
 		if err != nil {
 			return err
 		}
