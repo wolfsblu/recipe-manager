@@ -4,7 +4,7 @@
     
     import { formSchema } from "../../add/schema";
     import { setMessage, superForm } from "sveltekit-superforms";
-    import { zodClient } from "sveltekit-superforms/adapters";
+    import { zod4Client } from "sveltekit-superforms/adapters";
     import { toast } from "svelte-sonner";
     import { goto } from "$app/navigation";
     import { updateRecipe } from "$lib/api/recipes/recipes.svelte";
@@ -18,7 +18,7 @@
         SPA: true,
         dataType: 'json',
         resetForm: false,
-        validators: zodClient(formSchema),
+        validators: zod4Client(formSchema),
         async onUpdate({ form }) {
             if (form.valid) {
                 try {
