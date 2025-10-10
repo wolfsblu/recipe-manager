@@ -12,8 +12,7 @@ import (
 // This ensures each transaction has its own state and prevents concurrency issues
 type TxStore struct {
 	*Store
-	tx  *sql.Tx
-	qtx *database.Queries
+	tx *sql.Tx
 }
 
 // WithTransaction executes a function within a database transaction.
@@ -33,8 +32,7 @@ func (s *Store) WithTransaction(ctx context.Context, fn func(*TxStore) error) er
 			path:   s.path,
 			q:      qtx,
 		},
-		tx:  tx,
-		qtx: qtx,
+		tx: tx,
 	}
 
 	defer func() {
@@ -56,12 +54,7 @@ func (s *Store) WithTransaction(ctx context.Context, fn func(*TxStore) error) er
 	return nil
 }
 
-// query returns the transaction-aware query executor for TxStore
-func (t *TxStore) query() *database.Queries {
-	return t.qtx
-}
-
-// query returns the regular query executor for Store (when not in a transaction)
+// query returns the regular query executor for Store
 func (s *Store) query() *database.Queries {
 	return s.q
 }
