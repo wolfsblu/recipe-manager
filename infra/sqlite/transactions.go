@@ -24,13 +24,12 @@ func (s *Store) WithTransaction(ctx context.Context, fn func(*TxStore) error) er
 		return domain.WrapError(domain.ErrStartingTransaction, err)
 	}
 
-	qtx := s.q.WithTx(tx)
 	txStore := &TxStore{
 		Store: &Store{
 			db:     s.db,
 			mapper: s.mapper,
 			path:   s.path,
-			q:      qtx,
+			q:      s.q.WithTx(tx),
 		},
 		tx: tx,
 	}
@@ -46,11 +45,9 @@ func (s *Store) WithTransaction(ctx context.Context, fn func(*TxStore) error) er
 		_ = tx.Rollback()
 		return err
 	}
-
 	if err := tx.Commit(); err != nil {
 		return domain.WrapError(domain.ErrCommittingTransaction, err)
 	}
-
 	return nil
 }
 
