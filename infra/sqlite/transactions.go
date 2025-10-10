@@ -25,10 +25,16 @@ func (s *Store) WithTransaction(ctx context.Context, fn func(*TxStore) error) er
 		return domain.WrapError(domain.ErrStartingTransaction, err)
 	}
 
+	qtx := s.q.WithTx(tx)
 	txStore := &TxStore{
-		Store: s,
-		tx:    tx,
-		qtx:   s.q.WithTx(tx),
+		Store: &Store{
+			db:     s.db,
+			mapper: s.mapper,
+			path:   s.path,
+			q:      qtx,
+		},
+		tx:  tx,
+		qtx: qtx,
 	}
 
 	defer func() {
