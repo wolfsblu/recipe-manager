@@ -24,7 +24,10 @@ func (h *UserHandler) ConfirmUser(ctx context.Context, req *api.Token) error {
 }
 
 func (h *UserHandler) GetUserProfile(ctx context.Context) (*api.ReadUser, error) {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return nil, domain.ErrAuthentication
+	}
 	return &api.ReadUser{
 		ID:    user.ID,
 		Email: user.Email,

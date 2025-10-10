@@ -25,7 +25,10 @@ func NewRecipeHandler(service *domain.RecipeService) *RecipeHandler {
 }
 
 func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipe) (*api.ReadRecipe, error) {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return nil, domain.ErrAuthentication
+	}
 	recipe := h.mapper.FromWriteRecipe(req)
 	recipe.CreatedBy = user
 
@@ -46,7 +49,10 @@ func (h *RecipeHandler) BrowseRecipes(ctx context.Context) ([]api.ReadRecipe, er
 }
 
 func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecipeParams) error {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return domain.ErrAuthentication
+	}
 	err := h.Recipes.Delete(ctx, user, params.RecipeId)
 	if err != nil {
 		return err
@@ -55,7 +61,10 @@ func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecip
 }
 
 func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanParams) ([]api.ReadMealPlan, error) {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return nil, domain.ErrAuthentication
+	}
 	from := params.From.Or(time.Now())
 	until := params.Until.Or(from.Add(7 * 24 * time.Hour))
 	mealplan, err := h.Recipes.GetMealPlan(ctx, user, from, until)
@@ -66,17 +75,26 @@ func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanP
 }
 
 func (h *RecipeHandler) CreateMealPlan(ctx context.Context, req *api.WriteMealPlan) error {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return domain.ErrAuthentication
+	}
 	return h.Recipes.CreateMealPlan(ctx, user, req.RecipeId, req.Date)
 }
 
 func (h *RecipeHandler) DeleteMealPlan(ctx context.Context, params api.DeleteMealPlanParams) error {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return domain.ErrAuthentication
+	}
 	return h.Recipes.DeleteMealPlan(ctx, user, params.RecipeId, params.Date)
 }
 
 func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return nil, domain.ErrAuthentication
+	}
 	recipes, err := h.Recipes.GetByUser(ctx, user)
 	if err != nil {
 		return nil, err
@@ -85,7 +103,10 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error
 }
 
 func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeByIdParams) (*api.ReadRecipe, error) {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return nil, domain.ErrAuthentication
+	}
 	recipe, err := h.Recipes.GetById(ctx, user, params.RecipeId)
 	if err != nil {
 		return nil, domain.ErrRecipeNotFound
@@ -94,7 +115,10 @@ func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeB
 }
 
 func (h *RecipeHandler) UpdateRecipe(ctx context.Context, req *api.WriteRecipe, params api.UpdateRecipeParams) (*api.ReadRecipe, error) {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return nil, domain.ErrAuthentication
+	}
 	recipe := h.mapper.FromWriteRecipe(req)
 	recipe.ID = params.RecipeId
 	recipe.CreatedBy = user
@@ -132,7 +156,10 @@ func (h *RecipeHandler) GetTags(ctx context.Context) ([]api.ReadTag, error) {
 }
 
 func (h *RecipeHandler) AddVote(ctx context.Context, req *api.Vote, params api.AddVoteParams) (*api.RecipeVotes, error) {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return nil, domain.ErrAuthentication
+	}
 
 	votes, err := h.Recipes.AddVote(ctx, user, params.RecipeId, int64(req.Vote))
 	if err != nil {
@@ -143,7 +170,10 @@ func (h *RecipeHandler) AddVote(ctx context.Context, req *api.Vote, params api.A
 }
 
 func (h *RecipeHandler) RemoveVote(ctx context.Context, params api.RemoveVoteParams) (*api.RecipeVotes, error) {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return nil, domain.ErrAuthentication
+	}
 
 	votes, err := h.Recipes.RemoveVote(ctx, user, params.RecipeId)
 	if err != nil {
@@ -208,7 +238,10 @@ func (h *RecipeHandler) DeleteUnit(ctx context.Context, params api.DeleteUnitPar
 }
 
 func (h *RecipeHandler) PatchRecipe(ctx context.Context, req *api.RecipeWriteFields, params api.PatchRecipeParams) (*api.ReadRecipe, error) {
-	user := ctx.Value(config.CtxKeyUser).(*domain.User)
+	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
+	if !ok || user == nil {
+		return nil, domain.ErrAuthentication
+	}
 
 	existingRecipe, err := h.Recipes.GetById(ctx, user, params.RecipeId)
 	if err != nil {
