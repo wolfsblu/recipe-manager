@@ -8,18 +8,12 @@ import (
 	"github.com/wolfsblu/recipe-manager/domain"
 )
 
-func (m *APIMapper) ToNutrient(nutrient domain.Nutrient) api.Nutrient {
-	return api.Nutrient{
-		ID:   nutrient.ID,
-		Name: nutrient.Name,
-		Unit: nutrient.Unit,
-	}
-}
-
 func (m *APIMapper) ToIngredientNutrient(nutrient domain.IngredientNutrient) api.IngredientNutrient {
 	return api.IngredientNutrient{
-		Nutrient: m.ToNutrient(nutrient.Nutrient),
-		Amount:   nutrient.Amount,
+		ID:     nutrient.Nutrient.ID,
+		Name:   nutrient.Nutrient.Name,
+		Unit:   nutrient.Nutrient.Unit,
+		Amount: nutrient.Amount,
 	}
 }
 

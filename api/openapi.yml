@@ -738,18 +738,17 @@ components:
           examples:
             - g
     IngredientNutrient:
-      type: object
-      required:
-        - nutrient
-        - amount
-      properties:
-        nutrient:
-          $ref: '#/components/schemas/Nutrient'
-        amount:
-          type: number
-          format: float64
-          examples:
-            - 10.5
+      allOf:
+        - $ref: '#/components/schemas/Nutrient'
+        - type: object
+          required:
+            - amount
+          properties:
+            amount:
+              type: number
+              format: float64
+              examples:
+                - 10.5
     Ingredient:
       type: object
       required:

@@ -433,8 +433,7 @@ export interface components {
             /** @example g */
             unit: string;
         };
-        IngredientNutrient: {
-            nutrient: components["schemas"]["Nutrient"];
+        IngredientNutrient: components["schemas"]["Nutrient"] & {
             /**
              * Format: float64
              * @example 10.5
