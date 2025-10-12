@@ -30,13 +30,14 @@ func (m *APIMapper) ToIngredient(ingredient domain.Ingredient) *api.Ingredient {
 }
 
 func (m *APIMapper) ToReadStepIngredient(ingredient domain.StepIngredient) api.ReadStepIngredient {
-	unit := m.ToUnit(ingredient.Unit)
 	apiIngredient := m.ToIngredient(ingredient.Ingredient)
 
 	return api.ReadStepIngredient{
-		Ingredient: *apiIngredient,
-		Unit:       *unit,
-		Amount:     ingredient.Amount,
+		ID:        apiIngredient.ID,
+		Name:      apiIngredient.Name,
+		Nutrients: apiIngredient.Nutrients,
+		Unit:      *m.ToUnit(ingredient.Unit),
+		Amount:    ingredient.Amount,
 	}
 }
 

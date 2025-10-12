@@ -34,7 +34,7 @@ export const load: PageLoad = async ({ params }) => {
             instructions: step.instructions,
             ingredients: step.ingredients?.map(ingredient => ({
                 amount: ingredient.amount,
-                ingredientId: ingredient.ingredient.id,
+                ingredientId: ingredient.id,
                 unitId: ingredient.unit.id,
             })) || []
         })) || []

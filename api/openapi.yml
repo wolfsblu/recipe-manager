@@ -933,21 +933,20 @@ components:
           examples:
             - 3.5
     ReadStepIngredient:
-      type: object
-      required:
-        - amount
-        - ingredient
-        - unit
-      properties:
-        ingredient:
-          $ref: '#/components/schemas/Ingredient'
-        unit:
-          $ref: '#/components/schemas/ReadUnit'
-        amount:
-          type: number
-          format: float64
-          examples:
-            - 3.5
+      allOf:
+        - $ref: '#/components/schemas/Ingredient'
+        - type: object
+          required:
+            - amount
+            - unit
+          properties:
+            unit:
+              $ref: '#/components/schemas/ReadUnit'
+            amount:
+              type: number
+              format: float64
+              examples:
+                - 3.5
     Token:
       type: object
       required:

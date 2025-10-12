@@ -70,7 +70,7 @@
             for (const ingredient of allIngredients) {
                 const adjustedAmount = ingredient.amount * servingsMultiplier;
                 await addShoppingListItem(selectedListId, {
-                    ingredient: ingredient.ingredient?.name || '',
+                    ingredient: ingredient.name || '',
                     quantity: adjustedAmount?.toString(),
                     unit: ingredient.unit?.name || '',
                     done: false,

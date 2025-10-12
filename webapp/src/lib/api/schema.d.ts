@@ -544,8 +544,7 @@ export interface components {
              */
             amount: number;
         };
-        ReadStepIngredient: {
-            ingredient: components["schemas"]["Ingredient"];
+        ReadStepIngredient: components["schemas"]["Ingredient"] & {
             unit: components["schemas"]["ReadUnit"];
             /**
              * Format: float64

@@ -69,25 +69,26 @@
         recipe.steps
             .flatMap(step => step.ingredients || [])
             .reduce((ingredientMap, ingredient) => {
-                const key = `${ingredient.ingredient?.id}-${ingredient.unit.id}`;
-                
+                const key = `${ingredient.id}-${ingredient.unit.id}`;
+
                 if (ingredientMap.has(key)) {
                     // If same ingredient with same unit exists, add the amounts
                     ingredientMap.get(key).amount += ingredient.amount;
                 } else {
                     // Create new entry
                     ingredientMap.set(key, {
-                        ingredient: ingredient.ingredient,
+                        id: ingredient.id,
+                        name: ingredient.name,
                         unit: ingredient.unit,
                         amount: ingredient.amount
                     });
                 }
-                
+
                 return ingredientMap;
             }, new Map())
             .values()
-    ).sort((a, b) => 
-        (a.ingredient?.name || '').localeCompare(b.ingredient?.name || '')
+    ).sort((a, b) =>
+        (a.name || '').localeCompare(b.name || '')
     )
 </script>
 
@@ -239,7 +240,7 @@
             {#each ingredients as ingredient}
                 <div class="border flex items-center justify-between px-3 py-2 bg-muted/30 rounded-lg">
                     <span class="font-medium text-muted-foreground">
-                        {ingredient.ingredient?.name || m.recipes_detail_unknownIngredient()}
+                        {ingredient.name || m.recipes_detail_unknownIngredient()}
                     </span>
                     <Badge variant="outline" class="text-sm text-muted-foreground">
                         {ingredient.amount}
@@ -279,7 +280,7 @@
                                             {#each step.ingredients as ingredient}
                                                 <div class="flex items-center justify-between px-3 py-2 bg-muted/30 rounded-lg">
                                                     <span class="font-medium text-muted-foreground">
-                                                        {ingredient.ingredient?.name || m.recipes_detail_unknownIngredient()}
+                                                        {ingredient.name || m.recipes_detail_unknownIngredient()}
                                                     </span>
                                                     <Badge variant="outline" class="text-sm text-muted-foreground">
                                                         {ingredient.amount}
