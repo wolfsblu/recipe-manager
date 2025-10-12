@@ -328,12 +328,33 @@ func (s *Store) populateRecipeRelations(ctx context.Context, user *domain.User, 
 		})
 	}
 
+	uniqueIngredients := make([]domain.Ingredient, 0)
+	seenIngredients := make(map[int64]bool)
+	for _, ing := range ingredients {
+		if !seenIngredients[ing.IngredientID] {
+			uniqueIngredients = append(uniqueIngredients, s.mapper.ToIngredientFromRecipeRow(ing))
+			seenIngredients[ing.IngredientID] = true
+		}
+	}
+
+	populatedIngredients, err := s.populateIngredientNutrients(ctx, uniqueIngredients)
+	if err != nil {
+		return nil, err
+	}
+
+	populatedIngredientsMap := make(map[int64]domain.Ingredient)
+	for _, ingredient := range populatedIngredients {
+		populatedIngredientsMap[ingredient.ID] = ingredient
+	}
+
 	var stepsByRecipe map[int64][]domain.RecipeStep
 	stepsByRecipe = make(map[int64][]domain.RecipeStep)
 
 	ingredientsByStep := make(map[int64][]domain.StepIngredient)
 	for _, ing := range ingredients {
-		ingredientsByStep[ing.StepID] = append(ingredientsByStep[ing.StepID], s.mapper.ToStepIngredient(ing))
+		stepIngredient := s.mapper.ToStepIngredient(ing)
+		stepIngredient.Ingredient = populatedIngredientsMap[ing.IngredientID]
+		ingredientsByStep[ing.StepID] = append(ingredientsByStep[ing.StepID], stepIngredient)
 	}
 
 	stepsByRecipeTemp := make(map[int64][]database.GetStepsForRecipesRow)

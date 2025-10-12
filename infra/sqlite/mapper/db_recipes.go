@@ -9,7 +9,15 @@ func (m *DBMapper) ToIngredient(r database.Ingredient) domain.Ingredient {
 	return domain.Ingredient{
 		ID:        r.ID,
 		Name:      r.Name,
-		Nutrients: []domain.IngredientNutrient{}, // Will be populated separately
+		Nutrients: []domain.IngredientNutrient{},
+	}
+}
+
+func (m *DBMapper) ToIngredientFromRecipeRow(r database.GetIngredientsForRecipesRow) domain.Ingredient {
+	return domain.Ingredient{
+		ID:        r.IngredientID,
+		Name:      r.IngredientName,
+		Nutrients: []domain.IngredientNutrient{},
 	}
 }
 
