@@ -74,3 +74,11 @@ func (m *DBMapper) FromMealPlanEntry(entry domain.MealPlanEntry) database.Create
 		SortOrder: entry.SortOrder,
 	}
 }
+
+func (m *DBMapper) FromIngredientNutrient(ingredientID int64, nutrient domain.IngredientNutrient) database.AddIngredientNutrientParams {
+	return database.AddIngredientNutrientParams{
+		IngredientID: ingredientID,
+		NutrientID:   nutrient.Nutrient.ID,
+		Amount:       nutrient.Amount,
+	}
+}

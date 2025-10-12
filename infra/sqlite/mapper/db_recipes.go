@@ -7,8 +7,24 @@ import (
 
 func (m *DBMapper) ToIngredient(r database.Ingredient) domain.Ingredient {
 	return domain.Ingredient{
+		ID:        r.ID,
+		Name:      r.Name,
+		Nutrients: []domain.IngredientNutrient{}, // Will be populated separately
+	}
+}
+
+func (m *DBMapper) ToNutrient(r database.Nutrient) domain.Nutrient {
+	return domain.Nutrient{
 		ID:   r.ID,
 		Name: r.Name,
+		Unit: r.Unit,
+	}
+}
+
+func (m *DBMapper) ToIngredientNutrient(r database.GetNutrientsForIngredientRow) domain.IngredientNutrient {
+	return domain.IngredientNutrient{
+		Nutrient: m.ToNutrient(r.Nutrient),
+		Amount:   r.Amount,
 	}
 }
 

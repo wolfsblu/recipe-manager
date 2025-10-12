@@ -61,9 +61,23 @@ func (m *APIMapper) fromWriteStepIngredient(ingredient api.WriteStepIngredient) 
 	}
 }
 
+func (m *APIMapper) FromWriteIngredientNutrient(req api.WriteIngredientNutrient) domain.IngredientNutrient {
+	return domain.IngredientNutrient{
+		Nutrient: domain.Nutrient{
+			ID: req.NutrientId,
+		},
+		Amount: req.Amount,
+	}
+}
+
 func (m *APIMapper) FromWriteIngredient(req *api.WriteIngredient) domain.Ingredient {
+	nutrients := make([]domain.IngredientNutrient, len(req.Nutrients))
+	for i, nutrient := range req.Nutrients {
+		nutrients[i] = m.FromWriteIngredientNutrient(nutrient)
+	}
 	return domain.Ingredient{
-		Name: req.Name,
+		Name:      req.Name,
+		Nutrients: nutrients,
 	}
 }
 

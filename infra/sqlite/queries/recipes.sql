@@ -206,3 +206,45 @@ VALUES (?, ?, ?, ?);
 -- name: DeleteMealPlan :exec
 DELETE FROM meal_plan
 WHERE user_id = ? AND recipe_id = ? AND date = ?;
+
+-- name: GetNutrients :many
+SELECT *
+FROM nutrients
+ORDER BY name;
+
+-- name: CreateNutrient :one
+INSERT INTO nutrients (name, unit)
+VALUES (?, ?)
+RETURNING id;
+
+-- name: UpdateNutrient :exec
+UPDATE nutrients
+SET name = ?, unit = ?
+WHERE id = ?;
+
+-- name: DeleteNutrient :exec
+DELETE FROM nutrients
+WHERE id = ?;
+
+-- name: GetNutrientsForIngredient :many
+SELECT sqlc.embed(nutrients), ingredient_nutrients.amount
+FROM ingredient_nutrients
+INNER JOIN nutrients ON ingredient_nutrients.nutrient_id = nutrients.id
+WHERE ingredient_nutrients.ingredient_id = ?
+ORDER BY nutrients.name;
+
+-- name: GetNutrientsForIngredients :many
+SELECT ingredient_nutrients.ingredient_id, sqlc.embed(nutrients), ingredient_nutrients.amount
+FROM ingredient_nutrients
+INNER JOIN nutrients ON ingredient_nutrients.nutrient_id = nutrients.id
+WHERE ingredient_nutrients.ingredient_id IN (sqlc.slice(ingredient_ids))
+ORDER BY ingredient_nutrients.ingredient_id, nutrients.name;
+
+-- name: AddIngredientNutrient :exec
+INSERT INTO ingredient_nutrients (ingredient_id, nutrient_id, amount)
+VALUES (?, ?, ?)
+ON CONFLICT (ingredient_id, nutrient_id) DO UPDATE SET amount = excluded.amount;
+
+-- name: DeleteIngredientNutrients :exec
+DELETE FROM ingredient_nutrients
+WHERE ingredient_id = ?;

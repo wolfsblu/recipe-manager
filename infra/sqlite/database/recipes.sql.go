@@ -10,6 +10,23 @@ import (
 	"strings"
 )
 
+const addIngredientNutrient = `-- name: AddIngredientNutrient :exec
+INSERT INTO ingredient_nutrients (ingredient_id, nutrient_id, amount)
+VALUES (?, ?, ?)
+ON CONFLICT (ingredient_id, nutrient_id) DO UPDATE SET amount = excluded.amount
+`
+
+type AddIngredientNutrientParams struct {
+	IngredientID int64
+	NutrientID   int64
+	Amount       float64
+}
+
+func (q *Queries) AddIngredientNutrient(ctx context.Context, arg AddIngredientNutrientParams) error {
+	_, err := q.db.ExecContext(ctx, addIngredientNutrient, arg.IngredientID, arg.NutrientID, arg.Amount)
+	return err
+}
+
 const addVote = `-- name: AddVote :exec
 INSERT INTO recipe_votes (recipe_id, user_id, vote)
 VALUES (?, ?, ?)
@@ -96,6 +113,24 @@ func (q *Queries) CreateMealPlan(ctx context.Context, arg CreateMealPlanParams) 
 		arg.SortOrder,
 	)
 	return err
+}
+
+const createNutrient = `-- name: CreateNutrient :one
+INSERT INTO nutrients (name, unit)
+VALUES (?, ?)
+RETURNING id
+`
+
+type CreateNutrientParams struct {
+	Name string
+	Unit string
+}
+
+func (q *Queries) CreateNutrient(ctx context.Context, arg CreateNutrientParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createNutrient, arg.Name, arg.Unit)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const createRecipe = `-- name: CreateRecipe :one
@@ -233,6 +268,16 @@ func (q *Queries) DeleteIngredient(ctx context.Context, id int64) error {
 	return err
 }
 
+const deleteIngredientNutrients = `-- name: DeleteIngredientNutrients :exec
+DELETE FROM ingredient_nutrients
+WHERE ingredient_id = ?
+`
+
+func (q *Queries) DeleteIngredientNutrients(ctx context.Context, ingredientID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteIngredientNutrients, ingredientID)
+	return err
+}
+
 const deleteMealPlan = `-- name: DeleteMealPlan :exec
 DELETE FROM meal_plan
 WHERE user_id = ? AND recipe_id = ? AND date = ?
@@ -246,6 +291,16 @@ type DeleteMealPlanParams struct {
 
 func (q *Queries) DeleteMealPlan(ctx context.Context, arg DeleteMealPlanParams) error {
 	_, err := q.db.ExecContext(ctx, deleteMealPlan, arg.UserID, arg.RecipeID, arg.Date)
+	return err
+}
+
+const deleteNutrient = `-- name: DeleteNutrient :exec
+DELETE FROM nutrients
+WHERE id = ?
+`
+
+func (q *Queries) DeleteNutrient(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteNutrient, id)
 	return err
 }
 
@@ -514,6 +569,129 @@ func (q *Queries) GetMealPlan(ctx context.Context, arg GetMealPlanParams) ([]Get
 			&i.Recipe.Description,
 			&i.Recipe.CreatedBy,
 			&i.Recipe.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getNutrients = `-- name: GetNutrients :many
+SELECT id, name, unit
+FROM nutrients
+ORDER BY name
+`
+
+func (q *Queries) GetNutrients(ctx context.Context) ([]Nutrient, error) {
+	rows, err := q.db.QueryContext(ctx, getNutrients)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Nutrient
+	for rows.Next() {
+		var i Nutrient
+		if err := rows.Scan(&i.ID, &i.Name, &i.Unit); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getNutrientsForIngredient = `-- name: GetNutrientsForIngredient :many
+SELECT nutrients.id, nutrients.name, nutrients.unit, ingredient_nutrients.amount
+FROM ingredient_nutrients
+INNER JOIN nutrients ON ingredient_nutrients.nutrient_id = nutrients.id
+WHERE ingredient_nutrients.ingredient_id = ?
+ORDER BY nutrients.name
+`
+
+type GetNutrientsForIngredientRow struct {
+	Nutrient Nutrient
+	Amount   float64
+}
+
+func (q *Queries) GetNutrientsForIngredient(ctx context.Context, ingredientID int64) ([]GetNutrientsForIngredientRow, error) {
+	rows, err := q.db.QueryContext(ctx, getNutrientsForIngredient, ingredientID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetNutrientsForIngredientRow
+	for rows.Next() {
+		var i GetNutrientsForIngredientRow
+		if err := rows.Scan(
+			&i.Nutrient.ID,
+			&i.Nutrient.Name,
+			&i.Nutrient.Unit,
+			&i.Amount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getNutrientsForIngredients = `-- name: GetNutrientsForIngredients :many
+SELECT ingredient_nutrients.ingredient_id, nutrients.id, nutrients.name, nutrients.unit, ingredient_nutrients.amount
+FROM ingredient_nutrients
+INNER JOIN nutrients ON ingredient_nutrients.nutrient_id = nutrients.id
+WHERE ingredient_nutrients.ingredient_id IN (/*SLICE:ingredient_ids*/?)
+ORDER BY ingredient_nutrients.ingredient_id, nutrients.name
+`
+
+type GetNutrientsForIngredientsRow struct {
+	IngredientID int64
+	Nutrient     Nutrient
+	Amount       float64
+}
+
+func (q *Queries) GetNutrientsForIngredients(ctx context.Context, ingredientIds []int64) ([]GetNutrientsForIngredientsRow, error) {
+	query := getNutrientsForIngredients
+	var queryParams []interface{}
+	if len(ingredientIds) > 0 {
+		for _, v := range ingredientIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:ingredient_ids*/?", strings.Repeat(",?", len(ingredientIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:ingredient_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetNutrientsForIngredientsRow
+	for rows.Next() {
+		var i GetNutrientsForIngredientsRow
+		if err := rows.Scan(
+			&i.IngredientID,
+			&i.Nutrient.ID,
+			&i.Nutrient.Name,
+			&i.Nutrient.Unit,
+			&i.Amount,
 		); err != nil {
 			return nil, err
 		}
@@ -908,6 +1086,23 @@ type UpdateIngredientParams struct {
 
 func (q *Queries) UpdateIngredient(ctx context.Context, arg UpdateIngredientParams) error {
 	_, err := q.db.ExecContext(ctx, updateIngredient, arg.Name, arg.ID)
+	return err
+}
+
+const updateNutrient = `-- name: UpdateNutrient :exec
+UPDATE nutrients
+SET name = ?, unit = ?
+WHERE id = ?
+`
+
+type UpdateNutrientParams struct {
+	Name string
+	Unit string
+	ID   int64
+}
+
+func (q *Queries) UpdateNutrient(ctx context.Context, arg UpdateNutrientParams) error {
+	_, err := q.db.ExecContext(ctx, updateNutrient, arg.Name, arg.Unit, arg.ID)
 	return err
 }
 

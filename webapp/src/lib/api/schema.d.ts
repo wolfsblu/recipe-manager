@@ -422,6 +422,25 @@ export interface components {
         Error: {
             message: string;
         };
+        Nutrient: {
+            /**
+             * Format: int64
+             * @example 1
+             */
+            id: number;
+            /** @example Protein */
+            name: string;
+            /** @example g */
+            unit: string;
+        };
+        IngredientNutrient: {
+            nutrient: components["schemas"]["Nutrient"];
+            /**
+             * Format: float64
+             * @example 10.5
+             */
+            amount: number;
+        };
         Ingredient: {
             /**
              * Format: int64
@@ -430,6 +449,7 @@ export interface components {
             id: number;
             /** @example Flour */
             name: string;
+            nutrients: components["schemas"]["IngredientNutrient"][];
         };
         PasswordReset: components["schemas"]["Token"] & {
             /** @example my new password */
@@ -576,9 +596,22 @@ export interface components {
              */
             vote: 1 | -1;
         };
+        WriteIngredientNutrient: {
+            /**
+             * Format: int64
+             * @example 1
+             */
+            nutrientId: number;
+            /**
+             * Format: float64
+             * @example 10.5
+             */
+            amount: number;
+        };
         WriteIngredient: {
             /** @example Flour */
             name: string;
+            nutrients: components["schemas"]["WriteIngredientNutrient"][];
         };
         WriteUnit: {
             /** @example Kilogram */

@@ -4,6 +4,21 @@ CREATE TABLE ingredients
     name TEXT NOT NULL
 );
 
+CREATE TABLE nutrients
+(
+    id   INTEGER PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    unit TEXT NOT NULL
+);
+
+CREATE TABLE ingredient_nutrients
+(
+    ingredient_id INTEGER NOT NULL REFERENCES ingredients (id) ON DELETE CASCADE,
+    nutrient_id   INTEGER NOT NULL REFERENCES nutrients (id) ON DELETE CASCADE,
+    amount        REAL    NOT NULL,
+    PRIMARY KEY (ingredient_id, nutrient_id)
+);
+
 CREATE TABLE permissions
 (
     id   INTEGER PRIMARY KEY,

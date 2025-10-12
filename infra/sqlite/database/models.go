@@ -13,12 +13,24 @@ type Ingredient struct {
 	Name string
 }
 
+type IngredientNutrient struct {
+	IngredientID int64
+	NutrientID   int64
+	Amount       float64
+}
+
 type MealPlan struct {
 	ID        int64
 	Date      string
 	UserID    int64
 	RecipeID  int64
 	SortOrder int64
+}
+
+type Nutrient struct {
+	ID   int64
+	Name string
+	Unit string
 }
 
 type PasswordReset struct {

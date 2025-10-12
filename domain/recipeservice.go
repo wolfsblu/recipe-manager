@@ -139,10 +139,7 @@ func (s *RecipeService) UpdateIngredient(ctx context.Context, ingredient Ingredi
 	if err := s.validateIngredient(ingredient); err != nil {
 		return Ingredient{}, err
 	}
-	if err := s.store.UpdateIngredient(ctx, ingredient); err != nil {
-		return Ingredient{}, err
-	}
-	return ingredient, nil
+	return s.store.UpdateIngredient(ctx, ingredient)
 }
 
 func (s *RecipeService) DeleteIngredient(ctx context.Context, id int64) error {

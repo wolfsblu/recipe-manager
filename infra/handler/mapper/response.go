@@ -8,10 +8,30 @@ import (
 	"github.com/wolfsblu/recipe-manager/domain"
 )
 
+func (m *APIMapper) ToNutrient(nutrient domain.Nutrient) api.Nutrient {
+	return api.Nutrient{
+		ID:   nutrient.ID,
+		Name: nutrient.Name,
+		Unit: nutrient.Unit,
+	}
+}
+
+func (m *APIMapper) ToIngredientNutrient(nutrient domain.IngredientNutrient) api.IngredientNutrient {
+	return api.IngredientNutrient{
+		Nutrient: m.ToNutrient(nutrient.Nutrient),
+		Amount:   nutrient.Amount,
+	}
+}
+
 func (m *APIMapper) ToIngredient(ingredient domain.Ingredient) *api.Ingredient {
+	nutrients := make([]api.IngredientNutrient, len(ingredient.Nutrients))
+	for i, nutrient := range ingredient.Nutrients {
+		nutrients[i] = m.ToIngredientNutrient(nutrient)
+	}
 	return &api.Ingredient{
-		ID:   ingredient.ID,
-		Name: ingredient.Name,
+		ID:        ingredient.ID,
+		Name:      ingredient.Name,
+		Nutrients: nutrients,
 	}
 }
 

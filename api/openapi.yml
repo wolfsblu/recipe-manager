@@ -717,11 +717,45 @@ components:
           type: string
       required:
         - message
+    Nutrient:
+      type: object
+      required:
+        - id
+        - name
+        - unit
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples:
+            - 1
+        name:
+          type: string
+          examples:
+            - Protein
+        unit:
+          type: string
+          examples:
+            - g
+    IngredientNutrient:
+      type: object
+      required:
+        - nutrient
+        - amount
+      properties:
+        nutrient:
+          $ref: '#/components/schemas/Nutrient'
+        amount:
+          type: number
+          format: float64
+          examples:
+            - 10.5
     Ingredient:
       type: object
       required:
         - id
         - name
+        - nutrients
       properties:
         id:
           type: integer
@@ -732,6 +766,10 @@ components:
           type: string
           examples:
             - Flour
+        nutrients:
+          type: array
+          items:
+            $ref: '#/components/schemas/IngredientNutrient'
     PasswordReset:
       allOf:
         - $ref: '#/components/schemas/Token'
@@ -1000,15 +1038,36 @@ components:
           enum: [1, -1]
           examples:
             - 1
+    WriteIngredientNutrient:
+      type: object
+      required:
+        - nutrientId
+        - amount
+      properties:
+        nutrientId:
+          type: integer
+          format: int64
+          examples:
+            - 1
+        amount:
+          type: number
+          format: float64
+          examples:
+            - 10.5
     WriteIngredient:
       type: object
       required:
         - name
+        - nutrients
       properties:
         name:
           type: string
           examples:
             - Flour
+        nutrients:
+          type: array
+          items:
+            $ref: '#/components/schemas/WriteIngredientNutrient'
     WriteUnit:
       type: object
       required:

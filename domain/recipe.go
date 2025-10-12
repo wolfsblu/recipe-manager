@@ -52,8 +52,20 @@ type MealPlanEntry struct {
 }
 
 type Ingredient struct {
+	ID        int64
+	Name      string
+	Nutrients []IngredientNutrient
+}
+
+type Nutrient struct {
 	ID   int64
 	Name string
+	Unit string
+}
+
+type IngredientNutrient struct {
+	Nutrient Nutrient
+	Amount   float64
 }
 
 type Unit struct {
