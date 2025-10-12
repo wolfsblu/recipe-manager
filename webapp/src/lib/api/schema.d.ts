@@ -600,7 +600,7 @@ export interface components {
              * Format: int64
              * @example 1
              */
-            nutrientId: number;
+            id: number;
             /**
              * Format: float64
              * @example 10.5

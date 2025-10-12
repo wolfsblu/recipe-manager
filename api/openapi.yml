@@ -1040,10 +1040,10 @@ components:
     WriteIngredientNutrient:
       type: object
       required:
-        - nutrientId
+        - id
         - amount
       properties:
-        nutrientId:
+        id:
           type: integer
           format: int64
           examples:

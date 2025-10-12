@@ -64,7 +64,7 @@ func (m *APIMapper) fromWriteStepIngredient(ingredient api.WriteStepIngredient) 
 func (m *APIMapper) FromWriteIngredientNutrient(req api.WriteIngredientNutrient) domain.IngredientNutrient {
 	return domain.IngredientNutrient{
 		Nutrient: domain.Nutrient{
-			ID: req.NutrientId,
+			ID: req.ID,
 		},
 		Amount: req.Amount,
 	}
