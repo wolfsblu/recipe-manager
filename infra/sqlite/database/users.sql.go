@@ -114,7 +114,7 @@ func (q *Queries) DeleteRegistrationByUserId(ctx context.Context, userID int64) 
 
 const deleteRegistrationsBefore = `-- name: DeleteRegistrationsBefore :exec
 DELETE
-FROM users
+FROM user_registrations
 WHERE created_at < ?
 `
 
