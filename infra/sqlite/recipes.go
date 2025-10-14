@@ -12,12 +12,12 @@ import (
 )
 
 type recipeRelations struct {
-	tags                    []database.GetTagsForRecipesRow
-	images                  []database.GetImagesForRecipesRow
-	steps                   []database.GetStepsForRecipesRow
-	ingredients             []database.GetIngredientsForRecipesRow
-	votes                   map[int64]domain.RecipeVotes
-	populatedIngredientsMap map[int64]domain.Ingredient
+	tags        []database.GetTagsForRecipesRow
+	images      []database.GetImagesForRecipesRow
+	steps       []database.GetStepsForRecipesRow
+	ingredients []database.GetIngredientsForRecipesRow
+	nutrients   []database.GetNutrientsForRecipesRow
+	votes       map[int64]domain.RecipeVotes
 }
 
 func (s *Store) BrowseRecipes(ctx context.Context) (recipes []domain.Recipe, err error) {
@@ -173,74 +173,6 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 	return mealPlan, nil
 }
 
-func (s *Store) GetIngredients(ctx context.Context) ([]domain.Ingredient, error) {
-	result, err := s.query().GetIngredients(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	ingredients := make([]domain.Ingredient, len(result))
-	for i, ingredient := range result {
-		ingredients[i] = s.mapper.ToIngredient(ingredient)
-	}
-
-	return s.populateIngredientNutrients(ctx, ingredients)
-}
-
-func (s *Store) populateIngredientNutrients(ctx context.Context, ingredients []domain.Ingredient) ([]domain.Ingredient, error) {
-	if len(ingredients) == 0 {
-		return ingredients, nil
-	}
-
-	ingredientIDs := make([]int64, len(ingredients))
-	for i, ing := range ingredients {
-		ingredientIDs[i] = ing.ID
-	}
-
-	nutrients, err := s.query().GetNutrientsForIngredients(ctx, ingredientIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	// Group nutrients by ingredient ID
-	nutrientsByIngredient := make(map[int64][]domain.IngredientNutrient)
-	for _, nutrient := range nutrients {
-		nutrientsByIngredient[nutrient.IngredientID] = append(
-			nutrientsByIngredient[nutrient.IngredientID],
-			domain.IngredientNutrient{
-				Nutrient: s.mapper.ToNutrient(nutrient.Nutrient),
-				Amount:   nutrient.Amount,
-			},
-		)
-	}
-
-	// Assign nutrients to ingredients
-	populatedIngredients := make([]domain.Ingredient, len(ingredients))
-	for i, ingredient := range ingredients {
-		ingredient.Nutrients = nutrientsByIngredient[ingredient.ID]
-		if ingredient.Nutrients == nil {
-			ingredient.Nutrients = []domain.IngredientNutrient{}
-		}
-		populatedIngredients[i] = ingredient
-	}
-
-	return populatedIngredients, nil
-}
-
-func (s *Store) GetUnits(ctx context.Context) ([]domain.Unit, error) {
-	result, err := s.query().GetUnits(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	units := make([]domain.Unit, len(result))
-	for i, unit := range result {
-		units[i] = s.mapper.ToUnit(unit)
-	}
-
-	return units, nil
-}
-
 func (s *Store) GetTags(ctx context.Context) ([]domain.Tag, error) {
 	result, err := s.query().GetTags(ctx)
 	if err != nil {
@@ -300,7 +232,8 @@ func (s *Store) populateRecipeRelations(ctx context.Context, user *domain.User, 
 	}
 
 	tagsByRecipe := s.groupTagsByRecipe(relations.tags)
-	ingredientsByStep := s.groupIngredientsByStep(relations.ingredients, relations.populatedIngredientsMap)
+	ingredientMap := s.groupIngredientsWithNutrients(relations.ingredients, relations.nutrients)
+	ingredientsByStep := s.groupIngredientsByStep(relations.ingredients, ingredientMap)
 	stepsByRecipe := s.groupStepsByRecipe(relations.steps, ingredientsByStep)
 	imagesByRecipe, err := s.groupImagesByRecipe(relations.images)
 	if err != nil {
@@ -344,34 +277,18 @@ func (s *Store) getRecipeRelations(ctx context.Context, user *domain.User, recip
 		return nil, err
 	}
 
-	// Extract unique ingredients and populate with nutrients
-	uniqueIngredients := make([]domain.Ingredient, 0)
-	seenIngredients := make(map[int64]bool)
-	for _, ing := range ingredients {
-		if !seenIngredients[ing.IngredientID] {
-			uniqueIngredients = append(uniqueIngredients, s.mapper.ToIngredientFromRecipeRow(ing))
-			seenIngredients[ing.IngredientID] = true
-		}
-	}
-
-	populatedIngredients, err := s.populateIngredientNutrients(ctx, uniqueIngredients)
+	nutrients, err := s.query().GetNutrientsForRecipes(ctx, recipeIds)
 	if err != nil {
 		return nil, err
 	}
 
-	// Store populated ingredients in a map for quick lookup
-	populatedIngredientsMap := make(map[int64]domain.Ingredient)
-	for _, ingredient := range populatedIngredients {
-		populatedIngredientsMap[ingredient.ID] = ingredient
-	}
-
 	return &recipeRelations{
-		tags:                    tags,
-		images:                  images,
-		steps:                   steps,
-		ingredients:             ingredients,
-		votes:                   votes,
-		populatedIngredientsMap: populatedIngredientsMap,
+		tags:        tags,
+		images:      images,
+		steps:       steps,
+		ingredients: ingredients,
+		nutrients:   nutrients,
+		votes:       votes,
 	}, nil
 }
 
@@ -428,11 +345,37 @@ func (s *Store) groupImagesByRecipe(images []database.GetImagesForRecipesRow) (m
 	return imagesByRecipe, nil
 }
 
-func (s *Store) groupIngredientsByStep(ingredients []database.GetIngredientsForRecipesRow, populatedIngredientsMap map[int64]domain.Ingredient) map[int64][]domain.StepIngredient {
+func (s *Store) groupIngredientsWithNutrients(ingredients []database.GetIngredientsForRecipesRow, nutrients []database.GetNutrientsForRecipesRow) map[int64]domain.Ingredient {
+	nutrientsByIngredient := make(map[int64][]domain.IngredientNutrient)
+	for _, nutrient := range nutrients {
+		nutrientsByIngredient[nutrient.IngredientID] = append(
+			nutrientsByIngredient[nutrient.IngredientID],
+			domain.IngredientNutrient{
+				Nutrient: s.mapper.ToNutrient(nutrient.Nutrient),
+				Amount:   nutrient.Amount,
+			},
+		)
+	}
+
+	ingredientMap := make(map[int64]domain.Ingredient)
+	for _, ing := range ingredients {
+		if _, exists := ingredientMap[ing.IngredientID]; !exists {
+			ingredient := s.mapper.ToIngredientFromRecipeRow(ing)
+			ingredient.Nutrients = nutrientsByIngredient[ing.IngredientID]
+			if ingredient.Nutrients == nil {
+				ingredient.Nutrients = []domain.IngredientNutrient{}
+			}
+			ingredientMap[ing.IngredientID] = ingredient
+		}
+	}
+	return ingredientMap
+}
+
+func (s *Store) groupIngredientsByStep(ingredients []database.GetIngredientsForRecipesRow, ingredientMap map[int64]domain.Ingredient) map[int64][]domain.StepIngredient {
 	ingredientsByStep := make(map[int64][]domain.StepIngredient)
 	for _, ing := range ingredients {
 		stepIngredient := s.mapper.ToStepIngredient(ing)
-		stepIngredient.Ingredient = populatedIngredientsMap[ing.IngredientID]
+		stepIngredient.Ingredient = ingredientMap[ing.IngredientID]
 		ingredientsByStep[ing.StepID] = append(ingredientsByStep[ing.StepID], stepIngredient)
 	}
 	return ingredientsByStep
@@ -526,97 +469,4 @@ func (s *Store) GetUserVote(ctx context.Context, recipeID int64, userID int64) (
 		RecipeID: recipeID,
 		UserID:   userID,
 	})
-}
-
-func (s *Store) CreateIngredient(ctx context.Context, ingredient domain.Ingredient) (domain.Ingredient, error) {
-	var id int64
-	err := s.WithTransaction(ctx, func(tx *TxStore) error {
-		var err error
-		id, err = tx.query().CreateIngredient(ctx, ingredient.Name)
-		if err != nil {
-			return err
-		}
-
-		for _, nutrient := range ingredient.Nutrients {
-			err = tx.query().AddIngredientNutrient(ctx, tx.mapper.FromIngredientNutrient(id, nutrient))
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return domain.Ingredient{}, err
-	}
-	ingredient.ID = id
-	populated, err := s.populateIngredientNutrients(ctx, []domain.Ingredient{ingredient})
-	if err != nil {
-		return domain.Ingredient{}, err
-	}
-	return populated[0], nil
-}
-
-func (s *Store) UpdateIngredient(ctx context.Context, ingredient domain.Ingredient) (domain.Ingredient, error) {
-	err := s.WithTransaction(ctx, func(tx *TxStore) error {
-		err := tx.query().UpdateIngredient(ctx, database.UpdateIngredientParams{
-			Name: ingredient.Name,
-			ID:   ingredient.ID,
-		})
-		if err != nil {
-			return err
-		}
-
-		// Delete existing nutrients and add new ones
-		err = tx.query().DeleteIngredientNutrients(ctx, ingredient.ID)
-		if err != nil {
-			return err
-		}
-
-		for _, nutrient := range ingredient.Nutrients {
-			err = tx.query().AddIngredientNutrient(ctx, tx.mapper.FromIngredientNutrient(ingredient.ID, nutrient))
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return domain.Ingredient{}, err
-	}
-	populated, err := s.populateIngredientNutrients(ctx, []domain.Ingredient{ingredient})
-	if err != nil {
-		return domain.Ingredient{}, err
-	}
-	return populated[0], nil
-}
-
-func (s *Store) DeleteIngredient(ctx context.Context, id int64) error {
-	return s.query().DeleteIngredient(ctx, id)
-}
-
-func (s *Store) CreateUnit(ctx context.Context, unit domain.Unit) (domain.Unit, error) {
-	id, err := s.query().CreateUnit(ctx, database.CreateUnitParams{
-		Name:   unit.Name,
-		Symbol: unit.Symbol,
-	})
-	if err != nil {
-		return domain.Unit{}, err
-	}
-	return domain.Unit{
-		ID:     id,
-		Name:   unit.Name,
-		Symbol: unit.Symbol,
-	}, nil
-}
-
-func (s *Store) UpdateUnit(ctx context.Context, unit domain.Unit) error {
-	return s.query().UpdateUnit(ctx, database.UpdateUnitParams{
-		Name:   unit.Name,
-		Symbol: unit.Symbol,
-		ID:     unit.ID,
-	})
-}
-
-func (s *Store) DeleteUnit(ctx context.Context, id int64) error {
-	return s.query().DeleteUnit(ctx, id)
 }

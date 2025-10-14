@@ -240,6 +240,15 @@ INNER JOIN nutrients ON ingredient_nutrients.nutrient_id = nutrients.id
 WHERE ingredient_nutrients.ingredient_id IN (sqlc.slice(ingredient_ids))
 ORDER BY ingredient_nutrients.ingredient_id, nutrients.name;
 
+-- name: GetNutrientsForRecipes :many
+SELECT ingredient_nutrients.ingredient_id, sqlc.embed(nutrients), ingredient_nutrients.amount
+FROM ingredient_nutrients
+INNER JOIN nutrients ON ingredient_nutrients.nutrient_id = nutrients.id
+INNER JOIN recipe_ingredients ON ingredient_nutrients.ingredient_id = recipe_ingredients.ingredient_id
+INNER JOIN recipe_steps ON recipe_ingredients.step_id = recipe_steps.id
+WHERE recipe_steps.recipe_id IN (sqlc.slice(recipe_ids))
+ORDER BY ingredient_nutrients.ingredient_id, nutrients.name;
+
 -- name: AddIngredientNutrient :exec
 INSERT INTO ingredient_nutrients (ingredient_id, nutrient_id, amount)
 VALUES (?, ?, ?)

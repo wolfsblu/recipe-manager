@@ -706,6 +706,61 @@ func (q *Queries) GetNutrientsForIngredients(ctx context.Context, ingredientIds 
 	return items, nil
 }
 
+const getNutrientsForRecipes = `-- name: GetNutrientsForRecipes :many
+SELECT ingredient_nutrients.ingredient_id, nutrients.id, nutrients.name, nutrients.unit, ingredient_nutrients.amount
+FROM ingredient_nutrients
+INNER JOIN nutrients ON ingredient_nutrients.nutrient_id = nutrients.id
+INNER JOIN recipe_ingredients ON ingredient_nutrients.ingredient_id = recipe_ingredients.ingredient_id
+INNER JOIN recipe_steps ON recipe_ingredients.step_id = recipe_steps.id
+WHERE recipe_steps.recipe_id IN (/*SLICE:recipe_ids*/?)
+ORDER BY ingredient_nutrients.ingredient_id, nutrients.name
+`
+
+type GetNutrientsForRecipesRow struct {
+	IngredientID int64
+	Nutrient     Nutrient
+	Amount       float64
+}
+
+func (q *Queries) GetNutrientsForRecipes(ctx context.Context, recipeIds []int64) ([]GetNutrientsForRecipesRow, error) {
+	query := getNutrientsForRecipes
+	var queryParams []interface{}
+	if len(recipeIds) > 0 {
+		for _, v := range recipeIds {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", strings.Repeat(",?", len(recipeIds))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", "NULL", 1)
+	}
+	rows, err := q.db.QueryContext(ctx, query, queryParams...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetNutrientsForRecipesRow
+	for rows.Next() {
+		var i GetNutrientsForRecipesRow
+		if err := rows.Scan(
+			&i.IngredientID,
+			&i.Nutrient.ID,
+			&i.Nutrient.Name,
+			&i.Nutrient.Unit,
+			&i.Amount,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getRecipe = `-- name: GetRecipe :one
 SELECT id, name, servings, minutes, description, created_by, created_at
 FROM recipes
