@@ -30,7 +30,6 @@ type Recipe struct {
 	Tags   []Tag
 	Images []RecipeImage
 	Steps  []RecipeStep
-	Votes  RecipeVotes
 	RecipeDetails
 }
 
@@ -77,9 +76,4 @@ type Unit struct {
 type Tag struct {
 	ID   int64
 	Name string
-}
-
-type RecipeVotes struct {
-	Total int64
-	User  int64
 }

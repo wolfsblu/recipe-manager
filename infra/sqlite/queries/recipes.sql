@@ -135,42 +135,6 @@ WHERE recipe_id = ?;
 DELETE FROM recipe_tags
 WHERE recipe_id = ?;
 
--- name: AddVote :exec
-INSERT INTO recipe_votes (recipe_id, user_id, vote)
-VALUES (?, ?, ?)
-ON CONFLICT (recipe_id, user_id) DO UPDATE SET vote = excluded.vote;
-
--- name: RemoveVote :exec
-DELETE FROM recipe_votes
-WHERE recipe_id = ? AND user_id = ?;
-
--- name: GetRecipeVotes :one
-SELECT
-    COALESCE(SUM(vote), 0) as total_score
-FROM recipe_votes
-WHERE recipe_id = ?;
-
--- name: GetUserVote :one
-SELECT vote
-FROM recipe_votes
-WHERE recipe_id = ? AND user_id = ?
-LIMIT 1;
-
--- name: GetVotesForRecipes :many
-SELECT
-    recipe_id,
-    COALESCE(SUM(vote), 0) as total_score
-FROM recipe_votes
-WHERE recipe_id IN (sqlc.slice(recipe_ids))
-GROUP BY recipe_id;
-
--- name: GetUserVotesForRecipes :many
-SELECT
-    recipe_id,
-    vote
-FROM recipe_votes
-WHERE recipe_id IN (sqlc.slice(recipe_ids)) AND user_id = ?;
-
 -- name: CreateIngredient :one
 INSERT INTO ingredients (name)
 VALUES (?)

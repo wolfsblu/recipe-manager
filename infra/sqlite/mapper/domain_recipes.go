@@ -59,13 +59,6 @@ func (m *DBMapper) FromRecipeTag(recipeID int64, tag domain.Tag) database.Create
 	}
 }
 
-func (m *DBMapper) FromUserVotesParams(recipeIds []int64, userID int64) database.GetUserVotesForRecipesParams {
-	return database.GetUserVotesForRecipesParams{
-		RecipeIds: recipeIds,
-		UserID:    userID,
-	}
-}
-
 func (m *DBMapper) FromMealPlanEntry(entry domain.MealPlanEntry) database.CreateMealPlanParams {
 	return database.CreateMealPlanParams{
 		Date:      entry.Date.Format(time.DateOnly),

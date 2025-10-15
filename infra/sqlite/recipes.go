@@ -17,7 +17,6 @@ type recipeRelations struct {
 	steps       []database.GetStepsForRecipesRow
 	ingredients []database.GetIngredientsForRecipesRow
 	nutrients   []database.GetNutrientsForRecipesRow
-	votes       map[int64]domain.RecipeVotes
 }
 
 func (s *Store) BrowseRecipes(ctx context.Context) (recipes []domain.Recipe, err error) {
@@ -244,7 +243,6 @@ func (s *Store) populateRecipeRelations(ctx context.Context, user *domain.User, 
 	for i, recipe := range recipes {
 		recipe.Tags = tagsByRecipe[recipe.ID]
 		recipe.Images = imagesByRecipe[recipe.ID]
-		recipe.Votes = relations.votes[recipe.ID]
 		recipe.Steps = stepsByRecipe[recipe.ID]
 		populatedRecipes[i] = recipe
 	}
@@ -258,11 +256,6 @@ func (s *Store) getRecipeRelations(ctx context.Context, user *domain.User, recip
 	}
 
 	images, err := s.query().GetImagesForRecipes(ctx, recipeIds)
-	if err != nil {
-		return nil, err
-	}
-
-	votes, err := s.getVotes(ctx, user, recipeIds)
 	if err != nil {
 		return nil, err
 	}
@@ -288,38 +281,7 @@ func (s *Store) getRecipeRelations(ctx context.Context, user *domain.User, recip
 		steps:       steps,
 		ingredients: ingredients,
 		nutrients:   nutrients,
-		votes:       votes,
 	}, nil
-}
-
-func (s *Store) getVotes(ctx context.Context, user *domain.User, recipeIds []int64) (map[int64]domain.RecipeVotes, error) {
-	voteStats, err := s.query().GetVotesForRecipes(ctx, recipeIds)
-	if err != nil {
-		return nil, err
-	}
-	userVotes, err := s.query().GetUserVotesForRecipes(ctx, s.mapper.FromUserVotesParams(recipeIds, user.ID))
-	if err != nil {
-		return nil, err
-	}
-
-	votesByRecipe := make(map[int64]int64)
-	for _, vote := range voteStats {
-		if vote.TotalScore != nil {
-			votesByRecipe[vote.RecipeID] = vote.TotalScore.(int64)
-		}
-	}
-
-	userVotesByRecipe := make(map[int64]int64)
-	for _, vote := range userVotes {
-		userVotesByRecipe[vote.RecipeID] = vote.Vote
-	}
-
-	result := make(map[int64]domain.RecipeVotes)
-	for _, recipeId := range recipeIds {
-		result[recipeId] = s.mapper.ToRecipeVotes(votesByRecipe[recipeId], userVotesByRecipe[recipeId])
-	}
-
-	return result, nil
 }
 
 func (s *Store) groupTagsByRecipe(tags []database.GetTagsForRecipesRow) map[int64][]domain.Tag {
@@ -436,37 +398,4 @@ func (s *Store) UpdateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 		return domain.Recipe{}, err
 	}
 	return s.GetRecipeById(ctx, recipe.CreatedBy, recipe.ID)
-}
-
-func (s *Store) AddVote(ctx context.Context, recipeID int64, userID int64, vote int64) error {
-	return s.query().AddVote(ctx, database.AddVoteParams{
-		RecipeID: recipeID,
-		UserID:   userID,
-		Vote:     vote,
-	})
-}
-
-func (s *Store) RemoveVote(ctx context.Context, recipeID int64, userID int64) error {
-	return s.query().RemoveVote(ctx, database.RemoveVoteParams{
-		RecipeID: recipeID,
-		UserID:   userID,
-	})
-}
-
-func (s *Store) GetRecipeVotes(ctx context.Context, recipeID int64) (int64, error) {
-	result, err := s.query().GetRecipeVotes(ctx, recipeID)
-	if err != nil {
-		return 0, err
-	}
-	if result == nil {
-		return 0, nil
-	}
-	return result.(int64), nil
-}
-
-func (s *Store) GetUserVote(ctx context.Context, recipeID int64, userID int64) (int64, error) {
-	return s.query().GetUserVote(ctx, database.GetUserVoteParams{
-		RecipeID: recipeID,
-		UserID:   userID,
-	})
 }

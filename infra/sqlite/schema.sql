@@ -134,15 +134,6 @@ CREATE TABLE meal_plan
     UNIQUE (date, sort_order)
 );
 
-CREATE TABLE recipe_votes
-(
-    id        INTEGER PRIMARY KEY,
-    recipe_id INTEGER NOT NULL REFERENCES recipes (id) ON DELETE CASCADE,
-    user_id   INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
-    vote      INTEGER NOT NULL CHECK (vote IN (-1, 1)),
-    UNIQUE (recipe_id, user_id)
-);
-
 CREATE TABLE shopping_lists
 (
     id      INTEGER PRIMARY KEY,
@@ -165,8 +156,6 @@ CREATE TABLE shopping_list_items
 CREATE INDEX idx_meal_plan_sort_order ON meal_plan (sort_order);
 CREATE INDEX idx_recipe_ingredients_sort_order ON recipe_ingredients (sort_order);
 CREATE INDEX idx_recipe_steps_sort_order ON recipe_steps (sort_order);
-CREATE INDEX idx_recipe_votes_recipe_id ON recipe_votes (recipe_id);
-CREATE INDEX idx_recipe_votes_user_id ON recipe_votes (user_id);
 CREATE INDEX idx_shopping_lists_user_id ON shopping_lists (user_id);
 CREATE INDEX idx_shopping_list_items_shopping_list_id ON shopping_list_items (shopping_list_id);
 CREATE INDEX idx_shopping_list_items_sort_order ON shopping_list_items (sort_order);

@@ -99,34 +99,3 @@ export const getTags = async () => {
     }
     return response.data
 }
-
-export const addVote = async (recipeId: number, vote: 1 | -1) => {
-    const response = await client.POST("/recipes/{recipeId}/vote", {
-        params: {
-            path: {
-                recipeId: recipeId
-            }
-        },
-        body: {
-            vote: vote
-        }
-    })
-    if (response.error) {
-        throw response.error
-    }
-    return response.data
-}
-
-export const removeVote = async (recipeId: number) => {
-    const response = await client.DELETE("/recipes/{recipeId}/vote", {
-        params: {
-            path: {
-                recipeId: recipeId
-            }
-        }
-    })
-    if (response.error) {
-        throw response.error
-    }
-    return response.data
-}

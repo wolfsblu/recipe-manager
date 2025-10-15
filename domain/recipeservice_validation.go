@@ -21,13 +21,6 @@ func (s *RecipeService) validateRecipeOwnership(ctx context.Context, user *User,
 	return nil
 }
 
-func (s *RecipeService) validateVote(vote int64) error {
-	if vote != 1 && vote != -1 {
-		return ErrInvalidVote
-	}
-	return nil
-}
-
 func (s *RecipeService) validateIngredient(ingredient Ingredient) error {
 	if ingredient.Name == "" {
 		return ErrInvalidIngredient

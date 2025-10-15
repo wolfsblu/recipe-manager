@@ -25,7 +25,6 @@ var (
 	ErrUpdatingUser               = &Error{Message: "failed to update user"}
 	ErrUserExists                 = &Error{Message: "user already exists"}
 	ErrUserNotFound               = &Error{Message: "user was not found"}
-	ErrInvalidVote                = &Error{Message: "vote must be 1 or -1"}
 	ErrInvalidIngredient          = &Error{Message: "invalid ingredient"}
 	ErrInvalidUnit                = &Error{Message: "invalid unit"}
 )

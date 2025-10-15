@@ -23,7 +23,6 @@
     import {goto} from "$app/navigation";
     import { deleteRecipe } from "$lib/api/recipes/recipes.svelte";
     import { toast } from "svelte-sonner";
-    import VoteButtons from "$lib/components/recipes/VoteButtons.svelte";
     import AddToMealPlanButton from "$lib/components/recipes/AddToMealPlanButton.svelte";
     import * as m from "$lib/paraglide/messages.js";
 
@@ -102,10 +101,6 @@
             <div class="lg:w-1/2">
                 <div class="flex flex-row-reverse md:flex-row gap-3">
                     <div class="flex flex-col items-center gap-2">
-                        <VoteButtons recipeId={recipe.id} votes={recipe.votes} />
-
-                        <Separator orientation="horizontal" class="my-1 w-full" />
-
                         <Button
                             variant="ghost"
                             size="sm"

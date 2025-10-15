@@ -27,23 +27,6 @@ func (q *Queries) AddIngredientNutrient(ctx context.Context, arg AddIngredientNu
 	return err
 }
 
-const addVote = `-- name: AddVote :exec
-INSERT INTO recipe_votes (recipe_id, user_id, vote)
-VALUES (?, ?, ?)
-ON CONFLICT (recipe_id, user_id) DO UPDATE SET vote = excluded.vote
-`
-
-type AddVoteParams struct {
-	RecipeID int64
-	UserID   int64
-	Vote     int64
-}
-
-func (q *Queries) AddVote(ctx context.Context, arg AddVoteParams) error {
-	_, err := q.db.ExecContext(ctx, addVote, arg.RecipeID, arg.UserID, arg.Vote)
-	return err
-}
-
 const browseRecipes = `-- name: BrowseRecipes :many
 SELECT id, name, servings, minutes, description, created_by, created_at
 FROM recipes
@@ -783,20 +766,6 @@ func (q *Queries) GetRecipe(ctx context.Context, id int64) (Recipe, error) {
 	return i, err
 }
 
-const getRecipeVotes = `-- name: GetRecipeVotes :one
-SELECT
-    COALESCE(SUM(vote), 0) as total_score
-FROM recipe_votes
-WHERE recipe_id = ?
-`
-
-func (q *Queries) GetRecipeVotes(ctx context.Context, recipeID int64) (interface{}, error) {
-	row := q.db.QueryRowContext(ctx, getRecipeVotes, recipeID)
-	var total_score interface{}
-	err := row.Scan(&total_score)
-	return total_score, err
-}
-
 const getStepsForRecipes = `-- name: GetStepsForRecipes :many
 SELECT id, instructions, sort_order, recipe_id
 FROM recipe_steps
@@ -957,124 +926,6 @@ func (q *Queries) GetUnits(ctx context.Context) ([]Unit, error) {
 	return items, nil
 }
 
-const getUserVote = `-- name: GetUserVote :one
-SELECT vote
-FROM recipe_votes
-WHERE recipe_id = ? AND user_id = ?
-LIMIT 1
-`
-
-type GetUserVoteParams struct {
-	RecipeID int64
-	UserID   int64
-}
-
-func (q *Queries) GetUserVote(ctx context.Context, arg GetUserVoteParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, getUserVote, arg.RecipeID, arg.UserID)
-	var vote int64
-	err := row.Scan(&vote)
-	return vote, err
-}
-
-const getUserVotesForRecipes = `-- name: GetUserVotesForRecipes :many
-SELECT
-    recipe_id,
-    vote
-FROM recipe_votes
-WHERE recipe_id IN (/*SLICE:recipe_ids*/?) AND user_id = ?
-`
-
-type GetUserVotesForRecipesParams struct {
-	RecipeIds []int64
-	UserID    int64
-}
-
-type GetUserVotesForRecipesRow struct {
-	RecipeID int64
-	Vote     int64
-}
-
-func (q *Queries) GetUserVotesForRecipes(ctx context.Context, arg GetUserVotesForRecipesParams) ([]GetUserVotesForRecipesRow, error) {
-	query := getUserVotesForRecipes
-	var queryParams []interface{}
-	if len(arg.RecipeIds) > 0 {
-		for _, v := range arg.RecipeIds {
-			queryParams = append(queryParams, v)
-		}
-		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", strings.Repeat(",?", len(arg.RecipeIds))[1:], 1)
-	} else {
-		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", "NULL", 1)
-	}
-	queryParams = append(queryParams, arg.UserID)
-	rows, err := q.db.QueryContext(ctx, query, queryParams...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetUserVotesForRecipesRow
-	for rows.Next() {
-		var i GetUserVotesForRecipesRow
-		if err := rows.Scan(&i.RecipeID, &i.Vote); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const getVotesForRecipes = `-- name: GetVotesForRecipes :many
-SELECT
-    recipe_id,
-    COALESCE(SUM(vote), 0) as total_score
-FROM recipe_votes
-WHERE recipe_id IN (/*SLICE:recipe_ids*/?)
-GROUP BY recipe_id
-`
-
-type GetVotesForRecipesRow struct {
-	RecipeID   int64
-	TotalScore interface{}
-}
-
-func (q *Queries) GetVotesForRecipes(ctx context.Context, recipeIds []int64) ([]GetVotesForRecipesRow, error) {
-	query := getVotesForRecipes
-	var queryParams []interface{}
-	if len(recipeIds) > 0 {
-		for _, v := range recipeIds {
-			queryParams = append(queryParams, v)
-		}
-		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", strings.Repeat(",?", len(recipeIds))[1:], 1)
-	} else {
-		query = strings.Replace(query, "/*SLICE:recipe_ids*/?", "NULL", 1)
-	}
-	rows, err := q.db.QueryContext(ctx, query, queryParams...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetVotesForRecipesRow
-	for rows.Next() {
-		var i GetVotesForRecipesRow
-		if err := rows.Scan(&i.RecipeID, &i.TotalScore); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const listRecipes = `-- name: ListRecipes :many
 SELECT id, name, servings, minutes, description, created_by, created_at
 FROM recipes
@@ -1111,21 +962,6 @@ func (q *Queries) ListRecipes(ctx context.Context, createdBy int64) ([]Recipe, e
 		return nil, err
 	}
 	return items, nil
-}
-
-const removeVote = `-- name: RemoveVote :exec
-DELETE FROM recipe_votes
-WHERE recipe_id = ? AND user_id = ?
-`
-
-type RemoveVoteParams struct {
-	RecipeID int64
-	UserID   int64
-}
-
-func (q *Queries) RemoveVote(ctx context.Context, arg RemoveVoteParams) error {
-	_, err := q.db.ExecContext(ctx, removeVote, arg.RecipeID, arg.UserID)
-	return err
 }
 
 const updateIngredient = `-- name: UpdateIngredient :exec

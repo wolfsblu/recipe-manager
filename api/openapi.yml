@@ -325,49 +325,6 @@ paths:
           description: successful operation
         default:
           $ref: '#/components/responses/Error'
-  '/recipes/{recipeId}/vote':
-    post:
-      tags:
-        - Recipes
-      summary: Vote on a recipe
-      description: Cast an upvote (1) or downvote (-1) on a recipe
-      operationId: addVote
-      parameters:
-        - name: recipeId
-          in: path
-          description: ID of the recipe to vote on
-          required: true
-          schema:
-            type: integer
-            format: int64
-      requestBody:
-        $ref: '#/components/requestBodies/Vote'
-      responses:
-        '200':
-          description: successful operation
-          $ref: '#/components/responses/RecipeVotes'
-        default:
-          $ref: '#/components/responses/Error'
-    delete:
-      tags:
-        - Recipes
-      summary: Remove vote from a recipe
-      description: Remove your vote from a recipe
-      operationId: removeVote
-      parameters:
-        - name: recipeId
-          in: path
-          description: ID of the recipe to remove vote from
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: successful operation
-          $ref: '#/components/responses/RecipeVotes'
-        default:
-          $ref: '#/components/responses/Error'
   /ingredients:
     get:
       tags:
@@ -801,7 +758,6 @@ components:
           required:
             - id
             - steps
-            - votes
           properties:
             id:
               type: integer
@@ -816,8 +772,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ReadTag'
-            votes:
-              $ref: '#/components/schemas/RecipeVotes'
     ReadUnit:
       type: object
       required:
@@ -1024,18 +978,6 @@ components:
             - steps
     PatchRecipe:
       $ref: '#/components/schemas/RecipeWriteFields'
-    Vote:
-      type: object
-      required:
-        - vote
-      properties:
-        vote:
-          type: integer
-          format: int64
-          description: Vote value (1 for upvote, -1 for downvote)
-          enum: [1, -1]
-          examples:
-            - 1
     WriteIngredientNutrient:
       type: object
       required:
@@ -1080,25 +1022,6 @@ components:
           nullable: true
           examples:
             - kg
-    RecipeVotes:
-      type: object
-      required:
-        - total
-        - user
-      properties:
-        total:
-          type: integer
-          format: int64
-          description: Total vote score (upvotes minus downvotes)
-          examples:
-            - 15
-        user:
-          type: integer
-          format: int64
-          description: Current user's vote on this recipe (1 for upvote, -1 for downvote, 0 if no vote)
-          enum: [1, -1, 0]
-          examples:
-            - 1
     ReadShoppingList:
       type: object
       required:
@@ -1242,13 +1165,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Token'
-    Vote:
-      description: Vote on a recipe
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Vote'
     WriteIngredient:
       description: Ingredient object to create or update
       required: true
@@ -1352,12 +1268,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ReadUser'
-    RecipeVotes:
-      description: Recipe voting information
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RecipeVotes'
     Ingredient:
       description: Ingredient object returned as result
       content:

@@ -155,34 +155,6 @@ func (h *RecipeHandler) GetTags(ctx context.Context) ([]api.ReadTag, error) {
 	return h.mapper.ToTags(tags), nil
 }
 
-func (h *RecipeHandler) AddVote(ctx context.Context, req *api.Vote, params api.AddVoteParams) (*api.RecipeVotes, error) {
-	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
-	if !ok || user == nil {
-		return nil, domain.ErrAuthentication
-	}
-
-	votes, err := h.Recipes.AddVote(ctx, user, params.RecipeId, int64(req.Vote))
-	if err != nil {
-		return nil, err
-	}
-
-	return h.mapper.ToRecipeVotes(votes), nil
-}
-
-func (h *RecipeHandler) RemoveVote(ctx context.Context, params api.RemoveVoteParams) (*api.RecipeVotes, error) {
-	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
-	if !ok || user == nil {
-		return nil, domain.ErrAuthentication
-	}
-
-	votes, err := h.Recipes.RemoveVote(ctx, user, params.RecipeId)
-	if err != nil {
-		return nil, err
-	}
-
-	return h.mapper.ToRecipeVotes(votes), nil
-}
-
 func (h *RecipeHandler) AddIngredient(ctx context.Context, req *api.WriteIngredient) (*api.Ingredient, error) {
 	ingredient := h.mapper.FromWriteIngredient(req)
 

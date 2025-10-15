@@ -115,7 +115,6 @@ func (m *APIMapper) ToReadRecipe(recipe domain.Recipe) (*api.ReadRecipe, error) 
 		Images:      images,
 		Tags:        tags,
 		Steps:       steps,
-		Votes:       *m.ToRecipeVotes(recipe.Votes),
 	}, nil
 }
 
@@ -160,13 +159,6 @@ func (m *APIMapper) ToTags(tags []domain.Tag) []api.ReadTag {
 		result[i] = m.ToTag(tag)
 	}
 	return result
-}
-
-func (m *APIMapper) ToRecipeVotes(votes domain.RecipeVotes) *api.RecipeVotes {
-	return &api.RecipeVotes{
-		Total: votes.Total,
-		User:  api.RecipeVotesUser(votes.User),
-	}
 }
 
 func (m *APIMapper) ToRecipeImageURLs(images []domain.RecipeImage) ([]url.URL, error) {

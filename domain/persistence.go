@@ -18,10 +18,6 @@ type RecipeStore interface {
 	GetRecipeById(ctx context.Context, user *User, id int64) (Recipe, error)
 	GetRecipesByUser(ctx context.Context, user *User) ([]Recipe, error)
 	UpdateRecipe(ctx context.Context, recipe Recipe) (Recipe, error)
-	AddVote(ctx context.Context, recipeID int64, userID int64, vote int64) error
-	RemoveVote(ctx context.Context, recipeID int64, userID int64) error
-	GetRecipeVotes(ctx context.Context, recipeID int64) (int64, error)
-	GetUserVote(ctx context.Context, recipeID int64, userID int64) (int64, error)
 	CreateIngredient(ctx context.Context, ingredient Ingredient) (Ingredient, error)
 	UpdateIngredient(ctx context.Context, ingredient Ingredient) (Ingredient, error)
 	DeleteIngredient(ctx context.Context, id int64) error
