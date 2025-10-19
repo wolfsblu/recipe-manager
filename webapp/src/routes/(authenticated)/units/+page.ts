@@ -7,7 +7,9 @@ export const load: PageLoad = async () => {
         { link: "/units", name: "Units" },
     ]
 
-    const units = await getUnits()
+    const response = await getUnits({ limit: 100 });
+    const units = response?.data ?? [];
+
     return {
         breadcrumbs,
         units,

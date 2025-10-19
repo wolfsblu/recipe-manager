@@ -219,30 +219,6 @@ export interface paths {
         patch: operations["patchRecipe"];
         trace?: never;
     };
-    "/recipes/{recipeId}/vote": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Vote on a recipe
-         * @description Cast an upvote (1) or downvote (-1) on a recipe
-         */
-        post: operations["addVote"];
-        /**
-         * Remove vote from a recipe
-         * @description Remove your vote from a recipe
-         */
-        delete: operations["removeVote"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/ingredients": {
         parameters: {
             query?: never;
@@ -422,6 +398,36 @@ export interface components {
         Error: {
             message: string;
         };
+        PaginationMetadata: {
+            /**
+             * @description Cursor for fetching the next page (null if no more pages)
+             * @example eyJpZCI6MTIzfQ==
+             */
+            nextCursor?: string | null;
+            /**
+             * @description Whether there are more items available
+             * @example true
+             */
+            hasMore: boolean;
+        };
+        PaginatedRecipes: components["schemas"]["PaginationMetadata"] & {
+            data: components["schemas"]["ReadRecipe"][];
+        };
+        PaginatedIngredients: components["schemas"]["PaginationMetadata"] & {
+            data: components["schemas"]["Ingredient"][];
+        };
+        PaginatedUnits: components["schemas"]["PaginationMetadata"] & {
+            data: components["schemas"]["ReadUnit"][];
+        };
+        PaginatedTags: components["schemas"]["PaginationMetadata"] & {
+            data: components["schemas"]["ReadTag"][];
+        };
+        PaginatedShoppingLists: components["schemas"]["PaginationMetadata"] & {
+            data: components["schemas"]["ReadShoppingList"][];
+        };
+        PaginatedMealPlan: components["schemas"]["PaginationMetadata"] & {
+            data: components["schemas"]["ReadMealPlan"][];
+        };
         Nutrient: {
             /**
              * Format: int64
@@ -470,7 +476,6 @@ export interface components {
             id: number;
             steps: components["schemas"]["ReadRecipeStep"][];
             tags?: components["schemas"]["ReadTag"][];
-            votes: components["schemas"]["RecipeVotes"];
         };
         ReadUnit: {
             /**
@@ -585,15 +590,6 @@ export interface components {
         BaseRecipe: components["schemas"]["RecipeBaseFields"] & Record<string, never>;
         WriteRecipe: components["schemas"]["RecipeWriteFields"] & components["schemas"]["BaseRecipe"] & Record<string, never>;
         PatchRecipe: components["schemas"]["RecipeWriteFields"];
-        Vote: {
-            /**
-             * Format: int64
-             * @description Vote value (1 for upvote, -1 for downvote)
-             * @example 1
-             * @enum {integer}
-             */
-            vote: 1 | -1;
-        };
         WriteIngredientNutrient: {
             /**
              * Format: int64
@@ -616,21 +612,6 @@ export interface components {
             name: string;
             /** @example kg */
             symbol?: string | null;
-        };
-        RecipeVotes: {
-            /**
-             * Format: int64
-             * @description Total vote score (upvotes minus downvotes)
-             * @example 15
-             */
-            total: number;
-            /**
-             * Format: int64
-             * @description Current user's vote on this recipe (1 for upvote, -1 for downvote, 0 if no vote)
-             * @example 1
-             * @enum {integer}
-             */
-            user: 1 | -1 | 0;
         };
         ReadShoppingList: {
             /**
@@ -712,49 +693,49 @@ export interface components {
                 "application/json": components["schemas"]["ReadUser"];
             };
         };
-        /** @description A list of ingredients */
+        /** @description A paginated list of ingredients */
         IngredientList: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
-                "application/json": components["schemas"]["Ingredient"][];
+                "application/json": components["schemas"]["PaginatedIngredients"];
             };
         };
-        /** @description A list of units */
+        /** @description A paginated list of units */
         UnitList: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
-                "application/json": components["schemas"]["ReadUnit"][];
+                "application/json": components["schemas"]["PaginatedUnits"];
             };
         };
-        /** @description A list of tags */
+        /** @description A paginated list of tags */
         TagList: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
-                "application/json": components["schemas"]["ReadTag"][];
+                "application/json": components["schemas"]["PaginatedTags"];
             };
         };
-        /** @description Meal plan for the user */
+        /** @description Paginated meal plan for the user */
         MealPlan: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
-                "application/json": components["schemas"]["ReadMealPlan"][];
+                "application/json": components["schemas"]["PaginatedMealPlan"];
             };
         };
-        /** @description Recipe object returned as result */
+        /** @description Paginated recipe list */
         RecipeList: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
-                "application/json": components["schemas"]["ReadRecipe"][];
+                "application/json": components["schemas"]["PaginatedRecipes"];
             };
         };
         /** @description Recipe object returned as result */
@@ -775,15 +756,6 @@ export interface components {
                 "application/json": components["schemas"]["ReadUser"];
             };
         };
-        /** @description Recipe voting information */
-        RecipeVotes: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["RecipeVotes"];
-            };
-        };
         /** @description Ingredient object returned as result */
         Ingredient: {
             headers: {
@@ -802,13 +774,13 @@ export interface components {
                 "application/json": components["schemas"]["ReadUnit"];
             };
         };
-        /** @description A list of shopping lists */
+        /** @description A paginated list of shopping lists */
         ShoppingLists: {
             headers: {
                 [name: string]: unknown;
             };
             content: {
-                "application/json": components["schemas"]["ReadShoppingList"][];
+                "application/json": components["schemas"]["PaginatedShoppingLists"];
             };
         };
         /** @description Shopping list object returned as result */
@@ -830,7 +802,12 @@ export interface components {
             };
         };
     };
-    parameters: never;
+    parameters: {
+        /** @description Cursor for pagination (opaque token from previous response) */
+        CursorParam: string;
+        /** @description Maximum number of items to return (default 30, max 100) */
+        LimitParam: number;
+    };
     requestBodies: {
         /** @description User registration credentials */
         UserRegistration: {
@@ -860,12 +837,6 @@ export interface components {
         ConfirmUser: {
             content: {
                 "application/json": components["schemas"]["Token"];
-            };
-        };
-        /** @description Vote on a recipe */
-        Vote: {
-            content: {
-                "application/json": components["schemas"]["Vote"];
             };
         };
         /** @description Ingredient object to create or update */
@@ -909,7 +880,12 @@ export type $defs = Record<string, never>;
 export interface operations {
     browseRecipes: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Cursor for pagination (opaque token from previous response) */
+                cursor?: components["parameters"]["CursorParam"];
+                /** @description Maximum number of items to return (default 30, max 100) */
+                limit?: components["parameters"]["LimitParam"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1061,6 +1037,10 @@ export interface operations {
                 from?: string;
                 /** @description Until when to fetch the meal plan */
                 until?: string;
+                /** @description Cursor for pagination (opaque token from previous response) */
+                cursor?: components["parameters"]["CursorParam"];
+                /** @description Maximum number of items to return (default 30, max 100) */
+                limit?: components["parameters"]["LimitParam"];
             };
             header?: never;
             path?: never;
@@ -1119,7 +1099,12 @@ export interface operations {
     };
     getRecipes: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Cursor for pagination (opaque token from previous response) */
+                cursor?: components["parameters"]["CursorParam"];
+                /** @description Maximum number of items to return (default 30, max 100) */
+                limit?: components["parameters"]["LimitParam"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1224,43 +1209,14 @@ export interface operations {
             default: components["responses"]["Error"];
         };
     };
-    addVote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the recipe to vote on */
-                recipeId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: components["requestBodies"]["Vote"];
-        responses: {
-            /** @description successful operation */
-            200: components["responses"]["RecipeVotes"];
-            default: components["responses"]["Error"];
-        };
-    };
-    removeVote: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description ID of the recipe to remove vote from */
-                recipeId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description successful operation */
-            200: components["responses"]["RecipeVotes"];
-            default: components["responses"]["Error"];
-        };
-    };
     getIngredients: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Cursor for pagination (opaque token from previous response) */
+                cursor?: components["parameters"]["CursorParam"];
+                /** @description Maximum number of items to return (default 30, max 100) */
+                limit?: components["parameters"]["LimitParam"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1327,7 +1283,12 @@ export interface operations {
     };
     getUnits: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Cursor for pagination (opaque token from previous response) */
+                cursor?: components["parameters"]["CursorParam"];
+                /** @description Maximum number of items to return (default 30, max 100) */
+                limit?: components["parameters"]["LimitParam"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1394,7 +1355,12 @@ export interface operations {
     };
     getTags: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Cursor for pagination (opaque token from previous response) */
+                cursor?: components["parameters"]["CursorParam"];
+                /** @description Maximum number of items to return (default 30, max 100) */
+                limit?: components["parameters"]["LimitParam"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -1408,7 +1374,12 @@ export interface operations {
     };
     getShoppingLists: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Cursor for pagination (opaque token from previous response) */
+                cursor?: components["parameters"]["CursorParam"];
+                /** @description Maximum number of items to return (default 30, max 100) */
+                limit?: components["parameters"]["LimitParam"];
+            };
             header?: never;
             path?: never;
             cookie?: never;

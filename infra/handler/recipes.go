@@ -7,6 +7,7 @@ import (
 	"github.com/ogen-go/ogen/json"
 	"github.com/wolfsblu/recipe-manager/api"
 	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/config"
 	"github.com/wolfsblu/recipe-manager/infra/env"
 	"github.com/wolfsblu/recipe-manager/infra/handler/mapper"
@@ -40,14 +41,6 @@ func (h *RecipeHandler) AddRecipe(ctx context.Context, req *api.WriteRecipe) (*a
 	return h.mapper.ToReadRecipe(result)
 }
 
-func (h *RecipeHandler) BrowseRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
-	recipes, err := h.Recipes.Browse(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return h.mapper.ToRecipes(recipes)
-}
-
 func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecipeParams) error {
 	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
 	if !ok || user == nil {
@@ -60,18 +53,40 @@ func (h *RecipeHandler) DeleteRecipe(ctx context.Context, params api.DeleteRecip
 	return nil
 }
 
-func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanParams) ([]api.ReadMealPlan, error) {
+func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanParams) (*api.PaginatedMealPlan, error) {
 	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
 	if !ok || user == nil {
 		return nil, domain.ErrAuthentication
 	}
+
 	from := params.From.Or(time.Now())
 	until := params.Until.Or(from.Add(7 * 24 * time.Hour))
-	mealplan, err := h.Recipes.GetMealPlan(ctx, user, from, until)
+
+	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.ToMealPlans(mealplan)
+
+	result, err := h.Recipes.GetMealPlan(ctx, user, from, until, paginationReq)
+	if err != nil {
+		return nil, err
+	}
+
+	mealplans, err := h.mapper.ToMealPlans(result.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	var nextCursor api.OptNilString
+	if result.NextCursor != nil {
+		nextCursor = api.NewOptNilString(*result.NextCursor)
+	}
+
+	return &api.PaginatedMealPlan{
+		Data:       mealplans,
+		NextCursor: nextCursor,
+		HasMore:    result.HasMore,
+	}, nil
 }
 
 func (h *RecipeHandler) CreateMealPlan(ctx context.Context, req *api.WriteMealPlan) error {
@@ -90,16 +105,37 @@ func (h *RecipeHandler) DeleteMealPlan(ctx context.Context, params api.DeleteMea
 	return h.Recipes.DeleteMealPlan(ctx, user, params.RecipeId, params.Date)
 }
 
-func (h *RecipeHandler) GetRecipes(ctx context.Context) ([]api.ReadRecipe, error) {
+func (h *RecipeHandler) GetRecipes(ctx context.Context, params api.GetRecipesParams) (*api.PaginatedRecipes, error) {
 	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
 	if !ok || user == nil {
 		return nil, domain.ErrAuthentication
 	}
-	recipes, err := h.Recipes.GetByUser(ctx, user)
+
+	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.ToRecipes(recipes)
+
+	result, err := h.Recipes.GetByUser(ctx, user, paginationReq)
+	if err != nil {
+		return nil, err
+	}
+
+	recipes, err := h.mapper.ToRecipes(result.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	var nextCursor api.OptNilString
+	if result.NextCursor != nil {
+		nextCursor = api.NewOptNilString(*result.NextCursor)
+	}
+
+	return &api.PaginatedRecipes{
+		Data:       recipes,
+		NextCursor: nextCursor,
+		HasMore:    result.HasMore,
+	}, nil
 }
 
 func (h *RecipeHandler) GetRecipeById(ctx context.Context, params api.GetRecipeByIdParams) (*api.ReadRecipe, error) {
@@ -131,28 +167,78 @@ func (h *RecipeHandler) UpdateRecipe(ctx context.Context, req *api.WriteRecipe, 
 	return h.mapper.ToReadRecipe(result)
 }
 
-func (h *RecipeHandler) GetIngredients(ctx context.Context) ([]api.Ingredient, error) {
-	ingredients, err := h.Recipes.GetIngredients(ctx)
+func (h *RecipeHandler) GetIngredients(ctx context.Context, params api.GetIngredientsParams) (*api.PaginatedIngredients, error) {
+	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.ToIngredients(ingredients)
+
+	result, err := h.Recipes.GetIngredients(ctx, paginationReq)
+	if err != nil {
+		return nil, err
+	}
+
+	ingredients, err := h.mapper.ToIngredients(result.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	var nextCursor api.OptNilString
+	if result.NextCursor != nil {
+		nextCursor = api.NewOptNilString(*result.NextCursor)
+	}
+
+	return &api.PaginatedIngredients{
+		Data:       ingredients,
+		NextCursor: nextCursor,
+		HasMore:    result.HasMore,
+	}, nil
 }
 
-func (h *RecipeHandler) GetUnits(ctx context.Context) ([]api.ReadUnit, error) {
-	units, err := h.Recipes.GetUnits(ctx)
+func (h *RecipeHandler) GetUnits(ctx context.Context, params api.GetUnitsParams) (*api.PaginatedUnits, error) {
+	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.ToUnits(units), nil
+
+	result, err := h.Recipes.GetUnits(ctx, paginationReq)
+	if err != nil {
+		return nil, err
+	}
+
+	var nextCursor api.OptNilString
+	if result.NextCursor != nil {
+		nextCursor = api.NewOptNilString(*result.NextCursor)
+	}
+
+	return &api.PaginatedUnits{
+		Data:       h.mapper.ToUnits(result.Data),
+		NextCursor: nextCursor,
+		HasMore:    result.HasMore,
+	}, nil
 }
 
-func (h *RecipeHandler) GetTags(ctx context.Context) ([]api.ReadTag, error) {
-	tags, err := h.Recipes.GetTags(ctx)
+func (h *RecipeHandler) GetTags(ctx context.Context, params api.GetTagsParams) (*api.PaginatedTags, error) {
+	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.ToTags(tags), nil
+
+	result, err := h.Recipes.GetTags(ctx, paginationReq)
+	if err != nil {
+		return nil, err
+	}
+
+	var nextCursor api.OptNilString
+	if result.NextCursor != nil {
+		nextCursor = api.NewOptNilString(*result.NextCursor)
+	}
+
+	return &api.PaginatedTags{
+		Data:       h.mapper.ToTags(result.Data),
+		NextCursor: nextCursor,
+		HasMore:    result.HasMore,
+	}, nil
 }
 
 func (h *RecipeHandler) AddIngredient(ctx context.Context, req *api.WriteIngredient) (*api.Ingredient, error) {

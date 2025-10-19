@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 	_ "modernc.org/sqlite"
 )
@@ -17,17 +18,6 @@ type recipeRelations struct {
 	steps       []database.GetStepsForRecipesRow
 	ingredients []database.GetIngredientsForRecipesRow
 	nutrients   []database.GetNutrientsForRecipesRow
-}
-
-func (s *Store) BrowseRecipes(ctx context.Context) (recipes []domain.Recipe, err error) {
-	result, err := s.query().BrowseRecipes(ctx)
-	if err != nil {
-		return nil, err
-	}
-	for _, recipe := range result {
-		recipes = append(recipes, s.mapper.ToRecipe(recipe))
-	}
-	return recipes, err
 }
 
 func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.Recipe, error) {
@@ -115,14 +105,16 @@ func (s *Store) DeleteMealPlan(ctx context.Context, userID int64, recipeID int64
 	})
 }
 
-func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Time, until time.Time) ([]domain.MealPlan, error) {
+func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Time, until time.Time, req pagination.Page) (pagination.Result[domain.MealPlan], error) {
 	result, err := s.query().GetMealPlan(ctx, database.GetMealPlanParams{
 		UserID:    user.ID,
 		FromDate:  from.Format(time.DateOnly),
 		UntilDate: until.Format(time.DateOnly),
+		Cursor:    pagination.DecodeCursor(req.Cursor),
+		Limit:     int64(req.Limit + 1),
 	})
 	if err != nil {
-		return []domain.MealPlan{}, err
+		return pagination.Result[domain.MealPlan]{}, err
 	}
 
 	recipeMap := make(map[int64]domain.Recipe)
@@ -138,7 +130,7 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 
 	populatedRecipes, err := s.populateRecipeRelations(ctx, user, recipes)
 	if err != nil {
-		return []domain.MealPlan{}, err
+		return pagination.Result[domain.MealPlan]{}, err
 	}
 
 	populatedRecipeMap := make(map[int64]domain.Recipe)
@@ -153,37 +145,47 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 	}
 
 	i := 0
-	mealPlan := make([]domain.MealPlan, len(grouped))
+	mealPlan := make([]domain.MealPlan, 0, len(grouped))
 	for key, recipes := range grouped {
 		date, err := time.Parse(time.DateOnly, key)
 		if err != nil {
-			return []domain.MealPlan{}, err
+			return pagination.Result[domain.MealPlan]{}, err
 		}
-		mealPlan[i] = domain.MealPlan{
+		mealPlan = append(mealPlan, domain.MealPlan{
 			Date:    date,
 			Recipes: recipes,
-		}
+		})
 		i++
 	}
 
 	sort.Slice(mealPlan, func(i, j int) bool {
 		return mealPlan[i].Date.Before(mealPlan[j].Date)
 	})
-	return mealPlan, nil
+
+	// Note: For meal plan pagination, we use the first meal plan's date hash as the ID
+	return pagination.NewResult(mealPlan, req.Limit, func(m domain.MealPlan) int64 {
+		// Use date as a unique identifier (convert to unix timestamp)
+		return m.Date.Unix()
+	}), nil
 }
 
-func (s *Store) GetTags(ctx context.Context) ([]domain.Tag, error) {
-	result, err := s.query().GetTags(ctx)
+func (s *Store) GetTags(ctx context.Context, req pagination.Page) (pagination.Result[domain.Tag], error) {
+	result, err := s.query().GetTags(ctx, database.GetTagsParams{
+		Cursor: pagination.DecodeCursor(req.Cursor),
+		Limit:  int64(req.Limit + 1),
+	})
 	if err != nil {
-		return nil, err
+		return pagination.Result[domain.Tag]{}, err
 	}
 
-	tags := make([]domain.Tag, len(result))
-	for i, tag := range result {
-		tags[i] = s.mapper.ToTag(tag)
+	tags := make([]domain.Tag, 0, len(result))
+	for _, tag := range result {
+		tags = append(tags, s.mapper.ToTag(tag))
 	}
 
-	return tags, nil
+	return pagination.NewResult(tags, req.Limit, func(t domain.Tag) int64 {
+		return t.ID
+	}), nil
 }
 
 func (s *Store) GetRecipeById(ctx context.Context, user *domain.User, id int64) (recipe domain.Recipe, _ error) {
@@ -201,18 +203,30 @@ func (s *Store) GetRecipeById(ctx context.Context, user *domain.User, id int64) 
 	return populatedRecipes[0], nil
 }
 
-func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User) (recipes []domain.Recipe, _ error) {
-	result, err := s.query().ListRecipes(ctx, user.ID)
+func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User, req pagination.Page) (pagination.Result[domain.Recipe], error) {
+	result, err := s.query().ListRecipes(ctx, database.ListRecipesParams{
+		CreatedBy: user.ID,
+		Cursor:    pagination.DecodeCursor(req.Cursor),
+		Limit:     int64(req.Limit + 1),
+	})
 	if err != nil {
-		return nil, err
+		return pagination.Result[domain.Recipe]{}, err
 	}
 
-	recipes = make([]domain.Recipe, len(result))
-	for i, recipe := range result {
-		recipes[i] = s.mapper.ToRecipe(recipe)
+	recipes := make([]domain.Recipe, 0, len(result))
+	for _, recipe := range result {
+		recipes = append(recipes, s.mapper.ToRecipe(recipe))
 	}
 
-	return s.populateRecipeRelations(ctx, user, recipes)
+	// Populate relations before creating paginated result
+	populatedRecipes, err := s.populateRecipeRelations(ctx, user, recipes)
+	if err != nil {
+		return pagination.Result[domain.Recipe]{}, err
+	}
+
+	return pagination.NewResult(populatedRecipes, req.Limit, func(r domain.Recipe) int64 {
+		return r.ID
+	}), nil
 }
 
 func (s *Store) populateRecipeRelations(ctx context.Context, user *domain.User, recipes []domain.Recipe) ([]domain.Recipe, error) {

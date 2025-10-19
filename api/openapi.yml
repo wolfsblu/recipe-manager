@@ -23,18 +23,6 @@ tags:
 security:
   - cookieAuth: []
 paths:
-  /browse:
-    get:
-      tags:
-        - Recipes
-      summary: Browse public recipes
-      operationId: browseRecipes
-      responses:
-        '200':
-          description: Successful operation
-          $ref: '#/components/responses/RecipeList'
-        default:
-          $ref: '#/components/responses/Error'
   /login:
     post:
       tags:
@@ -165,6 +153,8 @@ paths:
             type: string
             format: date
             example: '2023-01-01'
+        - $ref: '#/components/parameters/CursorParam'
+        - $ref: '#/components/parameters/LimitParam'
       responses:
         '200':
           description: Successful operation
@@ -216,6 +206,9 @@ paths:
         - Recipes
       summary: Get all recipes
       operationId: getRecipes
+      parameters:
+        - $ref: '#/components/parameters/CursorParam'
+        - $ref: '#/components/parameters/LimitParam'
       responses:
         '200':
           description: Successful operation
@@ -331,6 +324,9 @@ paths:
         - Ingredients
       summary: Get all ingredients
       operationId: getIngredients
+      parameters:
+        - $ref: '#/components/parameters/CursorParam'
+        - $ref: '#/components/parameters/LimitParam'
       responses:
         '200':
           description: Successful operation
@@ -396,6 +392,9 @@ paths:
         - Units
       summary: Get all units
       operationId: getUnits
+      parameters:
+        - $ref: '#/components/parameters/CursorParam'
+        - $ref: '#/components/parameters/LimitParam'
       responses:
         '200':
           description: Successful operation
@@ -461,6 +460,9 @@ paths:
         - Tags
       summary: Get all tags
       operationId: getTags
+      parameters:
+        - $ref: '#/components/parameters/CursorParam'
+        - $ref: '#/components/parameters/LimitParam'
       responses:
         '200':
           description: Successful operation
@@ -473,6 +475,9 @@ paths:
         - Shopping Lists
       summary: Get all shopping lists for the user
       operationId: getShoppingLists
+      parameters:
+        - $ref: '#/components/parameters/CursorParam'
+        - $ref: '#/components/parameters/LimitParam'
       responses:
         '200':
           description: Successful operation
@@ -628,6 +633,25 @@ paths:
         default:
           $ref: '#/components/responses/Error'
 components:
+  parameters:
+    CursorParam:
+      name: cursor
+      in: query
+      description: Cursor for pagination (opaque token from previous response)
+      required: false
+      schema:
+        type: string
+    LimitParam:
+      name: limit
+      in: query
+      description: Maximum number of items to return (default 30, max 100)
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 30
   headers:
     SessionCookie:
       description: Sets the session for the logged in user
@@ -674,6 +698,88 @@ components:
           type: string
       required:
         - message
+    PaginationMetadata:
+      type: object
+      required:
+        - hasMore
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+          description: Cursor for fetching the next page (null if no more pages)
+          examples:
+            - eyJpZCI6MTIzfQ==
+        hasMore:
+          type: boolean
+          description: Whether there are more items available
+          examples:
+            - true
+    PaginatedRecipes:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMetadata'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReadRecipe'
+    PaginatedIngredients:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMetadata'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Ingredient'
+    PaginatedUnits:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMetadata'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReadUnit'
+    PaginatedTags:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMetadata'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReadTag'
+    PaginatedShoppingLists:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMetadata'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReadShoppingList'
+    PaginatedMealPlan:
+      allOf:
+        - $ref: '#/components/schemas/PaginationMetadata'
+        - type: object
+          required:
+            - data
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReadMealPlan'
     Nutrient:
       type: object
       required:
@@ -1217,45 +1323,35 @@ components:
           schema:
             $ref: '#/components/schemas/ReadUser'
     IngredientList:
-      description: A list of ingredients
+      description: A paginated list of ingredients
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Ingredient'
+            $ref: '#/components/schemas/PaginatedIngredients'
     UnitList:
-      description: A list of units
+      description: A paginated list of units
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ReadUnit'
+            $ref: '#/components/schemas/PaginatedUnits'
     TagList:
-      description: A list of tags
+      description: A paginated list of tags
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ReadTag'
+            $ref: '#/components/schemas/PaginatedTags'
     MealPlan:
-      description: Meal plan for the user
+      description: Paginated meal plan for the user
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ReadMealPlan'
+            $ref: '#/components/schemas/PaginatedMealPlan'
     RecipeList:
-      description: Recipe object returned as result
+      description: Paginated recipe list
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ReadRecipe'
+            $ref: '#/components/schemas/PaginatedRecipes'
     Recipe:
       description: Recipe object returned as result
       content:
@@ -1281,13 +1377,11 @@ components:
           schema:
             $ref: '#/components/schemas/ReadUnit'
     ShoppingLists:
-      description: A list of shopping lists
+      description: A paginated list of shopping lists
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ReadShoppingList'
+            $ref: '#/components/schemas/PaginatedShoppingLists'
     ShoppingList:
       description: Shopping list object returned as result
       content:

@@ -8,7 +8,8 @@ export const load: PageLoad = async () => {
     ];
 
     try {
-        const shoppingLists = await getShoppingLists();
+        const response = await getShoppingLists({ limit: 100 });
+        const shoppingLists = response?.data ?? [];
         return {
             breadcrumbs,
             shoppingLists,

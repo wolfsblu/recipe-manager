@@ -1,7 +1,14 @@
 import {client} from "$lib/api/client";
 
-export const getUnits = async () => {
-    const response = await client.GET("/units")
+wdexport const getUnits = async (params?: { cursor?: string | null; limit?: number }) => {
+    const response = await client.GET("/units", {
+        params: {
+            query: {
+                cursor: params?.cursor ?? undefined,
+                limit: params?.limit ?? undefined
+            }
+        }
+    })
     if (response.error) {
         throw response.error
     }

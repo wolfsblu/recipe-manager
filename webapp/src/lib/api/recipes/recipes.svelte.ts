@@ -1,7 +1,14 @@
 import {client} from "$lib/api/client";
 
-export const getRecipes = async () => {
-    const response = await client.GET("/recipes")
+export const getRecipes = async (params?: { cursor?: string | null; limit?: number }) => {
+    const response = await client.GET("/recipes", {
+        params: {
+            query: {
+                cursor: params?.cursor ?? undefined,
+                limit: params?.limit ?? undefined
+            }
+        }
+    })
     if (response.error) {
         throw response.error
     }
@@ -76,24 +83,45 @@ export const deleteRecipe = async (id: number) => {
     return response.data
 }
 
-export const getIngredients = async () => {
-    const response = await client.GET("/ingredients")
+export const getIngredients = async (params?: { cursor?: string | null; limit?: number }) => {
+    const response = await client.GET("/ingredients", {
+        params: {
+            query: {
+                cursor: params?.cursor ?? undefined,
+                limit: params?.limit ?? undefined
+            }
+        }
+    })
     if (response.error) {
         throw response.error
     }
     return response.data
 }
 
-export const getUnits = async () => {
-    const response = await client.GET("/units")
+export const getUnits = async (params?: { cursor?: string | null; limit?: number }) => {
+    const response = await client.GET("/units", {
+        params: {
+            query: {
+                cursor: params?.cursor ?? undefined,
+                limit: params?.limit ?? undefined
+            }
+        }
+    })
     if (response.error) {
         throw response.error
     }
     return response.data
 }
 
-export const getTags = async () => {
-    const response = await client.GET("/tags")
+export const getTags = async (params?: { cursor?: string | null; limit?: number }) => {
+    const response = await client.GET("/tags", {
+        params: {
+            query: {
+                cursor: params?.cursor ?? undefined,
+                limit: params?.limit ?? undefined
+            }
+        }
+    })
     if (response.error) {
         throw response.error
     }

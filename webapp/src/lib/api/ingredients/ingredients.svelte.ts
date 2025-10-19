@@ -1,7 +1,14 @@
 import {client} from "$lib/api/client";
 
-export const getIngredients = async () => {
-    const response = await client.GET("/ingredients")
+export const getIngredients = async (params?: { cursor?: string | null; limit?: number }) => {
+    const response = await client.GET("/ingredients", {
+        params: {
+            query: {
+                cursor: params?.cursor ?? undefined,
+                limit: params?.limit ?? undefined
+            }
+        }
+    })
     if (response.error) {
         throw response.error
     }

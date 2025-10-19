@@ -4,7 +4,6 @@ type ID string
 
 const (
 	// Recipes
-	BrowseRecipes ID = "browseRecipes"
 	GetRecipes    ID = "getRecipes"
 	AddRecipe     ID = "addRecipe"
 	GetRecipeById ID = "getRecipeById"

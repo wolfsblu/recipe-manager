@@ -7,7 +7,10 @@ export const load: PageLoad = async () => {
         { link: "/ingredients", name: "Ingredients" },
     ]
 
-    const ingredients = await getIngredients()
+    // Fetch ingredients with pagination (getting a large batch for now)
+    const response = await getIngredients({ limit: 100 });
+    const ingredients = response?.data ?? [];
+
     return {
         breadcrumbs,
         ingredients,

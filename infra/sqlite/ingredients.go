@@ -4,21 +4,38 @@ import (
 	"context"
 
 	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 )
 
-func (s *Store) GetIngredients(ctx context.Context) ([]domain.Ingredient, error) {
-	result, err := s.query().GetIngredients(ctx)
+func (s *Store) GetIngredients(ctx context.Context, req pagination.Page) (pagination.Result[domain.Ingredient], error) {
+	cursor := pagination.DecodeCursor(req.Cursor)
+	result, err := s.query().GetIngredients(ctx, database.GetIngredientsParams{
+		LastName: cursor.LastName,
+		LastID:   cursor.LastID,
+		Limit:    int64(req.Limit + 1),
+	})
 	if err != nil {
-		return nil, err
+		return pagination.Result[domain.Ingredient]{}, err
 	}
 
-	ingredients := make([]domain.Ingredient, len(result))
+	ingredients := make([]domain.Ingredient, 0, len(result))
 	for i, ingredient := range result {
 		ingredients[i] = s.mapper.ToIngredient(ingredient)
 	}
 
-	return s.populateIngredientNutrients(ctx, ingredients)
+	// Populate nutrients before creating paginated result
+	populatedIngredients, err := s.populateIngredientNutrients(ctx, ingredients)
+	if err != nil {
+		return pagination.Result[domain.Ingredient]{}, err
+	}
+
+	return pagination.NewResult(populatedIngredients, req.Limit, func(i domain.Ingredient) pagination.Cursor {
+		return pagination.Cursor{
+			LastID:   &i.ID,
+			LastName: &i.Name,
+		}
+	}), nil
 }
 
 func (s *Store) populateIngredientNutrients(ctx context.Context, ingredients []domain.Ingredient) ([]domain.Ingredient, error) {

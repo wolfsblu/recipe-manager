@@ -17,17 +17,17 @@ export const load: PageLoad = async ({ url }) => {
     const from = url.searchParams.get('from') || today.toISOString().split('T')[0];
     const until = url.searchParams.get('until') || nextWeek.toISOString().split('T')[0];
 
-    const [mealPlan, tags, shoppingLists] = await Promise.all([
-        getMealPlan(from, until),
-        getTags(),
-        getShoppingLists().catch(() => [])
+    const [mealPlanResponse, tagsResponse, shoppingListsResponse] = await Promise.all([
+        getMealPlan({ from, until, limit: 100 }),
+        getTags({ limit: 100 }),
+        getShoppingLists({ limit: 100 }).catch(() => ({ data: [], hasMore: false, nextCursor: null }))
     ]);
 
     return {
         breadcrumbs,
-        mealPlan,
-        tags,
-        shoppingLists,
+        mealPlan: mealPlanResponse?.data ?? [],
+        tags: tagsResponse?.data ?? [],
+        shoppingLists: shoppingListsResponse?.data ?? [],
         from,
         until
     };

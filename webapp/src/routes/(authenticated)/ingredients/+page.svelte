@@ -1,11 +1,13 @@
 <script lang="ts">
     import { createRawSnippet } from "svelte";
+    import { onMount } from "svelte";
     import * as Dialog from "$lib/components/ui/dialog/index.js";
     import { Button } from "$lib/components/ui/button/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
     import DataTable from "$lib/components/common/DataTable.svelte";
-    import { addIngredient, updateIngredient, deleteIngredient } from "$lib/api/ingredients/ingredients.svelte";
+    import { getIngredients, addIngredient, updateIngredient, deleteIngredient } from "$lib/api/ingredients/ingredients.svelte";
     import { useCrud } from "$lib/hooks/useCrud.svelte";
+    import { useServerPagination } from "$lib/utils/serverPagination.svelte";
     import { renderSnippet } from "$lib/components/ui/data-table/index.js";
     import { dialogStore, addIngredientDialogOpen } from "$lib/stores/dialog.svelte";
     import type { PageProps } from './$types';
@@ -17,6 +19,17 @@
     };
 
     const { data }: PageProps = $props();
+
+    const pagination = useServerPagination<Ingredient>({
+        fetchPage: async (cursor) => {
+            const response = await getIngredients({ cursor, limit: 30 });
+            return {
+                data: response?.data ?? [],
+                nextCursor: response?.nextCursor,
+                hasMore: response?.hasMore ?? false
+            };
+        }
+    });
 
     let newIngredientName = $state('');
     let editIngredientName = $state('');
@@ -79,10 +92,14 @@
             addIngredientDialogOpen.set(false);
         }
     });
+
+    onMount(() => {
+        pagination.loadInitialPage();
+    });
 </script>
 
 <DataTable
-    data={data.ingredients}
+    data={pagination.currentPageData}
     searchColumn="name"
     searchPlaceholder={m.ingredients_searchPlaceholder()}
     entityName={m.ingredients_entityName()}
@@ -91,6 +108,16 @@
     onEdit={openEditDialog}
     onDelete={crud.openDeleteDialog}
     onBulkDelete={crud.openBulkDeleteDialog}
+    serverPagination={{
+        canGoNext: pagination.canGoNext,
+        canGoPrevious: pagination.canGoPrevious,
+        onNext: pagination.nextPage,
+        onPrevious: pagination.previousPage,
+        onFirst: pagination.goToFirstPage,
+        loading: pagination.loading,
+        currentPage: pagination.currentPageNumber,
+        totalLoaded: pagination.totalLoadedItems
+    }}
 />
 
 <!-- Add Ingredient Dialog -->

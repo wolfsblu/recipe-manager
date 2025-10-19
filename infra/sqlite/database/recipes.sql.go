@@ -27,42 +27,6 @@ func (q *Queries) AddIngredientNutrient(ctx context.Context, arg AddIngredientNu
 	return err
 }
 
-const browseRecipes = `-- name: BrowseRecipes :many
-SELECT id, name, servings, minutes, description, created_by, created_at
-FROM recipes
-`
-
-func (q *Queries) BrowseRecipes(ctx context.Context) ([]Recipe, error) {
-	rows, err := q.db.QueryContext(ctx, browseRecipes)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Recipe
-	for rows.Next() {
-		var i Recipe
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Servings,
-			&i.Minutes,
-			&i.Description,
-			&i.CreatedBy,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const createIngredient = `-- name: CreateIngredient :one
 INSERT INTO ingredients (name)
 VALUES (?)
@@ -407,11 +371,19 @@ func (q *Queries) GetImagesForRecipes(ctx context.Context, recipeIds []int64) ([
 const getIngredients = `-- name: GetIngredients :many
 SELECT id, name
 FROM ingredients
-ORDER BY name
+WHERE (name, id) > (COALESCE(?1, ''), COALESCE(CAST(?2 AS INTEGER), 0))
+ORDER BY name, id
+LIMIT ?3
 `
 
-func (q *Queries) GetIngredients(ctx context.Context) ([]Ingredient, error) {
-	rows, err := q.db.QueryContext(ctx, getIngredients)
+type GetIngredientsParams struct {
+	LastName *string
+	LastID   *int64
+	Limit    int64
+}
+
+func (q *Queries) GetIngredients(ctx context.Context, arg GetIngredientsParams) ([]Ingredient, error) {
+	rows, err := q.db.QueryContext(ctx, getIngredients, arg.LastName, arg.LastID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -513,16 +485,20 @@ SELECT meal_plan.id, meal_plan.date, meal_plan.user_id, meal_plan.recipe_id, mea
        recipes.id, recipes.name, recipes.servings, recipes.minutes, recipes.description, recipes.created_by, recipes.created_at
 FROM meal_plan
          INNER JOIN recipes ON meal_plan.recipe_id = recipes.id
-WHERE user_id = ?
+WHERE user_id = ?1
   AND meal_plan.date >= ?2
   AND meal_plan.date <= ?3
-ORDER BY meal_plan.date, meal_plan.sort_order
+  AND meal_plan.id > COALESCE(?4, 0)
+ORDER BY meal_plan.id ASC
+LIMIT ?5
 `
 
 type GetMealPlanParams struct {
 	UserID    int64
 	FromDate  string
 	UntilDate string
+	Cursor    *int64
+	Limit     int64
 }
 
 type GetMealPlanRow struct {
@@ -531,7 +507,13 @@ type GetMealPlanRow struct {
 }
 
 func (q *Queries) GetMealPlan(ctx context.Context, arg GetMealPlanParams) ([]GetMealPlanRow, error) {
-	rows, err := q.db.QueryContext(ctx, getMealPlan, arg.UserID, arg.FromDate, arg.UntilDate)
+	rows, err := q.db.QueryContext(ctx, getMealPlan,
+		arg.UserID,
+		arg.FromDate,
+		arg.UntilDate,
+		arg.Cursor,
+		arg.Limit,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -823,11 +805,18 @@ func (q *Queries) GetStepsForRecipes(ctx context.Context, recipeIds []int64) ([]
 const getTags = `-- name: GetTags :many
 SELECT id, name
 FROM tags
-ORDER BY name
+WHERE id > COALESCE(?1, 0)
+ORDER BY id ASC
+LIMIT ?2
 `
 
-func (q *Queries) GetTags(ctx context.Context) ([]Tag, error) {
-	rows, err := q.db.QueryContext(ctx, getTags)
+type GetTagsParams struct {
+	Cursor *int64
+	Limit  int64
+}
+
+func (q *Queries) GetTags(ctx context.Context, arg GetTagsParams) ([]Tag, error) {
+	rows, err := q.db.QueryContext(ctx, getTags, arg.Cursor, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -900,11 +889,18 @@ func (q *Queries) GetTagsForRecipes(ctx context.Context, recipeIds []int64) ([]G
 const getUnits = `-- name: GetUnits :many
 SELECT id, symbol, name
 FROM units
-ORDER BY name
+WHERE id > COALESCE(?1, 0)
+ORDER BY id ASC
+LIMIT ?2
 `
 
-func (q *Queries) GetUnits(ctx context.Context) ([]Unit, error) {
-	rows, err := q.db.QueryContext(ctx, getUnits)
+type GetUnitsParams struct {
+	Cursor *int64
+	Limit  int64
+}
+
+func (q *Queries) GetUnits(ctx context.Context, arg GetUnitsParams) ([]Unit, error) {
+	rows, err := q.db.QueryContext(ctx, getUnits, arg.Cursor, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
@@ -929,12 +925,20 @@ func (q *Queries) GetUnits(ctx context.Context) ([]Unit, error) {
 const listRecipes = `-- name: ListRecipes :many
 SELECT id, name, servings, minutes, description, created_by, created_at
 FROM recipes
-WHERE created_by = ?
-ORDER BY name
+WHERE created_by = ?1
+  AND id > COALESCE(?2, 0)
+ORDER BY id ASC
+LIMIT ?3
 `
 
-func (q *Queries) ListRecipes(ctx context.Context, createdBy int64) ([]Recipe, error) {
-	rows, err := q.db.QueryContext(ctx, listRecipes, createdBy)
+type ListRecipesParams struct {
+	CreatedBy int64
+	Cursor    *int64
+	Limit     int64
+}
+
+func (q *Queries) ListRecipes(ctx context.Context, arg ListRecipesParams) ([]Recipe, error) {
+	rows, err := q.db.QueryContext(ctx, listRecipes, arg.CreatedBy, arg.Cursor, arg.Limit)
 	if err != nil {
 		return nil, err
 	}

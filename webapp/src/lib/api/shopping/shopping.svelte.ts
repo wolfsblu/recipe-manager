@@ -6,8 +6,15 @@ export type WriteShoppingList = components["schemas"]["WriteShoppingList"];
 export type ReadShoppingListItem = components["schemas"]["ReadShoppingListItem"];
 export type WriteShoppingListItem = components["schemas"]["WriteShoppingListItem"];
 
-export const getShoppingLists = async () => {
-    const response = await client.GET("/shopping-lists");
+export const getShoppingLists = async (params?: { cursor?: string | null; limit?: number }) => {
+    const response = await client.GET("/shopping-lists", {
+        params: {
+            query: {
+                cursor: params?.cursor ?? undefined,
+                limit: params?.limit ?? undefined
+            }
+        }
+    });
     if (response.error) {
         throw response.error;
     }

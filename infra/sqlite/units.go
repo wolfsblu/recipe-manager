@@ -4,21 +4,27 @@ import (
 	"context"
 
 	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 )
 
-func (s *Store) GetUnits(ctx context.Context) ([]domain.Unit, error) {
-	result, err := s.query().GetUnits(ctx)
+func (s *Store) GetUnits(ctx context.Context, req pagination.Page) (pagination.Result[domain.Unit], error) {
+	result, err := s.query().GetUnits(ctx, database.GetUnitsParams{
+		Cursor: pagination.DecodeCursor(req.Cursor),
+		Limit:  int64(req.Limit + 1),
+	})
 	if err != nil {
-		return nil, err
+		return pagination.Result[domain.Unit]{}, err
 	}
 
-	units := make([]domain.Unit, len(result))
-	for i, unit := range result {
-		units[i] = s.mapper.ToUnit(unit)
+	units := make([]domain.Unit, 0, len(result))
+	for _, unit := range result {
+		units = append(units, s.mapper.ToUnit(unit))
 	}
 
-	return units, nil
+	return pagination.NewResult(units, req.Limit, func(u domain.Unit) int64 {
+		return u.ID
+	}), nil
 }
 
 func (s *Store) CreateUnit(ctx context.Context, unit domain.Unit) (domain.Unit, error) {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/wolfsblu/recipe-manager/api"
 	"github.com/wolfsblu/recipe-manager/domain"
+	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/config"
 	"github.com/wolfsblu/recipe-manager/infra/env"
 	"github.com/wolfsblu/recipe-manager/infra/handler/mapper"
@@ -22,16 +23,37 @@ func NewShoppingHandler(service *domain.ShoppingService) *ShoppingHandler {
 	}
 }
 
-func (h *ShoppingHandler) GetShoppingLists(ctx context.Context) ([]api.ReadShoppingList, error) {
+func (h *ShoppingHandler) GetShoppingLists(ctx context.Context, params api.GetShoppingListsParams) (*api.PaginatedShoppingLists, error) {
 	user, ok := ctx.Value(config.CtxKeyUser).(*domain.User)
 	if !ok || user == nil {
 		return nil, domain.ErrAuthentication
 	}
-	lists, err := h.Shopping.GetByUser(ctx, user)
+
+	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
 	if err != nil {
 		return nil, err
 	}
-	return h.mapper.ToShoppingLists(lists)
+
+	result, err := h.Shopping.GetByUser(ctx, user, paginationReq)
+	if err != nil {
+		return nil, err
+	}
+
+	lists, err := h.mapper.ToShoppingLists(result.Data)
+	if err != nil {
+		return nil, err
+	}
+
+	var nextCursor api.OptNilString
+	if result.NextCursor != nil {
+		nextCursor = api.NewOptNilString(*result.NextCursor)
+	}
+
+	return &api.PaginatedShoppingLists{
+		Data:       lists,
+		NextCursor: nextCursor,
+		HasMore:    result.HasMore,
+	}, nil
 }
 
 func (h *ShoppingHandler) CreateShoppingList(ctx context.Context, req *api.WriteShoppingList) (*api.ReadShoppingList, error) {

@@ -1,11 +1,13 @@
 import {client} from "$lib/api/client";
 
-export const getMealPlan = async (from?: string, until?: string) => {
+export const getMealPlan = async (params?: { from?: string; until?: string; cursor?: string | null; limit?: number }) => {
     const response = await client.GET("/mealplan", {
         params: {
             query: {
-                ...(from && { from }),
-                ...(until && { until })
+                ...(params?.from && { from: params.from }),
+                ...(params?.until && { until: params.until }),
+                cursor: params?.cursor ?? undefined,
+                limit: params?.limit ?? undefined
             }
         }
     })

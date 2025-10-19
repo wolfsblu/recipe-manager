@@ -1,11 +1,13 @@
 <script lang="ts">
     import { createRawSnippet } from "svelte";
+    import { onMount } from "svelte";
     import * as Dialog from "$lib/components/ui/dialog/index.js";
     import { Button } from "$lib/components/ui/button/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
     import DataTable from "$lib/components/common/DataTable.svelte";
-    import { addUnit, updateUnit, deleteUnit } from "$lib/api/units/units.svelte";
+    import { getUnits, addUnit, updateUnit, deleteUnit } from "$lib/api/units/units.svelte";
     import { useCrud } from "$lib/hooks/useCrud.svelte";
+    import { useServerPagination } from "$lib/utils/serverPagination.svelte";
     import { renderSnippet } from "$lib/components/ui/data-table/index.js";
     import { dialogStore, addUnitDialogOpen } from "$lib/stores/dialog.svelte";
     import type { PageProps } from './$types';
@@ -18,6 +20,17 @@
     };
 
     const { data }: PageProps = $props();
+
+    const pagination = useServerPagination<Unit>({
+        fetchPage: async (cursor) => {
+            const response = await getUnits({ cursor, limit: 30 });
+            return {
+                data: response?.data ?? [],
+                nextCursor: response?.nextCursor,
+                hasMore: response?.hasMore ?? false
+            };
+        }
+    });
 
     let newUnitName = $state('');
     let newUnitSymbol = $state('');
@@ -110,10 +123,14 @@
             addUnitDialogOpen.set(false);
         }
     });
+
+    onMount(() => {
+        pagination.loadInitialPage();
+    });
 </script>
 
 <DataTable
-    data={data.units}
+    data={pagination.currentPageData}
     searchColumn="name"
     searchPlaceholder={m.units_searchPlaceholder()}
     entityName={m.units_entityName()}
@@ -122,6 +139,16 @@
     onEdit={openEditDialog}
     onDelete={crud.openDeleteDialog}
     onBulkDelete={crud.openBulkDeleteDialog}
+    serverPagination={{
+        canGoNext: pagination.canGoNext,
+        canGoPrevious: pagination.canGoPrevious,
+        onNext: pagination.nextPage,
+        onPrevious: pagination.previousPage,
+        onFirst: pagination.goToFirstPage,
+        loading: pagination.loading,
+        currentPage: pagination.currentPageNumber,
+        totalLoaded: pagination.totalLoadedItems
+    }}
 />
 
 <!-- Add Unit Dialog -->

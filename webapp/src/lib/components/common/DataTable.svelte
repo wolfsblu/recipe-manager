@@ -38,6 +38,17 @@
         onDelete: (item: T) => void;
         onBulkDelete: (items: T[]) => void;
         columns: ColumnDef<T>[];
+        // Server-side pagination props
+        serverPagination?: {
+            canGoNext: boolean;
+            canGoPrevious: boolean;
+            onNext: () => void;
+            onPrevious: () => void;
+            onFirst: () => void;
+            loading: boolean;
+            currentPage: number;
+            totalLoaded: number;
+        };
     }
 
     let {
@@ -49,13 +60,21 @@
         onEdit,
         onDelete,
         onBulkDelete,
-        columns: userColumns
+        columns: userColumns,
+        serverPagination
     }: Props = $props();
 
-    let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
+    let paginationState = $state<PaginationState>({ pageIndex: 0, pageSize: 10 });
     let columnFilters = $state<ColumnFiltersState>([]);
     let rowSelection = $state<RowSelectionState>({});
     let columnVisibility = $state<VisibilityState>({});
+
+    // Use large page size for server pagination to show all items on current page
+    $effect(() => {
+        if (serverPagination) {
+            paginationState = { pageIndex: 0, pageSize: 1000 };
+        }
+    });
 
     const columns: ColumnDef<T>[] = [
         {
@@ -100,7 +119,7 @@
         columns,
         state: {
             get pagination() {
-                return pagination;
+                return paginationState;
             },
             get columnVisibility() {
                 return columnVisibility;
@@ -118,9 +137,9 @@
         columnResizeMode: 'onChange',
         onPaginationChange: (updater) => {
             if (typeof updater === "function") {
-                pagination = updater(pagination);
+                paginationState = updater(paginationState);
             } else {
-                pagination = updater;
+                paginationState = updater;
             }
         },
         onColumnFiltersChange: (updater) => {
@@ -189,7 +208,14 @@
                 {table.getFilteredRowModel().rows.length} row(s) selected
             </div>
             <div>
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                {#if serverPagination}
+                    Page {serverPagination.currentPage} · {serverPagination.totalLoaded} loaded
+                    {#if serverPagination.loading}
+                        <span class="ml-1">(loading...)</span>
+                    {/if}
+                {:else}
+                    Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                {/if}
             </div>
         </div>
         <div class="rounded-md border">
@@ -240,35 +266,37 @@
                 <Button
                     variant="outline"
                     size="sm"
-                    onclick={() => table.setPageIndex(0)}
-                    disabled={!table.getCanPreviousPage()}
+                    onclick={() => serverPagination ? serverPagination.onFirst() : table.setPageIndex(0)}
+                    disabled={serverPagination ? !serverPagination.canGoPrevious || serverPagination.loading : !table.getCanPreviousPage()}
                 >
                     <ChevronsLeftIcon class="h-4 w-4" />
                 </Button>
                 <Button
                     variant="outline"
                     size="sm"
-                    onclick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
+                    onclick={() => serverPagination ? serverPagination.onPrevious() : table.previousPage()}
+                    disabled={serverPagination ? !serverPagination.canGoPrevious || serverPagination.loading : !table.getCanPreviousPage()}
                 >
                     <ChevronLeftIcon class="h-4 w-4" />
                 </Button>
                 <Button
                     variant="outline"
                     size="sm"
-                    onclick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
+                    onclick={() => serverPagination ? serverPagination.onNext() : table.nextPage()}
+                    disabled={serverPagination ? !serverPagination.canGoNext || serverPagination.loading : !table.getCanNextPage()}
                 >
                     <ChevronRightIcon class="h-4 w-4" />
                 </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onclick={() => table.setPageIndex(table.getPageCount() - 1)}
-                    disabled={!table.getCanNextPage()}
-                >
-                    <ChevronsRightIcon class="h-4 w-4" />
-                </Button>
+                {#if !serverPagination}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onclick={() => table.setPageIndex(table.getPageCount() - 1)}
+                        disabled={!table.getCanNextPage()}
+                    >
+                        <ChevronsRightIcon class="h-4 w-4" />
+                    </Button>
+                {/if}
             </div>
         </div>
     </div>

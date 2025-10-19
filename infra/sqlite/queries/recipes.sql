@@ -1,7 +1,3 @@
--- name: BrowseRecipes :many
-SELECT *
-FROM recipes;
-
 -- name: CreateRecipe :one
 INSERT INTO recipes (name, servings, minutes, description, created_by)
 VALUES (?, ?, ?, ?, ?)
@@ -42,10 +38,12 @@ SELECT sqlc.embed(meal_plan),
        sqlc.embed(recipes)
 FROM meal_plan
          INNER JOIN recipes ON meal_plan.recipe_id = recipes.id
-WHERE user_id = ?
+WHERE user_id = sqlc.arg(user_id)
   AND meal_plan.date >= sqlc.arg(from_date)
   AND meal_plan.date <= sqlc.arg(until_date)
-ORDER BY meal_plan.date, meal_plan.sort_order;
+  AND meal_plan.id > COALESCE(sqlc.narg(cursor), 0)
+ORDER BY meal_plan.id ASC
+LIMIT sqlc.arg(limit);
 
 -- name: GetImagesForRecipes :many
 SELECT id, path, sort_order, recipe_id
@@ -77,17 +75,23 @@ ORDER BY recipe_ingredients.sort_order;
 -- name: GetIngredients :many
 SELECT *
 FROM ingredients
-ORDER BY name;
+WHERE (name, id) > (COALESCE(sqlc.narg(last_name), ''), COALESCE(CAST(sqlc.narg(last_id) AS INTEGER), 0))
+ORDER BY name, id
+LIMIT sqlc.arg(limit);
 
 -- name: GetUnits :many
 SELECT *
 FROM units
-ORDER BY name;
+WHERE id > COALESCE(sqlc.narg(cursor), 0)
+ORDER BY id ASC
+LIMIT sqlc.arg(limit);
 
 -- name: GetTags :many
 SELECT *
 FROM tags
-ORDER BY name;
+WHERE id > COALESCE(sqlc.narg(cursor), 0)
+ORDER BY id ASC
+LIMIT sqlc.arg(limit);
 
 -- name: GetStepsForRecipes :many
 SELECT id, instructions, sort_order, recipe_id
@@ -109,8 +113,10 @@ ORDER BY tags.name;
 -- name: ListRecipes :many
 SELECT *
 FROM recipes
-WHERE created_by = ?
-ORDER BY name;
+WHERE created_by = sqlc.arg(created_by)
+  AND id > COALESCE(sqlc.narg(cursor), 0)
+ORDER BY id ASC
+LIMIT sqlc.arg(limit);
 
 -- name: UpdateRecipe :exec
 UPDATE recipes
