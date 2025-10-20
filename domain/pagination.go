@@ -65,11 +65,10 @@ func DecodeCursor[T any](cursor string) (T, error) {
 		return zero, err
 	}
 
-	var data T
-	if err := json.Unmarshal(jsonBytes, &data); err != nil {
+	if err := json.Unmarshal(jsonBytes, &zero); err != nil {
 		return zero, err
 	}
-	return data, nil
+	return zero, nil
 }
 
 // NormalizeLimit ensures the limit is within acceptable bounds
