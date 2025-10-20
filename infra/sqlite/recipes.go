@@ -129,7 +129,7 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 
 	grouped := s.groupMealPlansByDate(result)
 	uniqueRecipes := s.extractUniqueRecipes(grouped)
-	populatedMap, err := s.populateRecipeMap(ctx, user, uniqueRecipes)
+	populatedMap, err := s.populateRecipeMap(ctx, uniqueRecipes)
 	if err != nil {
 		return domain.Result[domain.MealPlan]{}, err
 	}
@@ -186,8 +186,8 @@ func (s *Store) extractUniqueRecipes(grouped map[string]*domain.MealPlan) []doma
 	return uniqueRecipes
 }
 
-func (s *Store) populateRecipeMap(ctx context.Context, user *domain.User, recipes []domain.Recipe) (map[int64]domain.Recipe, error) {
-	populatedRecipes, err := s.populateRecipeRelations(ctx, user, recipes)
+func (s *Store) populateRecipeMap(ctx context.Context, recipes []domain.Recipe) (map[int64]domain.Recipe, error) {
+	populatedRecipes, err := s.populateRecipeRelations(ctx, recipes)
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +251,7 @@ func (s *Store) GetRecipeById(ctx context.Context, user *domain.User, id int64) 
 	}
 
 	recipe = s.mapper.ToRecipe(result)
-	populatedRecipes, err := s.populateRecipeRelations(ctx, user, []domain.Recipe{recipe})
+	populatedRecipes, err := s.populateRecipeRelations(ctx, []domain.Recipe{recipe})
 	if err != nil {
 		return recipe, err
 	}
@@ -283,8 +283,7 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User, req dom
 		recipes = append(recipes, s.mapper.ToRecipe(recipe))
 	}
 
-	// Populate relations before creating paginated result
-	populatedRecipes, err := s.populateRecipeRelations(ctx, user, recipes)
+	populatedRecipes, err := s.populateRecipeRelations(ctx, recipes)
 	if err != nil {
 		return domain.Result[domain.Recipe]{}, err
 	}
@@ -297,7 +296,7 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User, req dom
 	}), nil
 }
 
-func (s *Store) populateRecipeRelations(ctx context.Context, user *domain.User, recipes []domain.Recipe) ([]domain.Recipe, error) {
+func (s *Store) populateRecipeRelations(ctx context.Context, recipes []domain.Recipe) ([]domain.Recipe, error) {
 	if len(recipes) == 0 {
 		return recipes, nil
 	}
@@ -307,7 +306,7 @@ func (s *Store) populateRecipeRelations(ctx context.Context, user *domain.User, 
 		recipeIds[i] = recipe.ID
 	}
 
-	relations, err := s.getRecipeRelations(ctx, user, recipeIds)
+	relations, err := s.getRecipeRelations(ctx, recipeIds)
 	if err != nil {
 		return nil, err
 	}
@@ -331,7 +330,7 @@ func (s *Store) populateRecipeRelations(ctx context.Context, user *domain.User, 
 	return populatedRecipes, nil
 }
 
-func (s *Store) getRecipeRelations(ctx context.Context, user *domain.User, recipeIds []int64) (*recipeRelations, error) {
+func (s *Store) getRecipeRelations(ctx context.Context, recipeIds []int64) (*recipeRelations, error) {
 	tags, err := s.query().GetTagsForRecipes(ctx, recipeIds)
 	if err != nil {
 		return nil, err
