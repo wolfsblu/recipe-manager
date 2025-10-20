@@ -2,7 +2,6 @@ package sqlite
 
 import (
 	"context"
-	"math"
 	"net/url"
 	"sort"
 	"time"
@@ -262,10 +261,7 @@ func (s *Store) GetRecipeById(ctx context.Context, user *domain.User, id int64) 
 func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User, req domain.Page) (domain.Result[domain.Recipe], error) {
 	cursor, err := domain.DecodeCursor[*domain.DateCursor](req.Cursor)
 	if err != nil {
-		cursor = &domain.DateCursor{
-			LastID:   math.MaxInt64,
-			LastDate: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
-		}
+		cursor = domain.NewDescendingDateCursor()
 	}
 
 	result, err := s.query().ListRecipes(ctx, database.ListRecipesParams{

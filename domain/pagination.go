@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math"
 	"time"
 )
 
@@ -40,6 +41,13 @@ type NameCursor struct {
 type DateCursor struct {
 	LastID   int64     `json:"id"`
 	LastDate time.Time `json:"date"`
+}
+
+func NewDescendingDateCursor() *DateCursor {
+	return &DateCursor{
+		LastID:   math.MaxInt64,
+		LastDate: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
+	}
 }
 
 // EncodeCursor creates a base64-encoded cursor from the last item ID
