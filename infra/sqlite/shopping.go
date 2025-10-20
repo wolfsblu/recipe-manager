@@ -4,19 +4,23 @@ import (
 	"context"
 
 	"github.com/wolfsblu/recipe-manager/domain"
-	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 	_ "modernc.org/sqlite"
 )
 
-func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req pagination.Page) (pagination.Result[domain.ShoppingList], error) {
+func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req domain.Page) (domain.Result[domain.ShoppingList], error) {
+	cursor, err := domain.DecodeCursor[*domain.NameCursor](req.Cursor)
+	if err != nil {
+		cursor = &domain.NameCursor{}
+	}
 	result, err := s.query().GetShoppingListsByUserID(ctx, database.GetShoppingListsByUserIDParams{
-		UserID: userID,
-		Cursor: pagination.DecodeCursor(req.Cursor),
-		Limit:  int64(req.Limit + 1),
+		UserID:   userID,
+		LastName: cursor.LastName,
+		LastID:   cursor.LastID,
+		Limit:    int64(req.Limit + 1),
 	})
 	if err != nil {
-		return pagination.Result[domain.ShoppingList]{}, err
+		return domain.Result[domain.ShoppingList]{}, err
 	}
 
 	var lists []domain.ShoppingList
@@ -29,7 +33,7 @@ func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req pa
 
 		items, err := s.query().GetShoppingListItemsByListID(ctx, row.ID)
 		if err != nil {
-			return pagination.Result[domain.ShoppingList]{}, err
+			return domain.Result[domain.ShoppingList]{}, err
 		}
 
 		for _, item := range items {
@@ -46,8 +50,11 @@ func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req pa
 		lists = append(lists, list)
 	}
 
-	return pagination.NewResult(lists, req.Limit, func(l domain.ShoppingList) int64 {
-		return l.ID
+	return domain.NewPagedResult(lists, req.Limit, func(l domain.ShoppingList) domain.NameCursor {
+		return domain.NameCursor{
+			LastID:   l.ID,
+			LastName: l.Name,
+		}
 	}), nil
 }
 

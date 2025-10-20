@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/wolfsblu/recipe-manager/domain"
-	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 	_ "modernc.org/sqlite"
 )
@@ -105,77 +104,130 @@ func (s *Store) DeleteMealPlan(ctx context.Context, userID int64, recipeID int64
 	})
 }
 
-func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Time, until time.Time, req pagination.Page) (pagination.Result[domain.MealPlan], error) {
+func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Time, until time.Time, page domain.Page) (domain.Result[domain.MealPlan], error) {
+	cursor, err := domain.DecodeCursor[*domain.DateCursor](page.Cursor)
+	if err != nil {
+		cursor = &domain.DateCursor{}
+	}
+	lastDate := ""
+	if !cursor.LastDate.IsZero() {
+		lastDate = cursor.LastDate.Format(time.DateOnly)
+	}
+
 	result, err := s.query().GetMealPlan(ctx, database.GetMealPlanParams{
 		UserID:    user.ID,
 		FromDate:  from.Format(time.DateOnly),
 		UntilDate: until.Format(time.DateOnly),
-		Cursor:    pagination.DecodeCursor(req.Cursor),
-		Limit:     int64(req.Limit + 1),
+		LastDate:  lastDate,
+		LastID:    cursor.LastID,
+		Limit:     int64(page.Limit + 1),
 	})
 	if err != nil {
-		return pagination.Result[domain.MealPlan]{}, err
+		return domain.Result[domain.MealPlan]{}, err
 	}
 
-	recipeMap := make(map[int64]domain.Recipe)
-	for _, item := range result {
-		recipe := s.mapper.ToRecipe(item.Recipe)
-		recipeMap[recipe.ID] = recipe
-	}
-
-	recipes := make([]domain.Recipe, 0, len(recipeMap))
-	for _, recipe := range recipeMap {
-		recipes = append(recipes, recipe)
-	}
-
-	populatedRecipes, err := s.populateRecipeRelations(ctx, user, recipes)
+	grouped := s.groupMealPlansByDate(result)
+	uniqueRecipes := s.extractUniqueRecipes(grouped)
+	populatedMap, err := s.populateRecipeMap(ctx, user, uniqueRecipes)
 	if err != nil {
-		return pagination.Result[domain.MealPlan]{}, err
+		return domain.Result[domain.MealPlan]{}, err
 	}
 
-	populatedRecipeMap := make(map[int64]domain.Recipe)
-	for _, recipe := range populatedRecipes {
-		populatedRecipeMap[recipe.ID] = recipe
-	}
+	mealPlans := s.buildMealPlans(grouped, populatedMap)
 
-	grouped := make(map[string][]domain.Recipe)
-	for _, item := range result {
-		recipe := populatedRecipeMap[item.Recipe.ID]
-		grouped[item.MealPlan.Date] = append(grouped[item.MealPlan.Date], recipe)
-	}
-
-	i := 0
-	mealPlan := make([]domain.MealPlan, 0, len(grouped))
-	for key, recipes := range grouped {
-		date, err := time.Parse(time.DateOnly, key)
-		if err != nil {
-			return pagination.Result[domain.MealPlan]{}, err
+	return domain.NewPagedResult(mealPlans, page.Limit, func(m domain.MealPlan) domain.DateCursor {
+		lastEntry := m.Entries[len(m.Entries)-1]
+		return domain.DateCursor{
+			LastID:   lastEntry.ID,
+			LastDate: m.Date,
 		}
-		mealPlan = append(mealPlan, domain.MealPlan{
-			Date:    date,
-			Recipes: recipes,
-		})
-		i++
-	}
-
-	sort.Slice(mealPlan, func(i, j int) bool {
-		return mealPlan[i].Date.Before(mealPlan[j].Date)
-	})
-
-	// Note: For meal plan pagination, we use the first meal plan's date hash as the ID
-	return pagination.NewResult(mealPlan, req.Limit, func(m domain.MealPlan) int64 {
-		// Use date as a unique identifier (convert to unix timestamp)
-		return m.Date.Unix()
 	}), nil
 }
 
-func (s *Store) GetTags(ctx context.Context, req pagination.Page) (pagination.Result[domain.Tag], error) {
+func (s *Store) groupMealPlansByDate(result []database.GetMealPlanRow) map[string]*domain.MealPlan {
+	grouped := make(map[string]*domain.MealPlan)
+
+	for _, item := range result {
+		dateKey := item.MealPlan.Date
+
+		if _, exists := grouped[dateKey]; !exists {
+			date, _ := time.Parse(time.DateOnly, dateKey)
+			grouped[dateKey] = &domain.MealPlan{
+				Date:    date,
+				Entries: make([]domain.MealPlanRecipe, 0),
+			}
+		}
+
+		mealPlan := grouped[dateKey]
+		recipe := s.mapper.ToRecipe(item.Recipe)
+		mealPlan.Entries = append(mealPlan.Entries, domain.MealPlanRecipe{
+			ID:     item.MealPlan.ID,
+			Recipe: recipe,
+		})
+	}
+
+	return grouped
+}
+
+func (s *Store) extractUniqueRecipes(grouped map[string]*domain.MealPlan) []domain.Recipe {
+	uniqueRecipes := make([]domain.Recipe, 0)
+	seen := make(map[int64]bool)
+
+	for _, mealPlan := range grouped {
+		for _, entry := range mealPlan.Entries {
+			if !seen[entry.Recipe.ID] {
+				uniqueRecipes = append(uniqueRecipes, entry.Recipe)
+				seen[entry.Recipe.ID] = true
+			}
+		}
+	}
+
+	return uniqueRecipes
+}
+
+func (s *Store) populateRecipeMap(ctx context.Context, user *domain.User, recipes []domain.Recipe) (map[int64]domain.Recipe, error) {
+	populatedRecipes, err := s.populateRecipeRelations(ctx, user, recipes)
+	if err != nil {
+		return nil, err
+	}
+
+	recipeMap := make(map[int64]domain.Recipe, len(populatedRecipes))
+	for _, recipe := range populatedRecipes {
+		recipeMap[recipe.ID] = recipe
+	}
+
+	return recipeMap, nil
+}
+
+func (s *Store) buildMealPlans(grouped map[string]*domain.MealPlan, populatedMap map[int64]domain.Recipe) []domain.MealPlan {
+	mealPlans := make([]domain.MealPlan, 0, len(grouped))
+
+	for _, mealPlan := range grouped {
+		for i, entry := range mealPlan.Entries {
+			mealPlan.Entries[i].Recipe = populatedMap[entry.Recipe.ID]
+		}
+		mealPlans = append(mealPlans, *mealPlan)
+	}
+
+	sort.Slice(mealPlans, func(i, j int) bool {
+		return mealPlans[i].Date.Before(mealPlans[j].Date)
+	})
+
+	return mealPlans
+}
+
+func (s *Store) GetTags(ctx context.Context, req domain.Page) (domain.Result[domain.Tag], error) {
+	cursor, err := domain.DecodeCursor[*domain.NameCursor](req.Cursor)
+	if err != nil {
+		cursor = &domain.NameCursor{}
+	}
 	result, err := s.query().GetTags(ctx, database.GetTagsParams{
-		Cursor: pagination.DecodeCursor(req.Cursor),
-		Limit:  int64(req.Limit + 1),
+		LastName: cursor.LastName,
+		LastID:   cursor.LastID,
+		Limit:    int64(req.Limit + 1),
 	})
 	if err != nil {
-		return pagination.Result[domain.Tag]{}, err
+		return domain.Result[domain.Tag]{}, err
 	}
 
 	tags := make([]domain.Tag, 0, len(result))
@@ -183,8 +235,11 @@ func (s *Store) GetTags(ctx context.Context, req pagination.Page) (pagination.Re
 		tags = append(tags, s.mapper.ToTag(tag))
 	}
 
-	return pagination.NewResult(tags, req.Limit, func(t domain.Tag) int64 {
-		return t.ID
+	return domain.NewPagedResult(tags, req.Limit, func(t domain.Tag) domain.NameCursor {
+		return domain.NameCursor{
+			LastID:   t.ID,
+			LastName: t.Name,
+		}
 	}), nil
 }
 
@@ -203,14 +258,20 @@ func (s *Store) GetRecipeById(ctx context.Context, user *domain.User, id int64) 
 	return populatedRecipes[0], nil
 }
 
-func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User, req pagination.Page) (pagination.Result[domain.Recipe], error) {
+func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User, req domain.Page) (domain.Result[domain.Recipe], error) {
+	cursor, err := domain.DecodeCursor[*domain.DateCursor](req.Cursor)
+	if err != nil {
+		cursor = &domain.DateCursor{}
+	}
+
 	result, err := s.query().ListRecipes(ctx, database.ListRecipesParams{
-		CreatedBy: user.ID,
-		Cursor:    pagination.DecodeCursor(req.Cursor),
-		Limit:     int64(req.Limit + 1),
+		CreatedBy:     user.ID,
+		LastCreatedAt: cursor.LastDate,
+		LastID:        cursor.LastID,
+		Limit:         int64(req.Limit + 1),
 	})
 	if err != nil {
-		return pagination.Result[domain.Recipe]{}, err
+		return domain.Result[domain.Recipe]{}, err
 	}
 
 	recipes := make([]domain.Recipe, 0, len(result))
@@ -221,11 +282,14 @@ func (s *Store) GetRecipesByUser(ctx context.Context, user *domain.User, req pag
 	// Populate relations before creating paginated result
 	populatedRecipes, err := s.populateRecipeRelations(ctx, user, recipes)
 	if err != nil {
-		return pagination.Result[domain.Recipe]{}, err
+		return domain.Result[domain.Recipe]{}, err
 	}
 
-	return pagination.NewResult(populatedRecipes, req.Limit, func(r domain.Recipe) int64 {
-		return r.ID
+	return domain.NewPagedResult(populatedRecipes, req.Limit, func(r domain.Recipe) domain.DateCursor {
+		return domain.DateCursor{
+			LastID:   r.ID,
+			LastDate: r.CreatedAt,
+		}
 	}), nil
 }
 

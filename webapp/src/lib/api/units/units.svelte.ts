@@ -1,6 +1,6 @@
 import {client} from "$lib/api/client";
 
-wdexport const getUnits = async (params?: { cursor?: string | null; limit?: number }) => {
+export const getUnits = async (params?: { cursor?: string | null; limit?: number }) => {
     const response = await client.GET("/units", {
         params: {
             query: {

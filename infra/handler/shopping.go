@@ -5,7 +5,6 @@ import (
 
 	"github.com/wolfsblu/recipe-manager/api"
 	"github.com/wolfsblu/recipe-manager/domain"
-	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/config"
 	"github.com/wolfsblu/recipe-manager/infra/env"
 	"github.com/wolfsblu/recipe-manager/infra/handler/mapper"
@@ -29,7 +28,7 @@ func (h *ShoppingHandler) GetShoppingLists(ctx context.Context, params api.GetSh
 		return nil, domain.ErrAuthentication
 	}
 
-	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
+	paginationReq, err := domain.ValidatePage(params.Cursor.Value, int(params.Limit.Or(domain.DefaultPageSize)))
 	if err != nil {
 		return nil, err
 	}

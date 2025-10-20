@@ -38,7 +38,8 @@ func (m *DBMapper) ToIngredientNutrient(r database.GetNutrientsForIngredientRow)
 
 func (m *DBMapper) ToRecipe(r database.Recipe) domain.Recipe {
 	return domain.Recipe{
-		ID: r.ID,
+		ID:        r.ID,
+		CreatedAt: r.CreatedAt,
 		RecipeDetails: domain.RecipeDetails{
 			Name:        r.Name,
 			Description: r.Description,

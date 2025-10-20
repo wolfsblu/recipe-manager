@@ -159,3 +159,7 @@ CREATE INDEX idx_recipe_steps_sort_order ON recipe_steps (sort_order);
 CREATE INDEX idx_shopping_lists_user_id ON shopping_lists (user_id);
 CREATE INDEX idx_shopping_list_items_shopping_list_id ON shopping_list_items (shopping_list_id);
 CREATE INDEX idx_shopping_list_items_sort_order ON shopping_list_items (sort_order);
+CREATE INDEX idx_recipes_created_at ON recipes (created_at DESC, id DESC);
+CREATE INDEX idx_units_name ON units (name, id);
+CREATE INDEX idx_tags_name ON tags (name, id);
+CREATE INDEX idx_shopping_lists_name ON shopping_lists (name, id);

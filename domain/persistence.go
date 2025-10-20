@@ -3,21 +3,19 @@ package domain
 import (
 	"context"
 	"time"
-
-	"github.com/wolfsblu/recipe-manager/domain/pagination"
 )
 
 type RecipeStore interface {
 	CreateRecipe(ctx context.Context, recipe Recipe) (Recipe, error)
 	DeleteRecipe(ctx context.Context, id int64) error
-	GetMealPlan(ctx context.Context, user *User, from time.Time, until time.Time, page pagination.Page) (pagination.Result[MealPlan], error)
+	GetMealPlan(ctx context.Context, user *User, from time.Time, until time.Time, page Page) (Result[MealPlan], error)
 	CreateMealPlan(ctx context.Context, entry MealPlanEntry) error
 	DeleteMealPlan(ctx context.Context, userID int64, recipeID int64, date time.Time) error
-	GetIngredients(ctx context.Context, page pagination.Page) (pagination.Result[Ingredient], error)
-	GetUnits(ctx context.Context, req pagination.Page) (pagination.Result[Unit], error)
-	GetTags(ctx context.Context, req pagination.Page) (pagination.Result[Tag], error)
+	GetIngredients(ctx context.Context, page Page) (Result[Ingredient], error)
+	GetUnits(ctx context.Context, page Page) (Result[Unit], error)
+	GetTags(ctx context.Context, page Page) (Result[Tag], error)
 	GetRecipeById(ctx context.Context, user *User, id int64) (Recipe, error)
-	GetRecipesByUser(ctx context.Context, user *User, page pagination.Page) (pagination.Result[Recipe], error)
+	GetRecipesByUser(ctx context.Context, user *User, page Page) (Result[Recipe], error)
 	UpdateRecipe(ctx context.Context, recipe Recipe) (Recipe, error)
 	CreateIngredient(ctx context.Context, ingredient Ingredient) (Ingredient, error)
 	UpdateIngredient(ctx context.Context, ingredient Ingredient) (Ingredient, error)
@@ -41,7 +39,7 @@ type UserStore interface {
 }
 
 type ShoppingStore interface {
-	GetShoppingListsByUser(ctx context.Context, userID int64, req pagination.Page) (pagination.Result[ShoppingList], error)
+	GetShoppingListsByUser(ctx context.Context, userID int64, page Page) (Result[ShoppingList], error)
 	GetShoppingListByID(ctx context.Context, listID int64) (ShoppingList, error)
 	CreateShoppingList(ctx context.Context, userID int64, name string) (ShoppingList, error)
 	UpdateShoppingList(ctx context.Context, listID int64, name string) (ShoppingList, error)

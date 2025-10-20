@@ -4,17 +4,21 @@ import (
 	"context"
 
 	"github.com/wolfsblu/recipe-manager/domain"
-	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 )
 
-func (s *Store) GetUnits(ctx context.Context, req pagination.Page) (pagination.Result[domain.Unit], error) {
+func (s *Store) GetUnits(ctx context.Context, req domain.Page) (domain.Result[domain.Unit], error) {
+	cursor, err := domain.DecodeCursor[*domain.NameCursor](req.Cursor)
+	if err != nil {
+		cursor = &domain.NameCursor{}
+	}
 	result, err := s.query().GetUnits(ctx, database.GetUnitsParams{
-		Cursor: pagination.DecodeCursor(req.Cursor),
-		Limit:  int64(req.Limit + 1),
+		LastName: cursor.LastName,
+		LastID:   cursor.LastID,
+		Limit:    int64(req.Limit + 1),
 	})
 	if err != nil {
-		return pagination.Result[domain.Unit]{}, err
+		return domain.Result[domain.Unit]{}, err
 	}
 
 	units := make([]domain.Unit, 0, len(result))
@@ -22,8 +26,11 @@ func (s *Store) GetUnits(ctx context.Context, req pagination.Page) (pagination.R
 		units = append(units, s.mapper.ToUnit(unit))
 	}
 
-	return pagination.NewResult(units, req.Limit, func(u domain.Unit) int64 {
-		return u.ID
+	return domain.NewPagedResult(units, req.Limit, func(u domain.Unit) domain.NameCursor {
+		return domain.NameCursor{
+			LastID:   u.ID,
+			LastName: u.Name,
+		}
 	}), nil
 }
 

@@ -7,7 +7,6 @@ import (
 	"github.com/ogen-go/ogen/json"
 	"github.com/wolfsblu/recipe-manager/api"
 	"github.com/wolfsblu/recipe-manager/domain"
-	"github.com/wolfsblu/recipe-manager/domain/pagination"
 	"github.com/wolfsblu/recipe-manager/infra/config"
 	"github.com/wolfsblu/recipe-manager/infra/env"
 	"github.com/wolfsblu/recipe-manager/infra/handler/mapper"
@@ -62,7 +61,7 @@ func (h *RecipeHandler) GetMealPlan(ctx context.Context, params api.GetMealPlanP
 	from := params.From.Or(time.Now())
 	until := params.Until.Or(from.Add(7 * 24 * time.Hour))
 
-	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
+	paginationReq, err := domain.ValidatePage(params.Cursor.Value, int(params.Limit.Or(domain.DefaultPageSize)))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +110,7 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context, params api.GetRecipesPar
 		return nil, domain.ErrAuthentication
 	}
 
-	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
+	paginationReq, err := domain.ValidatePage(params.Cursor.Value, int(params.Limit.Or(domain.DefaultPageSize)))
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +167,7 @@ func (h *RecipeHandler) UpdateRecipe(ctx context.Context, req *api.WriteRecipe, 
 }
 
 func (h *RecipeHandler) GetIngredients(ctx context.Context, params api.GetIngredientsParams) (*api.PaginatedIngredients, error) {
-	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
+	paginationReq, err := domain.ValidatePage(params.Cursor.Value, int(params.Limit.Or(domain.DefaultPageSize)))
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +195,7 @@ func (h *RecipeHandler) GetIngredients(ctx context.Context, params api.GetIngred
 }
 
 func (h *RecipeHandler) GetUnits(ctx context.Context, params api.GetUnitsParams) (*api.PaginatedUnits, error) {
-	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
+	paginationReq, err := domain.ValidatePage(params.Cursor.Value, int(params.Limit.Or(domain.DefaultPageSize)))
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +218,7 @@ func (h *RecipeHandler) GetUnits(ctx context.Context, params api.GetUnitsParams)
 }
 
 func (h *RecipeHandler) GetTags(ctx context.Context, params api.GetTagsParams) (*api.PaginatedTags, error) {
-	paginationReq, err := pagination.ValidatePage(params.Cursor.Value, int(params.Limit.Or(pagination.DefaultLimit)))
+	paginationReq, err := domain.ValidatePage(params.Cursor.Value, int(params.Limit.Or(domain.DefaultPageSize)))
 	if err != nil {
 		return nil, err
 	}

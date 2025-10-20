@@ -1,14 +1,15 @@
-package pagination
+package domain
 
 import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"time"
 )
 
 const (
-	DefaultLimit = 30  // DefaultLimit is the default page size if none is specified
-	MaxLimit     = 100 // MaxLimit is the maximum allowed page size
+	DefaultPageSize = 30  // DefaultPageSize is the default page size if none is specified
+	MaxPageSize     = 100 // MaxPageSize is the maximum allowed page size
 )
 
 // Page contains pagination parameters
@@ -26,12 +27,23 @@ type Result[T any] struct {
 
 // Cursor represents the data encoded in a pagination cursor
 type Cursor struct {
-	LastID   *int64  `json:"id"`
-	LastName *string `json:"name"`
+	LastID   int64     `json:"id"`
+	LastName string    `json:"name"`
+	LastDate time.Time `json:"date"`
+}
+
+type NameCursor struct {
+	LastID   int64  `json:"id"`
+	LastName string `json:"name"`
+}
+
+type DateCursor struct {
+	LastID   int64     `json:"id"`
+	LastDate time.Time `json:"date"`
 }
 
 // EncodeCursor creates a base64-encoded cursor from the last item ID
-func EncodeCursor(cursor Cursor) string {
+func EncodeCursor(cursor any) string {
 	jsonBytes, err := json.Marshal(cursor)
 	if err != nil {
 		// This should never happen with simple struct
@@ -41,39 +53,39 @@ func EncodeCursor(cursor Cursor) string {
 }
 
 // DecodeCursor decodes a base64-encoded cursor to extract the last ID
-// Returns nil if cursor is empty or invalid
-func DecodeCursor(cursor string) Cursor {
+// T should be a pointer type (*NameCursor, *DateCursor, etc.)
+func DecodeCursor[T any](cursor string) (T, error) {
+	var zero T
 	if cursor == "" {
-		return Cursor{}
+		return zero, fmt.Errorf("cursor is empty")
 	}
 
 	jsonBytes, err := base64.StdEncoding.DecodeString(cursor)
 	if err != nil {
-		return Cursor{}
+		return zero, err
 	}
 
-	var data Cursor
+	var data T
 	if err := json.Unmarshal(jsonBytes, &data); err != nil {
-		return Cursor{}
+		return zero, err
 	}
-
-	return data
+	return data, nil
 }
 
 // NormalizeLimit ensures the limit is within acceptable bounds
 func NormalizeLimit(limit int) int {
 	if limit <= 0 {
-		return DefaultLimit
+		return DefaultPageSize
 	}
-	if limit > MaxLimit {
-		return MaxLimit
+	if limit > MaxPageSize {
+		return MaxPageSize
 	}
 	return limit
 }
 
-// NewResult creates a paginated result from a slice of items
+// NewPagedResult creates a paginated result from a slice of items
 // It expects items to contain limit+1 items if there are more pages
-func NewResult[T any](items []T, limit int, getCursor func(T) Cursor) Result[T] {
+func NewPagedResult[T any, C any](items []T, limit int, getCursor func(T) C) Result[T] {
 	hasMore := len(items) > limit
 	data := items
 	if hasMore {
@@ -99,9 +111,9 @@ func ValidatePage(cursorBase64 string, limit int) (Page, error) {
 	normalizedLimit := NormalizeLimit(limit)
 
 	if cursorBase64 != "" {
-		cursor := DecodeCursor(cursorBase64)
-		if cursor.LastID == nil {
-			return Page{}, fmt.Errorf("invalid cursor format")
+		_, err := DecodeCursor[any](cursorBase64)
+		if err != nil {
+			return Page{}, WrapError(ErrPagination, err)
 		}
 	}
 

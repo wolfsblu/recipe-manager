@@ -4,23 +4,6 @@
  */
 
 export interface paths {
-    "/browse": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Browse public recipes */
-        get: operations["browseRecipes"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/login": {
         parameters: {
             query?: never;
@@ -878,25 +861,6 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    browseRecipes: {
-        parameters: {
-            query?: {
-                /** @description Cursor for pagination (opaque token from previous response) */
-                cursor?: components["parameters"]["CursorParam"];
-                /** @description Maximum number of items to return (default 30, max 100) */
-                limit?: components["parameters"]["LimitParam"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful operation */
-            200: components["responses"]["RecipeList"];
-            default: components["responses"]["Error"];
-        };
-    };
     login: {
         parameters: {
             query?: never;

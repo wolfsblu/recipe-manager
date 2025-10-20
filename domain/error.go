@@ -27,6 +27,7 @@ var (
 	ErrUserNotFound               = &Error{Message: "user was not found"}
 	ErrInvalidIngredient          = &Error{Message: "invalid ingredient"}
 	ErrInvalidUnit                = &Error{Message: "invalid unit"}
+	ErrPagination                 = &Error{Message: "invalid pagination"}
 )
 
 func (e *Error) Error() string {

@@ -41,8 +41,8 @@ FROM meal_plan
 WHERE user_id = sqlc.arg(user_id)
   AND meal_plan.date >= sqlc.arg(from_date)
   AND meal_plan.date <= sqlc.arg(until_date)
-  AND meal_plan.id > COALESCE(sqlc.narg(cursor), 0)
-ORDER BY meal_plan.id ASC
+  AND (meal_plan.date, meal_plan.id) > (sqlc.arg(last_date), CAST(sqlc.arg(last_id) AS INTEGER))
+ORDER BY meal_plan.date, meal_plan.id
 LIMIT sqlc.arg(limit);
 
 -- name: GetImagesForRecipes :many
@@ -75,22 +75,22 @@ ORDER BY recipe_ingredients.sort_order;
 -- name: GetIngredients :many
 SELECT *
 FROM ingredients
-WHERE (name, id) > (COALESCE(sqlc.narg(last_name), ''), COALESCE(CAST(sqlc.narg(last_id) AS INTEGER), 0))
+WHERE (name, id) > (sqlc.arg(last_name), CAST(sqlc.arg(last_id) AS INTEGER))
 ORDER BY name, id
 LIMIT sqlc.arg(limit);
 
 -- name: GetUnits :many
 SELECT *
 FROM units
-WHERE id > COALESCE(sqlc.narg(cursor), 0)
-ORDER BY id ASC
+WHERE (name, id) > (sqlc.arg(last_name), CAST(sqlc.arg(last_id) AS INTEGER))
+ORDER BY name, id
 LIMIT sqlc.arg(limit);
 
 -- name: GetTags :many
 SELECT *
 FROM tags
-WHERE id > COALESCE(sqlc.narg(cursor), 0)
-ORDER BY id ASC
+WHERE (name, id) > (sqlc.arg(last_name), CAST(sqlc.arg(last_id) AS INTEGER))
+ORDER BY name, id
 LIMIT sqlc.arg(limit);
 
 -- name: GetStepsForRecipes :many
@@ -114,8 +114,8 @@ ORDER BY tags.name;
 SELECT *
 FROM recipes
 WHERE created_by = sqlc.arg(created_by)
-  AND id > COALESCE(sqlc.narg(cursor), 0)
-ORDER BY id ASC
+  AND (created_at, id) < (sqlc.arg(last_created_at), CAST(sqlc.arg(last_id) AS INTEGER))
+ORDER BY created_at DESC, id DESC
 LIMIT sqlc.arg(limit);
 
 -- name: UpdateRecipe :exec

@@ -163,19 +163,25 @@ func (q *Queries) GetShoppingListItemsByListID(ctx context.Context, shoppingList
 const getShoppingListsByUserID = `-- name: GetShoppingListsByUserID :many
 SELECT id, user_id, name FROM shopping_lists
 WHERE user_id = ?1
-  AND id > COALESCE(?2, 0)
-ORDER BY id ASC
-LIMIT ?3
+  AND (name, id) > (?2, CAST(?3 AS INTEGER))
+ORDER BY name, id
+LIMIT ?4
 `
 
 type GetShoppingListsByUserIDParams struct {
-	UserID int64
-	Cursor *int64
-	Limit  int64
+	UserID   int64
+	LastName string
+	LastID   int64
+	Limit    int64
 }
 
 func (q *Queries) GetShoppingListsByUserID(ctx context.Context, arg GetShoppingListsByUserIDParams) ([]ShoppingList, error) {
-	rows, err := q.db.QueryContext(ctx, getShoppingListsByUserID, arg.UserID, arg.Cursor, arg.Limit)
+	rows, err := q.db.QueryContext(ctx, getShoppingListsByUserID,
+		arg.UserID,
+		arg.LastName,
+		arg.LastID,
+		arg.Limit,
+	)
 	if err != nil {
 		return nil, err
 	}

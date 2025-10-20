@@ -22,6 +22,7 @@ var errorStatusCodeMap = map[*domain.Error]int{
 	domain.ErrDeletingPasswordResetToken: http.StatusInternalServerError,
 	domain.ErrDeletingRegistration:       http.StatusInternalServerError,
 	domain.ErrInvalidCredentials:         http.StatusUnauthorized,
+	domain.ErrPagination:                 http.StatusBadRequest,
 	domain.ErrPasswordResetTokenNotFound: http.StatusUnauthorized,
 	domain.ErrRecipeNotFound:             http.StatusNotFound,
 	domain.ErrRegistrationNotFound:       http.StatusNotFound,

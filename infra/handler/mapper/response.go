@@ -63,13 +63,13 @@ func (m *APIMapper) ToIngredients(ingredients []domain.Ingredient) ([]api.Ingred
 }
 
 func (m *APIMapper) ToMealPlan(mealPlan domain.MealPlan) (api.ReadMealPlan, error) {
-	recipes := make([]api.ReadRecipe, len(mealPlan.Recipes))
-	for i, recipe := range mealPlan.Recipes {
-		response, err := m.ToReadRecipe(recipe)
+	recipes := make([]api.ReadRecipe, 0, len(mealPlan.Entries))
+	for _, entry := range mealPlan.Entries {
+		response, err := m.ToReadRecipe(entry.Recipe)
 		if err != nil {
 			return api.ReadMealPlan{}, err
 		}
-		recipes[i] = *response
+		recipes = append(recipes, *response)
 	}
 
 	return api.ReadMealPlan{

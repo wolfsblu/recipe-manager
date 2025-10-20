@@ -1,8 +1,8 @@
 -- name: GetShoppingListsByUserID :many
 SELECT id, user_id, name FROM shopping_lists
 WHERE user_id = sqlc.arg(user_id)
-  AND id > COALESCE(sqlc.narg(cursor), 0)
-ORDER BY id ASC
+  AND (name, id) > (sqlc.arg(last_name), CAST(sqlc.arg(last_id) AS INTEGER))
+ORDER BY name, id
 LIMIT sqlc.arg(limit);
 
 -- name: GetShoppingListByID :one

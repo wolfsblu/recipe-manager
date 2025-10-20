@@ -26,10 +26,11 @@ type RecipeStep struct {
 }
 
 type Recipe struct {
-	ID     int64
-	Tags   []Tag
-	Images []RecipeImage
-	Steps  []RecipeStep
+	ID        int64
+	CreatedAt time.Time
+	Tags      []Tag
+	Images    []RecipeImage
+	Steps     []RecipeStep
 	RecipeDetails
 }
 
@@ -40,7 +41,12 @@ type RecipeImage struct {
 
 type MealPlan struct {
 	Date    time.Time
-	Recipes []Recipe
+	Entries []MealPlanRecipe
+}
+
+type MealPlanRecipe struct {
+	ID     int64
+	Recipe Recipe
 }
 
 type MealPlanEntry struct {

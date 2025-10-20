@@ -2,15 +2,13 @@ package domain
 
 import (
 	"context"
-
-	"github.com/wolfsblu/recipe-manager/domain/pagination"
 )
 
 type ShoppingService struct {
 	store ShoppingStore
 }
 
-func (s *ShoppingService) GetByUser(ctx context.Context, user *User, req pagination.Page) (pagination.Result[ShoppingList], error) {
+func (s *ShoppingService) GetByUser(ctx context.Context, user *User, req Page) (Result[ShoppingList], error) {
 	return s.store.GetShoppingListsByUser(ctx, user.ID, req)
 }
 
