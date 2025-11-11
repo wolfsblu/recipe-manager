@@ -5,14 +5,23 @@ import (
 	"database/sql"
 
 	"github.com/wolfsblu/recipe-manager/domain"
-	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 )
 
-// TxStore wraps a Store with isolated transaction state
-// This ensures each transaction has its own state and prevents concurrency issues
+// TxStore wraps a Store to provide transaction-scoped database operations
 type TxStore struct {
 	*Store
 	tx *sql.Tx
+}
+
+// DB returns the transaction as a *sql.DB for go-jet compatibility
+// Note: go-jet's Query and Exec methods work with both *sql.DB and *sql.Tx
+// through their underlying interfaces
+func (t *TxStore) DB() interface {
+	ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
+	QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+	QueryRowContext(context.Context, string, ...interface{}) *sql.Row
+} {
+	return t.tx
 }
 
 // WithTransaction executes a function within a database transaction.
@@ -25,13 +34,8 @@ func (s *Store) WithTransaction(ctx context.Context, fn func(*TxStore) error) er
 	}
 
 	txStore := &TxStore{
-		Store: &Store{
-			db:     s.db,
-			mapper: s.mapper,
-			path:   s.path,
-			q:      s.q.WithTx(tx),
-		},
-		tx: tx,
+		Store: s,
+		tx:    tx,
 	}
 
 	defer func() {
@@ -49,9 +53,4 @@ func (s *Store) WithTransaction(ctx context.Context, fn func(*TxStore) error) er
 		return domain.WrapError(domain.ErrCommittingTransaction, err)
 	}
 	return nil
-}
-
-// query returns the regular query executor for Store
-func (s *Store) query() *database.Queries {
-	return s.q
 }

@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/wolfsblu/recipe-manager/domain"
-	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/gen/model"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/queries"
 	_ "modernc.org/sqlite"
 )
 
@@ -13,12 +14,9 @@ func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req do
 	if err != nil {
 		cursor = &domain.NameCursor{}
 	}
-	result, err := s.query().GetShoppingListsByUserID(ctx, database.GetShoppingListsByUserIDParams{
-		UserID:   userID,
-		LastName: cursor.LastName,
-		LastID:   cursor.LastID,
-		Limit:    int64(req.Limit + 1),
-	})
+
+	var result []model.ShoppingList
+	err = queries.SelectShoppingListsByUser(userID, cursor.LastID, cursor.LastName, int64(req.Limit+1)).Query(s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.ShoppingList]{}, err
 	}
@@ -31,7 +29,8 @@ func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req do
 			Name:   row.Name,
 		}
 
-		items, err := s.query().GetShoppingListItemsByListID(ctx, row.ID)
+		var items []model.ShoppingListItem
+		err = queries.SelectShoppingListItems(row.ID).Query(s.DB(), &items)
 		if err != nil {
 			return domain.Result[domain.ShoppingList]{}, err
 		}
@@ -59,7 +58,8 @@ func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req do
 }
 
 func (s *Store) GetShoppingListByID(ctx context.Context, listID int64) (domain.ShoppingList, error) {
-	row, err := s.query().GetShoppingListByID(ctx, listID)
+	var row model.ShoppingList
+	err := queries.SelectShoppingListByID(listID).Query(s.DB(), &row)
 	if err != nil {
 		return domain.ShoppingList{}, err
 	}
@@ -70,7 +70,8 @@ func (s *Store) GetShoppingListByID(ctx context.Context, listID int64) (domain.S
 		Name:   row.Name,
 	}
 
-	items, err := s.query().GetShoppingListItemsByListID(ctx, listID)
+	var items []model.ShoppingListItem
+	err = queries.SelectShoppingListItems(listID).Query(s.DB(), &items)
 	if err != nil {
 		return domain.ShoppingList{}, err
 	}
@@ -79,8 +80,8 @@ func (s *Store) GetShoppingListByID(ctx context.Context, listID int64) (domain.S
 		list.Items = append(list.Items, domain.ShoppingListItem{
 			ID:         item.ID,
 			Ingredient: item.Ingredient,
-			Quantity:   (item.Quantity),
-			Unit:       (item.Unit),
+			Quantity:   item.Quantity,
+			Unit:       item.Unit,
 			Done:       item.Done,
 			SortOrder:  item.SortOrder,
 		})
@@ -90,10 +91,8 @@ func (s *Store) GetShoppingListByID(ctx context.Context, listID int64) (domain.S
 }
 
 func (s *Store) CreateShoppingList(ctx context.Context, userID int64, name string) (domain.ShoppingList, error) {
-	row, err := s.query().CreateShoppingList(ctx, database.CreateShoppingListParams{
-		UserID: userID,
-		Name:   name,
-	})
+	var row model.ShoppingList
+	err := queries.InsertShoppingList(userID, name).Query(s.DB(), &row)
 	if err != nil {
 		return domain.ShoppingList{}, err
 	}
@@ -107,30 +106,22 @@ func (s *Store) CreateShoppingList(ctx context.Context, userID int64, name strin
 }
 
 func (s *Store) UpdateShoppingList(ctx context.Context, listID int64, name string) (domain.ShoppingList, error) {
-	row, err := s.query().UpdateShoppingList(ctx, database.UpdateShoppingListParams{
-		Name: name,
-		ID:   listID,
-	})
+	_, err := queries.UpdateShoppingList(listID, name).Exec(s.DB())
 	if err != nil {
 		return domain.ShoppingList{}, err
 	}
 
-	return s.GetShoppingListByID(ctx, row.ID)
+	return s.GetShoppingListByID(ctx, listID)
 }
 
 func (s *Store) DeleteShoppingList(ctx context.Context, listID int64) error {
-	return s.query().DeleteShoppingList(ctx, listID)
+	_, err := queries.DeleteShoppingList(listID).Exec(s.DB())
+	return err
 }
 
 func (s *Store) CreateShoppingListItem(ctx context.Context, listID int64, item domain.ShoppingListItem) (domain.ShoppingListItem, error) {
-	row, err := s.query().CreateShoppingListItem(ctx, database.CreateShoppingListItemParams{
-		ShoppingListID: listID,
-		Ingredient:     item.Ingredient,
-		Quantity:       item.Quantity,
-		Unit:           item.Unit,
-		Done:           item.Done,
-		SortOrder:      item.SortOrder,
-	})
+	var row model.ShoppingListItem
+	err := queries.InsertShoppingListItem(listID, item.Ingredient, item.Quantity, item.Unit, item.Done, item.SortOrder).Query(s.DB(), &row)
 	if err != nil {
 		return domain.ShoppingListItem{}, err
 	}
@@ -138,21 +129,21 @@ func (s *Store) CreateShoppingListItem(ctx context.Context, listID int64, item d
 	return domain.ShoppingListItem{
 		ID:         row.ID,
 		Ingredient: row.Ingredient,
-		Quantity:   (row.Quantity),
-		Unit:       (row.Unit),
+		Quantity:   row.Quantity,
+		Unit:       row.Unit,
 		Done:       row.Done,
 		SortOrder:  row.SortOrder,
 	}, nil
 }
 
 func (s *Store) UpdateShoppingListItem(ctx context.Context, itemID int64, item domain.ShoppingListItem) (domain.ShoppingListItem, error) {
-	row, err := s.query().UpdateShoppingListItem(ctx, database.UpdateShoppingListItemParams{
-		Ingredient: item.Ingredient,
-		Quantity:   item.Quantity,
-		Unit:       item.Unit,
-		Done:       item.Done,
-		ID:         itemID,
-	})
+	_, err := queries.UpdateShoppingListItem(itemID, item.Ingredient, item.Quantity, item.Unit, item.Done).Exec(s.DB())
+	if err != nil {
+		return domain.ShoppingListItem{}, err
+	}
+
+	var row model.ShoppingListItem
+	err = queries.SelectShoppingListItemByID(itemID).Query(s.DB(), &row)
 	if err != nil {
 		return domain.ShoppingListItem{}, err
 	}
@@ -160,13 +151,14 @@ func (s *Store) UpdateShoppingListItem(ctx context.Context, itemID int64, item d
 	return domain.ShoppingListItem{
 		ID:         row.ID,
 		Ingredient: row.Ingredient,
-		Quantity:   (row.Quantity),
-		Unit:       (row.Unit),
+		Quantity:   row.Quantity,
+		Unit:       row.Unit,
 		Done:       row.Done,
 		SortOrder:  row.SortOrder,
 	}, nil
 }
 
 func (s *Store) DeleteShoppingListItem(ctx context.Context, itemID int64) error {
-	return s.query().DeleteShoppingListItem(ctx, itemID)
+	_, err := queries.DeleteShoppingListItem(itemID).Exec(s.DB())
+	return err
 }

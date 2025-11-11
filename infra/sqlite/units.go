@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/wolfsblu/recipe-manager/domain"
-	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/gen/model"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/queries"
 )
 
 func (s *Store) GetUnits(ctx context.Context, req domain.Page) (domain.Result[domain.Unit], error) {
@@ -12,11 +13,9 @@ func (s *Store) GetUnits(ctx context.Context, req domain.Page) (domain.Result[do
 	if err != nil {
 		cursor = &domain.NameCursor{}
 	}
-	result, err := s.query().GetUnits(ctx, database.GetUnitsParams{
-		LastName: cursor.LastName,
-		LastID:   cursor.LastID,
-		Limit:    int64(req.Limit + 1),
-	})
+
+	var result []model.Unit
+	err = queries.SelectUnits(cursor.LastID, cursor.LastName, int64(req.Limit+1)).Query(s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.Unit]{}, err
 	}
@@ -35,28 +34,25 @@ func (s *Store) GetUnits(ctx context.Context, req domain.Page) (domain.Result[do
 }
 
 func (s *Store) CreateUnit(ctx context.Context, unit domain.Unit) (domain.Unit, error) {
-	id, err := s.query().CreateUnit(ctx, database.CreateUnitParams{
-		Name:   unit.Name,
-		Symbol: unit.Symbol,
-	})
+	var result model.Unit
+	err := queries.InsertUnit(unit.Name, unit.Symbol).Query(s.DB(), &result)
 	if err != nil {
 		return domain.Unit{}, err
 	}
+
 	return domain.Unit{
-		ID:     id,
-		Name:   unit.Name,
-		Symbol: unit.Symbol,
+		ID:     result.ID,
+		Name:   result.Name,
+		Symbol: result.Symbol,
 	}, nil
 }
 
 func (s *Store) UpdateUnit(ctx context.Context, unit domain.Unit) error {
-	return s.query().UpdateUnit(ctx, database.UpdateUnitParams{
-		Name:   unit.Name,
-		Symbol: unit.Symbol,
-		ID:     unit.ID,
-	})
+	_, err := queries.UpdateUnit(unit.ID, unit.Name, unit.Symbol).Exec(s.DB())
+	return err
 }
 
 func (s *Store) DeleteUnit(ctx context.Context, id int64) error {
-	return s.query().DeleteUnit(ctx, id)
+	_, err := queries.DeleteUnit(id).Exec(s.DB())
+	return err
 }

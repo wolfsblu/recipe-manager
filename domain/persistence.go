@@ -15,7 +15,7 @@ type RecipeStore interface {
 	GetUnits(ctx context.Context, page Page) (Result[Unit], error)
 	GetTags(ctx context.Context, page Page) (Result[Tag], error)
 	GetRecipeById(ctx context.Context, user *User, id int64) (Recipe, error)
-	GetRecipesByUser(ctx context.Context, user *User, page Page) (Result[Recipe], error)
+	GetRecipesByUser(ctx context.Context, user *User, page Page, sort RecipeSort) (Result[Recipe], error)
 	UpdateRecipe(ctx context.Context, recipe Recipe) (Recipe, error)
 	CreateIngredient(ctx context.Context, ingredient Ingredient) (Ingredient, error)
 	UpdateIngredient(ctx context.Context, ingredient Ingredient) (Ingredient, error)

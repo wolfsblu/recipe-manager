@@ -52,8 +52,9 @@ func (s *RecipeService) Delete(ctx context.Context, user *User, id int64) error 
 	return s.store.DeleteRecipe(ctx, id)
 }
 
-func (s *RecipeService) GetByUser(ctx context.Context, user *User, page Page) (Result[Recipe], error) {
-	return s.store.GetRecipesByUser(ctx, user, page)
+func (s *RecipeService) GetByUser(ctx context.Context, user *User, page Page, sort RecipeSort) (Result[Recipe], error) {
+	// NewRecipeSort already validates and applies defaults
+	return s.store.GetRecipesByUser(ctx, user, page, sort)
 }
 
 func (s *RecipeService) GetById(ctx context.Context, user *User, id int64) (Recipe, error) {

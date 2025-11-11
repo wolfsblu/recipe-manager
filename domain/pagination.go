@@ -43,11 +43,93 @@ type DateCursor struct {
 	LastDate time.Time `json:"date"`
 }
 
+type RecipeCursor struct {
+	LastID        int64     `json:"id"`
+	LastName      string    `json:"name,omitempty"`
+	LastCreatedAt time.Time `json:"created_at,omitempty"`
+	LastServings  int64     `json:"servings,omitempty"`
+}
+
+type SortField string
+
+const (
+	SortFieldName      SortField = "name"
+	SortFieldCreatedAt SortField = "created_at"
+	SortFieldServings  SortField = "servings"
+)
+
+type SortOrder string
+
+const (
+	SortOrderAsc  SortOrder = "asc"
+	SortOrderDesc SortOrder = "desc"
+)
+
+// RecipeSort combines sort field and order
+type RecipeSort struct {
+	Field SortField
+	Order SortOrder
+}
+
 func NewDescendingDateCursor() *DateCursor {
 	return &DateCursor{
 		LastID:   math.MaxInt64,
 		LastDate: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
 	}
+}
+
+func NewDescendingRecipeCursorByCreatedAt() *RecipeCursor {
+	return &RecipeCursor{
+		LastID:        math.MaxInt64,
+		LastCreatedAt: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
+	}
+}
+
+func NewDescendingRecipeCursorByName() *RecipeCursor {
+	return &RecipeCursor{
+		LastID:   math.MaxInt64,
+		LastName: string(rune(0x10FFFF)), // Max unicode character
+	}
+}
+
+func NewDescendingRecipeCursorByServings() *RecipeCursor {
+	return &RecipeCursor{
+		LastID:       math.MaxInt64,
+		LastServings: math.MaxInt64,
+	}
+}
+
+// IsValid checks if a SortField value is valid
+func (f SortField) IsValid() bool {
+	switch f {
+	case SortFieldName, SortFieldCreatedAt, SortFieldServings:
+		return true
+	default:
+		return false
+	}
+}
+
+// IsValid checks if a SortOrder value is valid
+func (o SortOrder) IsValid() bool {
+	switch o {
+	case SortOrderAsc, SortOrderDesc:
+		return true
+	default:
+		return false
+	}
+}
+
+// NewRecipeSort creates a RecipeSort with defaults if invalid values provided
+func NewRecipeSort(field SortField, order SortOrder) RecipeSort {
+	// Default to created_at if invalid
+	if !field.IsValid() {
+		field = SortFieldCreatedAt
+	}
+	// Default to desc if invalid
+	if !order.IsValid() {
+		order = SortOrderDesc
+	}
+	return RecipeSort{Field: field, Order: order}
 }
 
 // EncodeCursor creates a base64-encoded cursor from the last item ID

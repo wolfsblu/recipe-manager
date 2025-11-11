@@ -4,20 +4,18 @@ import (
 	"context"
 
 	"github.com/wolfsblu/recipe-manager/domain"
-	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/gen/model"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/queries"
 )
 
 func (s *Store) GetIngredients(ctx context.Context, page domain.Page) (domain.Result[domain.Ingredient], error) {
 	cursor, err := domain.DecodeCursor[*domain.NameCursor](page.Cursor)
 	if err != nil {
-		// Empty cursor is valid for first page
 		cursor = &domain.NameCursor{}
 	}
-	result, err := s.query().GetIngredients(ctx, database.GetIngredientsParams{
-		LastName: cursor.LastName,
-		LastID:   cursor.LastID,
-		Limit:    int64(page.Limit + 1),
-	})
+
+	var result []model.Ingredient
+	err = queries.SelectIngredients(cursor.LastID, cursor.LastName, int64(page.Limit+1)).Query(s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.Ingredient]{}, err
 	}
@@ -27,7 +25,6 @@ func (s *Store) GetIngredients(ctx context.Context, page domain.Page) (domain.Re
 		ingredients[i] = s.mapper.ToIngredient(ingredient)
 	}
 
-	// Populate nutrients before creating paginated result
 	populatedIngredients, err := s.populateIngredientNutrients(ctx, ingredients)
 	if err != nil {
 		return domain.Result[domain.Ingredient]{}, err
@@ -51,12 +48,17 @@ func (s *Store) populateIngredientNutrients(ctx context.Context, ingredients []d
 		ingredientIDs[i] = ing.ID
 	}
 
-	nutrients, err := s.query().GetNutrientsForIngredients(ctx, ingredientIDs)
+	type NutrientRow struct {
+		IngredientID int64
+		Nutrient     model.Nutrient
+		Amount       float64
+	}
+	var nutrients []NutrientRow
+	err := queries.SelectNutrientsForIngredients(ingredientIDs).Query(s.DB(), &nutrients)
 	if err != nil {
 		return nil, err
 	}
 
-	// Group nutrients by ingredient ID
 	nutrientsByIngredient := make(map[int64][]domain.IngredientNutrient)
 	for _, nutrient := range nutrients {
 		nutrientsByIngredient[nutrient.IngredientID] = append(
@@ -68,7 +70,6 @@ func (s *Store) populateIngredientNutrients(ctx context.Context, ingredients []d
 		)
 	}
 
-	// Assign nutrients to ingredients
 	populatedIngredients := make([]domain.Ingredient, len(ingredients))
 	for i, ingredient := range ingredients {
 		ingredient.Nutrients = nutrientsByIngredient[ingredient.ID]
@@ -84,14 +85,15 @@ func (s *Store) populateIngredientNutrients(ctx context.Context, ingredients []d
 func (s *Store) CreateIngredient(ctx context.Context, ingredient domain.Ingredient) (domain.Ingredient, error) {
 	var id int64
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
-		var err error
-		id, err = tx.query().CreateIngredient(ctx, ingredient.Name)
+		var result model.Ingredient
+		err := queries.InsertIngredient(ingredient.Name).Query(tx.DB(), &result)
 		if err != nil {
 			return err
 		}
+		id = result.ID
 
 		for _, nutrient := range ingredient.Nutrients {
-			err = tx.query().AddIngredientNutrient(ctx, tx.mapper.FromIngredientNutrient(id, nutrient))
+			_, err = queries.InsertIngredientNutrient(id, nutrient.Nutrient.ID, nutrient.Amount).Exec(tx.DB())
 			if err != nil {
 				return err
 			}
@@ -111,22 +113,18 @@ func (s *Store) CreateIngredient(ctx context.Context, ingredient domain.Ingredie
 
 func (s *Store) UpdateIngredient(ctx context.Context, ingredient domain.Ingredient) (domain.Ingredient, error) {
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
-		err := tx.query().UpdateIngredient(ctx, database.UpdateIngredientParams{
-			Name: ingredient.Name,
-			ID:   ingredient.ID,
-		})
+		_, err := queries.UpdateIngredient(ingredient.ID, ingredient.Name).Exec(tx.DB())
 		if err != nil {
 			return err
 		}
 
-		// Delete existing nutrients and add new ones
-		err = tx.query().DeleteIngredientNutrients(ctx, ingredient.ID)
+		_, err = queries.DeleteIngredientNutrients(ingredient.ID).Exec(tx.DB())
 		if err != nil {
 			return err
 		}
 
 		for _, nutrient := range ingredient.Nutrients {
-			err = tx.query().AddIngredientNutrient(ctx, tx.mapper.FromIngredientNutrient(ingredient.ID, nutrient))
+			_, err = queries.InsertIngredientNutrient(ingredient.ID, nutrient.Nutrient.ID, nutrient.Amount).Exec(tx.DB())
 			if err != nil {
 				return err
 			}
@@ -144,5 +142,6 @@ func (s *Store) UpdateIngredient(ctx context.Context, ingredient domain.Ingredie
 }
 
 func (s *Store) DeleteIngredient(ctx context.Context, id int64) error {
-	return s.query().DeleteIngredient(ctx, id)
+	_, err := queries.DeleteIngredient(id).Exec(s.DB())
+	return err
 }

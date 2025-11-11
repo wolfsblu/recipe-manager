@@ -5,14 +5,12 @@ import (
 	"fmt"
 
 	"github.com/wolfsblu/recipe-manager/infra/env"
-	"github.com/wolfsblu/recipe-manager/infra/sqlite/database"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/mapper"
 )
 
 type Store struct {
 	db     *sql.DB
 	path   string
-	q      *database.Queries
 	mapper *mapper.DBMapper
 }
 
@@ -30,7 +28,6 @@ func NewSqliteStore() (*Store, error) {
 		db:     con,
 		mapper: mapper.New(),
 		path:   dbPath,
-		q:      database.New(con),
 	}
 
 	if err := store.migrate(); err != nil {
@@ -48,6 +45,11 @@ func (s *Store) Close() error {
 		return s.db.Close()
 	}
 	return nil
+}
+
+// DB returns the underlying database connection for go-jet queries
+func (s *Store) DB() *sql.DB {
+	return s.db
 }
 
 func connect(path string) (*sql.DB, error) {

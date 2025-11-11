@@ -209,6 +209,8 @@ paths:
       parameters:
         - $ref: '#/components/parameters/CursorParam'
         - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/RecipeSortFieldParam'
+        - $ref: '#/components/parameters/RecipeSortOrderParam'
       responses:
         '200':
           description: Successful operation
@@ -652,6 +654,29 @@ components:
         minimum: 1
         maximum: 100
         default: 30
+    RecipeSortFieldParam:
+      name: sort_field
+      in: query
+      description: Field to sort recipes by
+      required: false
+      schema:
+        type: string
+        enum:
+          - name
+          - created_at
+          - servings
+        default: created_at
+    RecipeSortOrderParam:
+      name: sort_order
+      in: query
+      description: Sort order direction
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        default: desc
   headers:
     SessionCookie:
       description: Sets the session for the logged in user
@@ -698,6 +723,22 @@ components:
           type: string
       required:
         - message
+    Pagination:
+      type: object
+      required:
+        - hasMore
+      properties:
+        nextCursor:
+          type: string
+          nullable: true
+          description: Cursor for fetching the next page (null if no more pages)
+          examples:
+            - eyJpZCI6MTIzfQ==
+        hasMore:
+          type: boolean
+          description: Whether there are more items available
+          examples:
+            - true
     PaginationMetadata:
       type: object
       required:
@@ -714,17 +755,44 @@ components:
           description: Whether there are more items available
           examples:
             - true
+    SortOrder:
+      type: string
+      enum:
+        - asc
+        - desc
+      description: Sort direction
+    RecipeSortField:
+      type: string
+      enum:
+        - name
+        - created_at
+        - servings
+      description: Fields available for sorting recipes
+    RecipeSort:
+      type: object
+      required:
+        - field
+        - order
+      properties:
+        field:
+          $ref: '#/components/schemas/RecipeSortField'
+        order:
+          $ref: '#/components/schemas/SortOrder'
     PaginatedRecipes:
-      allOf:
-        - $ref: '#/components/schemas/PaginationMetadata'
-        - type: object
-          required:
-            - data
-          properties:
-            data:
-              type: array
-              items:
-                $ref: '#/components/schemas/ReadRecipe'
+      type: object
+      required:
+        - data
+        - pagination
+        - sort
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadRecipe'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        sort:
+          $ref: '#/components/schemas/RecipeSort'
     PaginatedIngredients:
       allOf:
         - $ref: '#/components/schemas/PaginationMetadata'

@@ -115,7 +115,12 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context, params api.GetRecipesPar
 		return nil, err
 	}
 
-	result, err := h.Recipes.GetByUser(ctx, user, paginationReq)
+	// Parse sort parameters with defaults
+	sortField := domain.SortField(params.SortField.Or(api.RecipeSortFieldParamCreatedAt))
+	sortOrder := domain.SortOrder(params.SortOrder.Or(api.RecipeSortOrderParamDesc))
+	recipeSort := domain.NewRecipeSort(sortField, sortOrder)
+
+	result, err := h.Recipes.GetByUser(ctx, user, paginationReq, recipeSort)
 	if err != nil {
 		return nil, err
 	}
@@ -130,10 +135,27 @@ func (h *RecipeHandler) GetRecipes(ctx context.Context, params api.GetRecipesPar
 		nextCursor = api.NewOptNilString(*result.NextCursor)
 	}
 
+	// Map domain sort field/order to API response enums
+	sortFieldMap := map[domain.SortField]api.RecipeSortField{
+		domain.SortFieldName:      api.RecipeSortFieldName,
+		domain.SortFieldCreatedAt: api.RecipeSortFieldCreatedAt,
+		domain.SortFieldServings:  api.RecipeSortFieldServings,
+	}
+	sortOrderMap := map[domain.SortOrder]api.SortOrder{
+		domain.SortOrderAsc:  api.SortOrderAsc,
+		domain.SortOrderDesc: api.SortOrderDesc,
+	}
+
 	return &api.PaginatedRecipes{
-		Data:       recipes,
-		NextCursor: nextCursor,
-		HasMore:    result.HasMore,
+		Data: recipes,
+		Pagination: api.Pagination{
+			NextCursor: nextCursor,
+			HasMore:    result.HasMore,
+		},
+		Sort: api.RecipeSort{
+			Field: sortFieldMap[recipeSort.Field],
+			Order: sortOrderMap[recipeSort.Order],
+		},
 	}, nil
 }
 

@@ -381,6 +381,18 @@ export interface components {
         Error: {
             message: string;
         };
+        Pagination: {
+            /**
+             * @description Cursor for fetching the next page (null if no more pages)
+             * @example eyJpZCI6MTIzfQ==
+             */
+            nextCursor?: string | null;
+            /**
+             * @description Whether there are more items available
+             * @example true
+             */
+            hasMore: boolean;
+        };
         PaginationMetadata: {
             /**
              * @description Cursor for fetching the next page (null if no more pages)
@@ -393,8 +405,24 @@ export interface components {
              */
             hasMore: boolean;
         };
-        PaginatedRecipes: components["schemas"]["PaginationMetadata"] & {
+        /**
+         * @description Sort direction
+         * @enum {string}
+         */
+        SortOrder: "asc" | "desc";
+        /**
+         * @description Fields available for sorting recipes
+         * @enum {string}
+         */
+        RecipeSortField: "name" | "created_at" | "servings";
+        RecipeSort: {
+            field: components["schemas"]["RecipeSortField"];
+            order: components["schemas"]["SortOrder"];
+        };
+        PaginatedRecipes: {
             data: components["schemas"]["ReadRecipe"][];
+            pagination: components["schemas"]["Pagination"];
+            sort: components["schemas"]["RecipeSort"];
         };
         PaginatedIngredients: components["schemas"]["PaginationMetadata"] & {
             data: components["schemas"]["Ingredient"][];
@@ -790,6 +818,10 @@ export interface components {
         CursorParam: string;
         /** @description Maximum number of items to return (default 30, max 100) */
         LimitParam: number;
+        /** @description Field to sort recipes by */
+        RecipeSortFieldParam: "name" | "created_at" | "servings";
+        /** @description Sort order direction */
+        RecipeSortOrderParam: "asc" | "desc";
     };
     requestBodies: {
         /** @description User registration credentials */
@@ -1068,6 +1100,10 @@ export interface operations {
                 cursor?: components["parameters"]["CursorParam"];
                 /** @description Maximum number of items to return (default 30, max 100) */
                 limit?: components["parameters"]["LimitParam"];
+                /** @description Field to sort recipes by */
+                sort_field?: components["parameters"]["RecipeSortFieldParam"];
+                /** @description Sort order direction */
+                sort_order?: components["parameters"]["RecipeSortOrderParam"];
             };
             header?: never;
             path?: never;
