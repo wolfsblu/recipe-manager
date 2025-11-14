@@ -91,7 +91,8 @@ func SelectImagesForRecipes(recipeIDs []int64) SelectStatement {
 // InsertRecipe returns an insert statement for a new recipe
 func InsertRecipe(name, description string, servings, minutes, createdBy int64) InsertStatement {
 	return Recipes.INSERT(Recipes.Name, Recipes.Servings, Recipes.Minutes, Recipes.Description, Recipes.CreatedBy).
-		VALUES(name, servings, minutes, description, createdBy)
+		VALUES(name, servings, minutes, description, createdBy).
+		RETURNING(Recipes.AllColumns()...)
 }
 
 // DeleteRecipe returns a delete statement for a recipe
@@ -190,7 +191,8 @@ func SelectMealPlan(userID int64, from, until string, lastDate string, lastID, l
 // InsertRecipeStep returns an insert statement for a recipe step
 func InsertRecipeStep(recipeID int64, instructions string, sortOrder int64) InsertStatement {
 	return RecipeSteps.INSERT(RecipeSteps.RecipeID, RecipeSteps.Instructions, RecipeSteps.SortOrder).
-		VALUES(recipeID, instructions, sortOrder)
+		VALUES(recipeID, instructions, sortOrder).
+		RETURNING(RecipeSteps.AllColumns()...)
 }
 
 // InsertStepIngredient returns an insert statement for a step ingredient

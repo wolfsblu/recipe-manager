@@ -61,8 +61,8 @@ func (s *RecipeService) GetById(ctx context.Context, user *User, id int64) (Reci
 	return s.store.GetRecipeById(ctx, user, id)
 }
 
-func (s *RecipeService) GetIngredients(ctx context.Context, page Page) (Result[Ingredient], error) {
-	return s.store.GetIngredients(ctx, page)
+func (s *RecipeService) GetIngredients(ctx context.Context, filters IngredientFilters) (Result[Ingredient], error) {
+	return s.store.GetIngredients(ctx, filters)
 }
 
 func (s *RecipeService) GetUnits(ctx context.Context, page Page) (Result[Unit], error) {

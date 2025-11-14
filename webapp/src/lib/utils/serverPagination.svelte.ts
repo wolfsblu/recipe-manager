@@ -107,6 +107,14 @@ export function useServerPagination<T>(options: ServerPaginationOptions<T>) {
         return pages.length;
     }
 
+    async function reset() {
+        allItems = [];
+        pages = [];
+        currentPageIndex = 0;
+        hasMore = true;
+        await loadInitialPage();
+    }
+
     return {
         get items() { return allItems; },
         get currentPageData() { return getCurrentPageData(); },
@@ -120,6 +128,7 @@ export function useServerPagination<T>(options: ServerPaginationOptions<T>) {
         loadInitialPage,
         nextPage,
         previousPage,
-        goToFirstPage
+        goToFirstPage,
+        reset
     };
 }

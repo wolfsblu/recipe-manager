@@ -101,20 +101,25 @@ func SelectRegistrationByToken(token string) SelectStatement {
 
 // InsertUser returns an insert statement for a new user
 func InsertUser(email, passwordHash string, roleID int64, locale string) InsertStatement {
-	return Users.INSERT(Users.Email, Users.PasswordHash, Users.RoleID, Users.Locale).
-		VALUES(email, passwordHash, roleID, locale)
+	stmt := Users.INSERT(Users.Email, Users.PasswordHash, Users.RoleID, Users.Locale).
+		VALUES(email, passwordHash, roleID, locale).
+		RETURNING(Users.AllColumns()...)
+	stmt.DebugSql()
+	return stmt
 }
 
 // InsertUserRegistration returns an insert statement for a user registration
 func InsertUserRegistration(userID int64, token string) InsertStatement {
 	return UserRegistrations.INSERT(UserRegistrations.UserID, UserRegistrations.Token).
-		VALUES(userID, token)
+		VALUES(userID, token).
+		RETURNING(UserRegistrations.AllColumns()...)
 }
 
 // InsertPasswordReset returns an insert statement for a password reset
 func InsertPasswordReset(userID int64, token string) InsertStatement {
 	return PasswordResets.INSERT(PasswordResets.UserID, PasswordResets.Token).
-		VALUES(userID, token)
+		VALUES(userID, token).
+		RETURNING(PasswordResets.AllColumns()...)
 }
 
 // UpdateUser returns an update statement for user details

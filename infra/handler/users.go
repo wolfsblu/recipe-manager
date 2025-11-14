@@ -78,6 +78,7 @@ func (h *UserHandler) Register(ctx context.Context, c *api.UserRegistration) err
 	if err != nil {
 		return domain.WrapError(domain.ErrCreatingUser, err)
 	}
+
 	return h.Users.RegisterUser(ctx, domain.UserDetails{
 		Email:        c.Email,
 		PasswordHash: hash,

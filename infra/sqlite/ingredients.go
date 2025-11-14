@@ -8,14 +8,22 @@ import (
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/queries"
 )
 
-func (s *Store) GetIngredients(ctx context.Context, page domain.Page) (domain.Result[domain.Ingredient], error) {
-	cursor, err := domain.DecodeCursor[*domain.NameCursor](page.Cursor)
+func (s *Store) GetIngredients(ctx context.Context, filters domain.IngredientFilters) (domain.Result[domain.Ingredient], error) {
+	// Decode cursor - use NameCursor which has both LastID and LastName
+	cursor, err := domain.DecodeCursor[*domain.NameCursor](filters.Page.Cursor)
 	if err != nil {
 		cursor = &domain.NameCursor{}
 	}
 
 	var result []model.Ingredient
-	err = queries.SelectIngredients(cursor.LastID, cursor.LastName, int64(page.Limit+1)).Query(s.DB(), &result)
+	err = queries.SelectIngredientsPaginated(
+		cursor.LastID,
+		cursor.LastName,
+		int64(filters.Page.Limit+1),
+		filters.SortBy,
+		filters.SortOrder,
+		filters.Search,
+	).Query(s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.Ingredient]{}, err
 	}
@@ -30,7 +38,8 @@ func (s *Store) GetIngredients(ctx context.Context, page domain.Page) (domain.Re
 		return domain.Result[domain.Ingredient]{}, err
 	}
 
-	return domain.NewPagedResult(populatedIngredients, page.Limit, func(i domain.Ingredient) domain.NameCursor {
+	// Always use NameCursor since it has both LastID and LastName fields needed for any sort
+	return domain.NewPagedResult(populatedIngredients, filters.Page.Limit, func(i domain.Ingredient) domain.NameCursor {
 		return domain.NameCursor{
 			LastID:   i.ID,
 			LastName: i.Name,

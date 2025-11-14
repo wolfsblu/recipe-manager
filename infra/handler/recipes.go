@@ -194,7 +194,15 @@ func (h *RecipeHandler) GetIngredients(ctx context.Context, params api.GetIngred
 		return nil, err
 	}
 
-	result, err := h.Recipes.GetIngredients(ctx, paginationReq)
+	// Construct ingredient filters with sort and filter params
+	filters := domain.IngredientFilters{
+		Page:      paginationReq,
+		SortBy:    string(params.SortBy.Or(api.GetIngredientsSortByName)),
+		SortOrder: string(params.SortOrder.Or(api.GetIngredientsSortOrderAsc)),
+		Search:    params.Search.Value,
+	}
+
+	result, err := h.Recipes.GetIngredients(ctx, filters)
 	if err != nil {
 		return nil, err
 	}

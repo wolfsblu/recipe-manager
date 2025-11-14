@@ -61,7 +61,8 @@ func SelectShoppingListItemByID(itemID int64) SelectStatement {
 // InsertShoppingList returns an insert statement for a new shopping list
 func InsertShoppingList(userID int64, name string) InsertStatement {
 	return ShoppingLists.INSERT(ShoppingLists.UserID, ShoppingLists.Name).
-		VALUES(userID, name)
+		VALUES(userID, name).
+		RETURNING(ShoppingLists.AllColumns()...)
 }
 
 // InsertShoppingListItem returns an insert statement for a new shopping list item
@@ -73,7 +74,8 @@ func InsertShoppingListItem(listID int64, ingredient string, quantity, unit *str
 		ShoppingListItems.Unit,
 		ShoppingListItems.Done,
 		ShoppingListItems.SortOrder,
-	).VALUES(listID, ingredient, quantity, unit, done, sortOrder)
+	).VALUES(listID, ingredient, quantity, unit, done, sortOrder).
+		RETURNING(ShoppingListItems.AllColumns()...)
 }
 
 // UpdateShoppingList returns an update statement for a shopping list

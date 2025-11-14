@@ -1,11 +1,20 @@
 import {client} from "$lib/api/client";
 
-export const getIngredients = async (params?: { cursor?: string | null; limit?: number }) => {
+export const getIngredients = async (params?: {
+    cursor?: string | null;
+    limit?: number;
+    sortBy?: "name" | "id";
+    sortOrder?: "asc" | "desc";
+    search?: string;
+}) => {
     const response = await client.GET("/ingredients", {
         params: {
             query: {
                 cursor: params?.cursor ?? undefined,
-                limit: params?.limit ?? undefined
+                limit: params?.limit ?? undefined,
+                sortBy: params?.sortBy ?? undefined,
+                sortOrder: params?.sortOrder ?? undefined,
+                search: params?.search ?? undefined
             }
         }
     })
