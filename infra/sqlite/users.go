@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/wolfsblu/recipe-manager/domain"
@@ -15,7 +16,7 @@ func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User)
 	generatedToken := security.GenerateToken(security.DefaultTokenLength)
 
 	var result model.PasswordReset
-	err := queries.InsertPasswordReset(user.ID, generatedToken).Query(s.DB(), &result)
+	err := queries.InsertPasswordReset(user.ID, generatedToken).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return token, domain.WrapError(domain.ErrCreatingPasswordResetToken, err)
 	}
@@ -26,18 +27,18 @@ func (s *Store) CreatePasswordResetToken(ctx context.Context, user *domain.User)
 }
 
 func (s *Store) DeletePasswordResetsBefore(ctx context.Context, before time.Time) error {
-	_, err := queries.DeletePasswordResetsBefore(before).Exec(s.DB())
+	_, err := queries.DeletePasswordResetsBefore(before).ExecContext(ctx, s.DB())
 	return err
 }
 
 func (s *Store) DeleteRegistrationsBefore(ctx context.Context, before time.Time) error {
-	_, err := queries.DeleteRegistrationsBefore(before).Exec(s.DB())
+	_, err := queries.DeleteRegistrationsBefore(before).ExecContext(ctx, s.DB())
 	return err
 }
 
 func (s *Store) GetPasswordResetTokenByUser(ctx context.Context, user *domain.User) (token domain.PasswordResetToken, _ error) {
 	var result model.PasswordReset
-	err := queries.SelectPasswordResetByUser(user.ID).Query(s.DB(), &result)
+	err := queries.SelectPasswordResetByUser(user.ID).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return token, domain.WrapError(domain.ErrPasswordResetTokenNotFound, err)
 	}
@@ -52,7 +53,7 @@ func (s *Store) GetRegistrationByToken(ctx context.Context, token string) (regis
 		User             model.User
 	}
 	var result ResultRow
-	err := queries.SelectRegistrationByToken(token).Query(s.DB(), &result)
+	err := queries.SelectRegistrationByToken(token).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return registration, domain.WrapError(domain.ErrRegistrationNotFound, err)
 	}
@@ -64,7 +65,11 @@ func (s *Store) GetRegistrationByToken(ctx context.Context, token string) (regis
 
 func (s *Store) GetUserByEmail(ctx context.Context, email string) (user domain.User, _ error) {
 	var result model.User
-	err := queries.SelectUserByEmail(email).Query(s.DB(), &result)
+	log.Println(email)
+	stmt := queries.SelectUserByEmail(email)
+	log.Println(stmt.DebugSql())
+	err := stmt.QueryContext(ctx, s.DB(), &result)
+
 	if err != nil {
 		return user, domain.WrapError(domain.ErrUserNotFound, err)
 	}
@@ -79,7 +84,7 @@ func (s *Store) GetUserById(ctx context.Context, id int64) (user domain.User, _ 
 		}
 	}
 	var result ResultRow
-	err := queries.SelectUserByID(id).Query(s.DB(), &result)
+	err := queries.SelectUserByID(id).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return user, domain.WrapError(domain.ErrUserNotFound, err)
 	}
@@ -91,7 +96,7 @@ func (s *Store) GetUserById(ctx context.Context, id int64) (user domain.User, _ 
 
 	// Get permissions
 	var permissions []model.Permission
-	err = queries.SelectPermissionsByRole(result.User.RoleID).Query(s.DB(), &permissions)
+	err = queries.SelectPermissionsByRole(result.User.RoleID).QueryContext(ctx, s.DB(), &permissions)
 	if err != nil {
 		return user, err
 	}
@@ -112,17 +117,17 @@ func (s *Store) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPa
 			User          model.User
 		}
 		var result ResultRow
-		err := queries.SelectPasswordResetByToken(searchToken).Query(tx.DB(), &result)
+		err := queries.SelectPasswordResetByToken(searchToken).QueryContext(ctx, tx.DB(), &result)
 		if err != nil {
 			return domain.WrapError(domain.ErrPasswordResetTokenNotFound, err)
 		}
 
-		_, err = queries.UpdatePassword(result.User.ID, hashedPassword).Exec(tx.DB())
+		_, err = queries.UpdatePassword(result.User.ID, hashedPassword).ExecContext(ctx, tx.DB())
 		if err != nil {
 			return domain.WrapError(domain.ErrUpdatingPassword, err)
 		}
 
-		_, err = queries.DeletePasswordReset(result.User.ID).Exec(tx.DB())
+		_, err = queries.DeletePasswordReset(result.User.ID).ExecContext(ctx, tx.DB())
 		if err != nil {
 			return domain.WrapError(domain.ErrDeletingPasswordResetToken, err)
 		}
@@ -133,12 +138,12 @@ func (s *Store) UpdatePasswordByToken(ctx context.Context, searchToken, hashedPa
 
 func (s *Store) ConfirmRegistration(ctx context.Context, user *domain.User) error {
 	return s.WithTransaction(ctx, func(tx *TxStore) error {
-		_, err := queries.UpdateUser(user.ID, user.Email, user.Confirmed).Exec(tx.DB())
+		_, err := queries.UpdateUser(user.ID, user.Email, user.Confirmed).ExecContext(ctx, tx.DB())
 		if err != nil {
 			return domain.WrapError(domain.ErrUpdatingUser, err)
 		}
 
-		_, err = queries.DeleteRegistration(user.ID).Exec(tx.DB())
+		_, err = queries.DeleteRegistration(user.ID).ExecContext(ctx, tx.DB())
 		if err != nil {
 			return domain.WrapError(domain.ErrDeletingRegistration, err)
 		}
@@ -154,7 +159,7 @@ func (s *Store) RegisterUser(ctx context.Context, userDetails domain.UserDetails
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
 		var dbUser model.User
 		err := queries.InsertUser(userDetails.Email, userDetails.PasswordHash, int64(roles.User), userDetails.Locale).
-			Query(tx.DB(), &dbUser)
+			QueryContext(ctx, tx.DB(), &dbUser)
 		if err != nil {
 			return err
 		}
@@ -162,7 +167,7 @@ func (s *Store) RegisterUser(ctx context.Context, userDetails domain.UserDetails
 
 		generatedToken := security.GenerateToken(security.DefaultTokenLength)
 		var dbRegistration model.UserRegistration
-		err = queries.InsertUserRegistration(user.ID, generatedToken).Query(tx.DB(), &dbRegistration)
+		err = queries.InsertUserRegistration(user.ID, generatedToken).QueryContext(ctx, tx.DB(), &dbRegistration)
 		if err != nil {
 			return err
 		}

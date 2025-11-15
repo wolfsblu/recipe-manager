@@ -16,7 +16,7 @@ func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req do
 	}
 
 	var result []model.ShoppingList
-	err = queries.SelectShoppingListsByUser(userID, cursor.LastID, cursor.LastName, int64(req.Limit+1)).Query(s.DB(), &result)
+	err = queries.SelectShoppingListsByUser(userID, cursor.LastID, cursor.LastName, int64(req.Limit+1)).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.ShoppingList]{}, err
 	}
@@ -30,7 +30,7 @@ func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req do
 		}
 
 		var items []model.ShoppingListItem
-		err = queries.SelectShoppingListItems(row.ID).Query(s.DB(), &items)
+		err = queries.SelectShoppingListItems(row.ID).QueryContext(ctx, s.DB(), &items)
 		if err != nil {
 			return domain.Result[domain.ShoppingList]{}, err
 		}
@@ -59,7 +59,7 @@ func (s *Store) GetShoppingListsByUser(ctx context.Context, userID int64, req do
 
 func (s *Store) GetShoppingListByID(ctx context.Context, listID int64) (domain.ShoppingList, error) {
 	var row model.ShoppingList
-	err := queries.SelectShoppingListByID(listID).Query(s.DB(), &row)
+	err := queries.SelectShoppingListByID(listID).QueryContext(ctx, s.DB(), &row)
 	if err != nil {
 		return domain.ShoppingList{}, err
 	}
@@ -71,7 +71,7 @@ func (s *Store) GetShoppingListByID(ctx context.Context, listID int64) (domain.S
 	}
 
 	var items []model.ShoppingListItem
-	err = queries.SelectShoppingListItems(listID).Query(s.DB(), &items)
+	err = queries.SelectShoppingListItems(listID).QueryContext(ctx, s.DB(), &items)
 	if err != nil {
 		return domain.ShoppingList{}, err
 	}
@@ -92,7 +92,7 @@ func (s *Store) GetShoppingListByID(ctx context.Context, listID int64) (domain.S
 
 func (s *Store) CreateShoppingList(ctx context.Context, userID int64, name string) (domain.ShoppingList, error) {
 	var row model.ShoppingList
-	err := queries.InsertShoppingList(userID, name).Query(s.DB(), &row)
+	err := queries.InsertShoppingList(userID, name).QueryContext(ctx, s.DB(), &row)
 	if err != nil {
 		return domain.ShoppingList{}, err
 	}
@@ -106,7 +106,7 @@ func (s *Store) CreateShoppingList(ctx context.Context, userID int64, name strin
 }
 
 func (s *Store) UpdateShoppingList(ctx context.Context, listID int64, name string) (domain.ShoppingList, error) {
-	_, err := queries.UpdateShoppingList(listID, name).Exec(s.DB())
+	_, err := queries.UpdateShoppingList(listID, name).ExecContext(ctx, s.DB())
 	if err != nil {
 		return domain.ShoppingList{}, err
 	}
@@ -115,13 +115,13 @@ func (s *Store) UpdateShoppingList(ctx context.Context, listID int64, name strin
 }
 
 func (s *Store) DeleteShoppingList(ctx context.Context, listID int64) error {
-	_, err := queries.DeleteShoppingList(listID).Exec(s.DB())
+	_, err := queries.DeleteShoppingList(listID).ExecContext(ctx, s.DB())
 	return err
 }
 
 func (s *Store) CreateShoppingListItem(ctx context.Context, listID int64, item domain.ShoppingListItem) (domain.ShoppingListItem, error) {
 	var row model.ShoppingListItem
-	err := queries.InsertShoppingListItem(listID, item.Ingredient, item.Quantity, item.Unit, item.Done, item.SortOrder).Query(s.DB(), &row)
+	err := queries.InsertShoppingListItem(listID, item.Ingredient, item.Quantity, item.Unit, item.Done, item.SortOrder).QueryContext(ctx, s.DB(), &row)
 	if err != nil {
 		return domain.ShoppingListItem{}, err
 	}
@@ -137,13 +137,13 @@ func (s *Store) CreateShoppingListItem(ctx context.Context, listID int64, item d
 }
 
 func (s *Store) UpdateShoppingListItem(ctx context.Context, itemID int64, item domain.ShoppingListItem) (domain.ShoppingListItem, error) {
-	_, err := queries.UpdateShoppingListItem(itemID, item.Ingredient, item.Quantity, item.Unit, item.Done).Exec(s.DB())
+	_, err := queries.UpdateShoppingListItem(itemID, item.Ingredient, item.Quantity, item.Unit, item.Done).ExecContext(ctx, s.DB())
 	if err != nil {
 		return domain.ShoppingListItem{}, err
 	}
 
 	var row model.ShoppingListItem
-	err = queries.SelectShoppingListItemByID(itemID).Query(s.DB(), &row)
+	err = queries.SelectShoppingListItemByID(itemID).QueryContext(ctx, s.DB(), &row)
 	if err != nil {
 		return domain.ShoppingListItem{}, err
 	}
@@ -159,6 +159,6 @@ func (s *Store) UpdateShoppingListItem(ctx context.Context, itemID int64, item d
 }
 
 func (s *Store) DeleteShoppingListItem(ctx context.Context, itemID int64) error {
-	_, err := queries.DeleteShoppingListItem(itemID).Exec(s.DB())
+	_, err := queries.DeleteShoppingListItem(itemID).ExecContext(ctx, s.DB())
 	return err
 }

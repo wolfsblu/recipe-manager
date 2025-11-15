@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/go-jet/jet/v2/qrm"
 	"github.com/wolfsblu/recipe-manager/infra/env"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/mapper"
 )
@@ -34,6 +35,8 @@ func NewSqliteStore() (*Store, error) {
 		_ = con.Close()
 		return nil, err
 	}
+
+	qrm.GlobalConfig.StrictScan = true
 
 	return store, nil
 }

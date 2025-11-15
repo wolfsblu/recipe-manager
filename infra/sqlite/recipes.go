@@ -49,7 +49,7 @@ func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 	var recipeId int64
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
 		var result model.Recipe
-		err := queries.InsertRecipe(recipe.Name, recipe.Description, recipe.Servings, recipe.Minutes, recipe.CreatedBy.ID).Query(tx.DB(), &result)
+		err := queries.InsertRecipe(recipe.Name, recipe.Description, recipe.Servings, recipe.Minutes, recipe.CreatedBy.ID).QueryContext(ctx, tx.DB(), &result)
 		if err != nil {
 			return err
 		}
@@ -75,7 +75,7 @@ func (s *Store) CreateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 func (s *Store) createRecipeSteps(ctx context.Context, recipeID int64, steps []domain.RecipeStep) error {
 	for i, step := range steps {
 		var result model.RecipeStep
-		err := queries.InsertRecipeStep(recipeID, step.Instructions, int64(i)).Query(s.DB(), &result)
+		err := queries.InsertRecipeStep(recipeID, step.Instructions, int64(i)).QueryContext(ctx, s.DB(), &result)
 		if err != nil {
 			return err
 		}
@@ -89,7 +89,7 @@ func (s *Store) createRecipeSteps(ctx context.Context, recipeID int64, steps []d
 
 func (s *Store) createStepIngredients(ctx context.Context, stepID int64, ingredients []domain.StepIngredient) error {
 	for i, ingredient := range ingredients {
-		_, err := queries.InsertStepIngredient(stepID, ingredient.Ingredient.ID, ingredient.Unit.ID, ingredient.Amount, int64(i)).Exec(s.DB())
+		_, err := queries.InsertStepIngredient(stepID, ingredient.Ingredient.ID, ingredient.Unit.ID, ingredient.Amount, int64(i)).ExecContext(ctx, s.DB())
 		if err != nil {
 			return err
 		}
@@ -99,7 +99,7 @@ func (s *Store) createStepIngredients(ctx context.Context, stepID int64, ingredi
 
 func (s *Store) createRecipeImages(ctx context.Context, recipeID int64, images []domain.RecipeImage) error {
 	for i, image := range images {
-		_, err := queries.InsertRecipeImage(recipeID, image.URL.String(), int64(i)).Exec(s.DB())
+		_, err := queries.InsertRecipeImage(recipeID, image.URL.String(), int64(i)).ExecContext(ctx, s.DB())
 		if err != nil {
 			return err
 		}
@@ -109,7 +109,7 @@ func (s *Store) createRecipeImages(ctx context.Context, recipeID int64, images [
 
 func (s *Store) createRecipeTags(ctx context.Context, recipeID int64, tags []domain.Tag) error {
 	for _, tag := range tags {
-		_, err := queries.InsertRecipeTag(recipeID, tag.ID).Exec(s.DB())
+		_, err := queries.InsertRecipeTag(recipeID, tag.ID).ExecContext(ctx, s.DB())
 		if err != nil {
 			return err
 		}
@@ -118,17 +118,17 @@ func (s *Store) createRecipeTags(ctx context.Context, recipeID int64, tags []dom
 }
 
 func (s *Store) DeleteRecipe(ctx context.Context, id int64) error {
-	_, err := queries.DeleteRecipe(id).Exec(s.DB())
+	_, err := queries.DeleteRecipe(id).ExecContext(ctx, s.DB())
 	return err
 }
 
 func (s *Store) CreateMealPlan(ctx context.Context, entry domain.MealPlanEntry) error {
-	_, err := queries.InsertMealPlan(entry.Date.Format(time.DateOnly), entry.UserID, entry.RecipeID, entry.SortOrder).Exec(s.DB())
+	_, err := queries.InsertMealPlan(entry.Date.Format(time.DateOnly), entry.UserID, entry.RecipeID, entry.SortOrder).ExecContext(ctx, s.DB())
 	return err
 }
 
 func (s *Store) DeleteMealPlan(ctx context.Context, userID int64, recipeID int64, date time.Time) error {
-	_, err := queries.DeleteMealPlan(userID, recipeID, date.Format(time.DateOnly)).Exec(s.DB())
+	_, err := queries.DeleteMealPlan(userID, recipeID, date.Format(time.DateOnly)).ExecContext(ctx, s.DB())
 	return err
 }
 
@@ -147,7 +147,7 @@ func (s *Store) GetMealPlan(ctx context.Context, user *domain.User, from time.Ti
 		Recipe   model.Recipe
 	}
 	var results []ResultRow
-	err = queries.SelectMealPlan(user.ID, from.Format(time.DateOnly), until.Format(time.DateOnly), lastDate, cursor.LastID, int64(page.Limit+1)).Query(s.DB(), &results)
+	err = queries.SelectMealPlan(user.ID, from.Format(time.DateOnly), until.Format(time.DateOnly), lastDate, cursor.LastID, int64(page.Limit+1)).QueryContext(ctx, s.DB(), &results)
 	if err != nil {
 		return domain.Result[domain.MealPlan]{}, err
 	}
@@ -248,7 +248,7 @@ func (s *Store) GetTags(ctx context.Context, req domain.Page) (domain.Result[dom
 	}
 
 	var result []model.Tag
-	err = queries.SelectTags(cursor.LastID, cursor.LastName, int64(req.Limit+1)).Query(s.DB(), &result)
+	err = queries.SelectTags(cursor.LastID, cursor.LastName, int64(req.Limit+1)).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.Tag]{}, err
 	}
@@ -268,7 +268,7 @@ func (s *Store) GetTags(ctx context.Context, req domain.Page) (domain.Result[dom
 
 func (s *Store) GetRecipeById(ctx context.Context, user *domain.User, id int64) (recipe domain.Recipe, _ error) {
 	var result model.Recipe
-	err := queries.SelectRecipeByID(id).Query(s.DB(), &result)
+	err := queries.SelectRecipeByID(id).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return recipe, err
 	}
@@ -339,7 +339,7 @@ func (s *Store) listRecipesBySortOrder(ctx context.Context, userID int64, cursor
 	}
 
 	var results []model.Recipe
-	err := queries.SelectRecipesByUserPaginated(userID, recipeCursor, limit, string(sortConfig.Field), string(sortConfig.Order)).Query(s.DB(), &results)
+	err := queries.SelectRecipesByUserPaginated(userID, recipeCursor, limit, string(sortConfig.Field), string(sortConfig.Order)).QueryContext(ctx, s.DB(), &results)
 	return results, err
 }
 
@@ -379,31 +379,31 @@ func (s *Store) populateRecipeRelations(ctx context.Context, recipes []domain.Re
 
 func (s *Store) getRecipeRelations(ctx context.Context, recipeIds []int64) (*recipeRelations, error) {
 	var tags []recipeTag
-	err := queries.SelectTagsForRecipes(recipeIds).Query(s.DB(), &tags)
+	err := queries.SelectTagsForRecipes(recipeIds).QueryContext(ctx, s.DB(), &tags)
 	if err != nil {
 		return nil, err
 	}
 
 	var images []recipeImage
-	err = queries.SelectImagesForRecipes(recipeIds).Query(s.DB(), &images)
+	err = queries.SelectImagesForRecipes(recipeIds).QueryContext(ctx, s.DB(), &images)
 	if err != nil {
 		return nil, err
 	}
 
 	var steps []recipeStep
-	err = queries.SelectStepsForRecipes(recipeIds).Query(s.DB(), &steps)
+	err = queries.SelectStepsForRecipes(recipeIds).QueryContext(ctx, s.DB(), &steps)
 	if err != nil {
 		return nil, err
 	}
 
 	var ingredients []recipeIngredient
-	err = queries.SelectIngredientsForRecipes(recipeIds).Query(s.DB(), &ingredients)
+	err = queries.SelectIngredientsForRecipes(recipeIds).QueryContext(ctx, s.DB(), &ingredients)
 	if err != nil {
 		return nil, err
 	}
 
 	var nutrients []ingredientNutrient
-	err = queries.SelectNutrientsForRecipes(recipeIds).Query(s.DB(), &nutrients)
+	err = queries.SelectNutrientsForRecipes(recipeIds).QueryContext(ctx, s.DB(), &nutrients)
 	if err != nil {
 		return nil, err
 	}
@@ -510,7 +510,7 @@ func (s *Store) groupStepsByRecipe(steps []recipeStep, ingredientsByStep map[int
 
 func (s *Store) UpdateRecipe(ctx context.Context, recipe domain.Recipe) (domain.Recipe, error) {
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
-		_, err := queries.UpdateRecipe(recipe.ID, recipe.Name, recipe.Description, recipe.Servings, recipe.Minutes).Exec(tx.DB())
+		_, err := queries.UpdateRecipe(recipe.ID, recipe.Name, recipe.Description, recipe.Servings, recipe.Minutes).ExecContext(ctx, tx.DB())
 		if err != nil {
 			return err
 		}
@@ -547,21 +547,21 @@ func (s *Store) UpdateRecipe(ctx context.Context, recipe domain.Recipe) (domain.
 }
 
 func (s *Store) deleteRecipeIngredients(ctx context.Context, recipeID int64) error {
-	_, err := queries.DeleteRecipeIngredients(recipeID).Exec(s.DB())
+	_, err := queries.DeleteRecipeIngredients(recipeID).ExecContext(ctx, s.DB())
 	return err
 }
 
 func (s *Store) deleteRecipeSteps(ctx context.Context, recipeID int64) error {
-	_, err := queries.DeleteRecipeSteps(recipeID).Exec(s.DB())
+	_, err := queries.DeleteRecipeSteps(recipeID).ExecContext(ctx, s.DB())
 	return err
 }
 
 func (s *Store) deleteRecipeImages(ctx context.Context, recipeID int64) error {
-	_, err := queries.DeleteRecipeImages(recipeID).Exec(s.DB())
+	_, err := queries.DeleteRecipeImages(recipeID).ExecContext(ctx, s.DB())
 	return err
 }
 
 func (s *Store) deleteRecipeTags(ctx context.Context, recipeID int64) error {
-	_, err := queries.DeleteRecipeTags(recipeID).Exec(s.DB())
+	_, err := queries.DeleteRecipeTags(recipeID).ExecContext(ctx, s.DB())
 	return err
 }

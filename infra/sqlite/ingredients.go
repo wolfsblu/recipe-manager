@@ -23,7 +23,7 @@ func (s *Store) GetIngredients(ctx context.Context, filters domain.IngredientFil
 		filters.SortBy,
 		filters.SortOrder,
 		filters.Search,
-	).Query(s.DB(), &result)
+	).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.Ingredient]{}, err
 	}
@@ -63,7 +63,7 @@ func (s *Store) populateIngredientNutrients(ctx context.Context, ingredients []d
 		Amount       float64
 	}
 	var nutrients []NutrientRow
-	err := queries.SelectNutrientsForIngredients(ingredientIDs).Query(s.DB(), &nutrients)
+	err := queries.SelectNutrientsForIngredients(ingredientIDs).QueryContext(ctx, s.DB(), &nutrients)
 	if err != nil {
 		return nil, err
 	}
@@ -95,14 +95,14 @@ func (s *Store) CreateIngredient(ctx context.Context, ingredient domain.Ingredie
 	var id int64
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
 		var result model.Ingredient
-		err := queries.InsertIngredient(ingredient.Name).Query(tx.DB(), &result)
+		err := queries.InsertIngredient(ingredient.Name).QueryContext(ctx, tx.DB(), &result)
 		if err != nil {
 			return err
 		}
 		id = result.ID
 
 		for _, nutrient := range ingredient.Nutrients {
-			_, err = queries.InsertIngredientNutrient(id, nutrient.Nutrient.ID, nutrient.Amount).Exec(tx.DB())
+			_, err = queries.InsertIngredientNutrient(id, nutrient.Nutrient.ID, nutrient.Amount).ExecContext(ctx, tx.DB())
 			if err != nil {
 				return err
 			}
@@ -122,18 +122,18 @@ func (s *Store) CreateIngredient(ctx context.Context, ingredient domain.Ingredie
 
 func (s *Store) UpdateIngredient(ctx context.Context, ingredient domain.Ingredient) (domain.Ingredient, error) {
 	err := s.WithTransaction(ctx, func(tx *TxStore) error {
-		_, err := queries.UpdateIngredient(ingredient.ID, ingredient.Name).Exec(tx.DB())
+		_, err := queries.UpdateIngredient(ingredient.ID, ingredient.Name).ExecContext(ctx, tx.DB())
 		if err != nil {
 			return err
 		}
 
-		_, err = queries.DeleteIngredientNutrients(ingredient.ID).Exec(tx.DB())
+		_, err = queries.DeleteIngredientNutrients(ingredient.ID).ExecContext(ctx, tx.DB())
 		if err != nil {
 			return err
 		}
 
 		for _, nutrient := range ingredient.Nutrients {
-			_, err = queries.InsertIngredientNutrient(ingredient.ID, nutrient.Nutrient.ID, nutrient.Amount).Exec(tx.DB())
+			_, err = queries.InsertIngredientNutrient(ingredient.ID, nutrient.Nutrient.ID, nutrient.Amount).ExecContext(ctx, tx.DB())
 			if err != nil {
 				return err
 			}
@@ -151,6 +151,6 @@ func (s *Store) UpdateIngredient(ctx context.Context, ingredient domain.Ingredie
 }
 
 func (s *Store) DeleteIngredient(ctx context.Context, id int64) error {
-	_, err := queries.DeleteIngredient(id).Exec(s.DB())
+	_, err := queries.DeleteIngredient(id).ExecContext(ctx, s.DB())
 	return err
 }

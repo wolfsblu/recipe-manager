@@ -15,7 +15,7 @@ func (s *Store) GetUnits(ctx context.Context, req domain.Page) (domain.Result[do
 	}
 
 	var result []model.Unit
-	err = queries.SelectUnits(cursor.LastID, cursor.LastName, int64(req.Limit+1)).Query(s.DB(), &result)
+	err = queries.SelectUnits(cursor.LastID, cursor.LastName, int64(req.Limit+1)).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.Unit]{}, err
 	}
@@ -35,7 +35,7 @@ func (s *Store) GetUnits(ctx context.Context, req domain.Page) (domain.Result[do
 
 func (s *Store) CreateUnit(ctx context.Context, unit domain.Unit) (domain.Unit, error) {
 	var result model.Unit
-	err := queries.InsertUnit(unit.Name, unit.Symbol).Query(s.DB(), &result)
+	err := queries.InsertUnit(unit.Name, unit.Symbol).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return domain.Unit{}, err
 	}
@@ -48,11 +48,11 @@ func (s *Store) CreateUnit(ctx context.Context, unit domain.Unit) (domain.Unit, 
 }
 
 func (s *Store) UpdateUnit(ctx context.Context, unit domain.Unit) error {
-	_, err := queries.UpdateUnit(unit.ID, unit.Name, unit.Symbol).Exec(s.DB())
+	_, err := queries.UpdateUnit(unit.ID, unit.Name, unit.Symbol).ExecContext(ctx, s.DB())
 	return err
 }
 
 func (s *Store) DeleteUnit(ctx context.Context, id int64) error {
-	_, err := queries.DeleteUnit(id).Exec(s.DB())
+	_, err := queries.DeleteUnit(id).ExecContext(ctx, s.DB())
 	return err
 }
