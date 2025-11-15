@@ -36,7 +36,7 @@ func NewSqliteStore() (*Store, error) {
 		return nil, err
 	}
 
-	qrm.GlobalConfig.StrictScan = true
+	qrm.GlobalConfig.StrictScan = false
 
 	return store, nil
 }

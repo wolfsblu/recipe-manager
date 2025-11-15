@@ -26,17 +26,9 @@ func SelectUserByID(id int64) SelectStatement {
 
 // SelectUserByEmail returns a query to fetch a user by email
 func SelectUserByEmail(email string) SelectStatement {
-	return SELECT(
-		Users.ID,
-		Users.Email,
-		Users.PasswordHash,
-		Users.IsConfirmed,
-		Users.RoleID,
-		Users.Locale,
-		Users.CreatedAt,
-	).FROM(Users).
-		WHERE(Users.Email.EQ(String(email))).
-		LIMIT(1)
+	return SELECT(Users.AllColumns).
+		FROM(Users).
+		WHERE(Users.Email.EQ(String(email)))
 }
 
 // SelectPermissionsByRole returns a query to fetch all permissions for a role
@@ -103,7 +95,7 @@ func SelectRegistrationByToken(token string) SelectStatement {
 func InsertUser(email, passwordHash string, roleID int64, locale string) InsertStatement {
 	stmt := Users.INSERT(Users.Email, Users.PasswordHash, Users.RoleID, Users.Locale).
 		VALUES(email, passwordHash, roleID, locale).
-		RETURNING(Users.AllColumns()...)
+		RETURNING(Users.AllColumns)
 	stmt.DebugSql()
 	return stmt
 }
@@ -112,14 +104,14 @@ func InsertUser(email, passwordHash string, roleID int64, locale string) InsertS
 func InsertUserRegistration(userID int64, token string) InsertStatement {
 	return UserRegistrations.INSERT(UserRegistrations.UserID, UserRegistrations.Token).
 		VALUES(userID, token).
-		RETURNING(UserRegistrations.AllColumns()...)
+		RETURNING(UserRegistrations.AllColumns)
 }
 
 // InsertPasswordReset returns an insert statement for a password reset
 func InsertPasswordReset(userID int64, token string) InsertStatement {
 	return PasswordResets.INSERT(PasswordResets.UserID, PasswordResets.Token).
 		VALUES(userID, token).
-		RETURNING(PasswordResets.AllColumns()...)
+		RETURNING(PasswordResets.AllColumns)
 }
 
 // UpdateUser returns an update statement for user details

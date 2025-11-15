@@ -69,12 +69,7 @@ func SelectRecipesByUserPaginated(userID int64, cursor RecipeCursor, limit int64
 
 // SelectTagsForRecipes returns a query to fetch all tags for given recipe IDs
 func SelectTagsForRecipes(recipeIDs []int64) SelectStatement {
-	tagCols := Tags.AllColumns()
-	cols := make([]Projection, 0, len(tagCols)+1)
-	cols = append(cols, RecipeTags.RecipeID)
-	cols = append(cols, tagCols...)
-
-	return SELECT(cols[0], cols[1:]...).FROM(
+	return SELECT(RecipeTags.RecipeID, Tags.AllColumns).FROM(
 		Tags.INNER_JOIN(RecipeTags, Tags.ID.EQ(RecipeTags.TagID)),
 	).WHERE(RecipeTags.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
 		ORDER_BY(Tags.Name.ASC())
@@ -82,8 +77,7 @@ func SelectTagsForRecipes(recipeIDs []int64) SelectStatement {
 
 // SelectImagesForRecipes returns a query to fetch all images for given recipe IDs
 func SelectImagesForRecipes(recipeIDs []int64) SelectStatement {
-	cols := RecipeImages.AllColumns()
-	return SELECT(cols[0], cols[1:]...).FROM(RecipeImages).
+	return SELECT(RecipeImages.AllColumns).FROM(RecipeImages).
 		WHERE(RecipeImages.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
 		ORDER_BY(RecipeImages.SortOrder.ASC())
 }
@@ -92,7 +86,7 @@ func SelectImagesForRecipes(recipeIDs []int64) SelectStatement {
 func InsertRecipe(name, description string, servings, minutes, createdBy int64) InsertStatement {
 	return Recipes.INSERT(Recipes.Name, Recipes.Servings, Recipes.Minutes, Recipes.Description, Recipes.CreatedBy).
 		VALUES(name, servings, minutes, description, createdBy).
-		RETURNING(Recipes.AllColumns()...)
+		RETURNING(Recipes.AllColumns)
 }
 
 // DeleteRecipe returns a delete statement for a recipe
@@ -102,45 +96,32 @@ func DeleteRecipe(id int64) DeleteStatement {
 
 // SelectStepsForRecipes returns a query to fetch all steps for given recipe IDs
 func SelectStepsForRecipes(recipeIDs []int64) SelectStatement {
-	cols := RecipeSteps.AllColumns()
-	return SELECT(cols[0], cols[1:]...).FROM(RecipeSteps).
+	return SELECT(RecipeSteps.AllColumns).FROM(RecipeSteps).
 		WHERE(RecipeSteps.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
 		ORDER_BY(RecipeSteps.SortOrder.ASC())
 }
 
 // SelectIngredientsForRecipes returns a query to fetch all ingredients for given recipe IDs
 func SelectIngredientsForRecipes(recipeIDs []int64) SelectStatement {
-	riCols := RecipeIngredients.AllColumns()
-	iCols := Ingredients.AllColumns()
-	uCols := Units.AllColumns()
-
-	// Build column list
-	cols := make([]Projection, 0, len(riCols)+len(iCols)+len(uCols)+1)
-	cols = append(cols, riCols...)
-	cols = append(cols, iCols...)
-	cols = append(cols, uCols...)
-	cols = append(cols, RecipeSteps.ID.AS("step_id"))
-
-	return SELECT(cols[0], cols[1:]...).FROM(
-		RecipeIngredients.
-			INNER_JOIN(RecipeSteps, RecipeIngredients.StepID.EQ(RecipeSteps.ID)).
-			INNER_JOIN(Ingredients, RecipeIngredients.IngredientID.EQ(Ingredients.ID)).
-			INNER_JOIN(Units, RecipeIngredients.UnitID.EQ(Units.ID)),
+	return SELECT(
+		RecipeIngredients.AllColumns,
+		Ingredients.AllColumns,
+		Units.AllColumns,
+		RecipeSteps.ID.AS("step_id"),
+	).FROM(RecipeIngredients.
+		INNER_JOIN(RecipeSteps, RecipeIngredients.StepID.EQ(RecipeSteps.ID)).
+		INNER_JOIN(Ingredients, RecipeIngredients.IngredientID.EQ(Ingredients.ID)).
+		INNER_JOIN(Units, RecipeIngredients.UnitID.EQ(Units.ID)),
 	).WHERE(RecipeSteps.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
 		ORDER_BY(RecipeIngredients.SortOrder.ASC())
 }
 
 // SelectNutrientsForRecipes returns a query to fetch nutrients for recipe ingredients
 func SelectNutrientsForRecipes(recipeIDs []int64) SelectStatement {
-	inCols := IngredientNutrients.AllColumns()
-	nCols := Nutrients.AllColumns()
-
-	// Build column list
-	cols := make([]Projection, 0, len(inCols)+len(nCols))
-	cols = append(cols, inCols...)
-	cols = append(cols, nCols...)
-
-	return SELECT(cols[0], cols[1:]...).FROM(
+	return SELECT(
+		IngredientNutrients.AllColumns,
+		Nutrients.AllColumns,
+	).FROM(
 		IngredientNutrients.
 			INNER_JOIN(Nutrients, IngredientNutrients.NutrientID.EQ(Nutrients.ID)).
 			INNER_JOIN(RecipeIngredients, IngredientNutrients.IngredientID.EQ(RecipeIngredients.IngredientID)).
@@ -192,7 +173,7 @@ func SelectMealPlan(userID int64, from, until string, lastDate string, lastID, l
 func InsertRecipeStep(recipeID int64, instructions string, sortOrder int64) InsertStatement {
 	return RecipeSteps.INSERT(RecipeSteps.RecipeID, RecipeSteps.Instructions, RecipeSteps.SortOrder).
 		VALUES(recipeID, instructions, sortOrder).
-		RETURNING(RecipeSteps.AllColumns()...)
+		RETURNING(RecipeSteps.AllColumns)
 }
 
 // InsertStepIngredient returns an insert statement for a step ingredient

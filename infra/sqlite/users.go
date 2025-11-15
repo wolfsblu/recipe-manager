@@ -2,13 +2,13 @@ package sqlite
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/wolfsblu/recipe-manager/domain"
 	"github.com/wolfsblu/recipe-manager/domain/roles"
 	"github.com/wolfsblu/recipe-manager/domain/security"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/gen/model"
+	"github.com/wolfsblu/recipe-manager/infra/sqlite/gen/table"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/queries"
 )
 
@@ -64,16 +64,14 @@ func (s *Store) GetRegistrationByToken(ctx context.Context, token string) (regis
 }
 
 func (s *Store) GetUserByEmail(ctx context.Context, email string) (user domain.User, _ error) {
-	var result model.User
-	log.Println(email)
+	result = model.Users{}
 	stmt := queries.SelectUserByEmail(email)
-	log.Println(stmt.DebugSql())
 	err := stmt.QueryContext(ctx, s.DB(), &result)
-
 	if err != nil {
 		return user, domain.WrapError(domain.ErrUserNotFound, err)
 	}
 	return s.mapper.ToUser(result), nil
+	//return s.mapper.ToUser(dest), nil
 }
 
 func (s *Store) GetUserById(ctx context.Context, id int64) (user domain.User, _ error) {

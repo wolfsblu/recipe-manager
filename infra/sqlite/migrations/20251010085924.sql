@@ -1,1 +1,0 @@
-INSERT INTO ingredients (name) VALUES ('Tomato Passata');

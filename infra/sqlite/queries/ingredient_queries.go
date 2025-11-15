@@ -70,7 +70,7 @@ func SelectNutrientsForIngredients(ingredientIDs []int64) SelectStatement {
 func InsertIngredient(name string) InsertStatement {
 	return Ingredients.INSERT(Ingredients.Name).
 		VALUES(name).
-		RETURNING(Ingredients.AllColumns()...)
+		RETURNING(Ingredients.AllColumns)
 }
 
 // InsertIngredientNutrient returns an insert statement for an ingredient nutrient
@@ -116,7 +116,7 @@ func SelectUnits(lastID int64, lastName string, limit int64) SelectStatement {
 func InsertUnit(name string, symbol *string) InsertStatement {
 	return Units.INSERT(Units.Name, Units.Symbol).
 		VALUES(name, symbol).
-		RETURNING(Units.AllColumns()...)
+		RETURNING(Units.AllColumns)
 }
 
 // UpdateUnit returns an update statement for a unit

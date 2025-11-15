@@ -5,7 +5,7 @@ import (
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/gen/model"
 )
 
-func (m *DBMapper) ToIngredient(r model.Ingredient) domain.Ingredient {
+func (m *DBMapper) ToIngredient(r model.Ingredients) domain.Ingredient {
 	return domain.Ingredient{
 		ID:        r.ID,
 		Name:      r.Name,
