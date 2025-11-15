@@ -8,7 +8,6 @@ import (
 	"github.com/wolfsblu/recipe-manager/domain/roles"
 	"github.com/wolfsblu/recipe-manager/domain/security"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/gen/model"
-	"github.com/wolfsblu/recipe-manager/infra/sqlite/gen/table"
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/queries"
 )
 
@@ -64,7 +63,7 @@ func (s *Store) GetRegistrationByToken(ctx context.Context, token string) (regis
 }
 
 func (s *Store) GetUserByEmail(ctx context.Context, email string) (user domain.User, _ error) {
-	result = model.Users{}
+	result := model.User{}
 	stmt := queries.SelectUserByEmail(email)
 	err := stmt.QueryContext(ctx, s.DB(), &result)
 	if err != nil {

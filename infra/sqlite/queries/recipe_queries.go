@@ -8,161 +8,161 @@ import (
 )
 
 // SelectRecipeByID returns a query to fetch a single recipe by ID
-func SelectRecipeByID(id int64) SelectStatement {
+func SelectRecipeByID(id int32) SelectStatement {
 	return SELECT(
-		Recipes.ID,
-		Recipes.Name,
-		Recipes.Servings,
-		Recipes.Minutes,
-		Recipes.Description,
-		Recipes.CreatedBy,
-		Recipes.CreatedAt,
-	).FROM(Recipes).
-		WHERE(Recipes.ID.EQ(Int(id)))
+		Recipe.ID,
+		Recipe.Name,
+		Recipe.Servings,
+		Recipe.Minutes,
+		Recipe.Description,
+		Recipe.CreatedBy,
+		Recipe.CreatedAt,
+	).FROM(Recipe).
+		WHERE(Recipe.ID.EQ(Int32(id)))
 }
 
 // SelectRecipesByUserPaginated returns a query for paginated user recipes with sorting
-func SelectRecipesByUserPaginated(userID int64, cursor RecipeCursor, limit int64, sortField, sortOrder string) SelectStatement {
+func SelectRecipesByUserPaginated(userID int32, cursor RecipeCursor, limit int64, sortField, sortOrder string) SelectStatement {
 	var comparison BoolExpression
 	var orderBy []OrderByClause
 
 	switch sortField {
 	case "name":
 		if sortOrder == "asc" {
-			comparison = ROW(Recipes.Name, Recipes.ID).GT(ROW(String(cursor.LastName), Int(cursor.LastID)))
-			orderBy = []OrderByClause{Recipes.Name.ASC(), Recipes.ID.ASC()}
+			comparison = ROW(Recipe.Name, Recipe.ID).GT(ROW(String(cursor.LastName), Int32(cursor.LastID)))
+			orderBy = []OrderByClause{Recipe.Name.ASC(), Recipe.ID.ASC()}
 		} else {
-			comparison = ROW(Recipes.Name, Recipes.ID).LT(ROW(String(cursor.LastName), Int(cursor.LastID)))
-			orderBy = []OrderByClause{Recipes.Name.DESC(), Recipes.ID.DESC()}
+			comparison = ROW(Recipe.Name, Recipe.ID).LT(ROW(String(cursor.LastName), Int32(cursor.LastID)))
+			orderBy = []OrderByClause{Recipe.Name.DESC(), Recipe.ID.DESC()}
 		}
 	case "servings":
 		if sortOrder == "asc" {
-			comparison = ROW(Recipes.Servings, Recipes.ID).GT(ROW(Int(cursor.LastServings), Int(cursor.LastID)))
-			orderBy = []OrderByClause{Recipes.Servings.ASC(), Recipes.ID.ASC()}
+			comparison = ROW(Recipe.Servings, Recipe.ID).GT(ROW(Int32(cursor.LastServings), Int32(cursor.LastID)))
+			orderBy = []OrderByClause{Recipe.Servings.ASC(), Recipe.ID.ASC()}
 		} else {
-			comparison = ROW(Recipes.Servings, Recipes.ID).LT(ROW(Int(cursor.LastServings), Int(cursor.LastID)))
-			orderBy = []OrderByClause{Recipes.Servings.DESC(), Recipes.ID.DESC()}
+			comparison = ROW(Recipe.Servings, Recipe.ID).LT(ROW(Int32(cursor.LastServings), Int32(cursor.LastID)))
+			orderBy = []OrderByClause{Recipe.Servings.DESC(), Recipe.ID.DESC()}
 		}
 	default: // created_at
 		if sortOrder == "asc" {
-			comparison = ROW(Recipes.CreatedAt, Recipes.ID).GT(ROW(String(cursor.LastCreatedAt.Format(time.RFC3339)), Int(cursor.LastID)))
-			orderBy = []OrderByClause{Recipes.CreatedAt.ASC(), Recipes.ID.ASC()}
+			comparison = ROW(Recipe.CreatedAt, Recipe.ID).GT(ROW(String(cursor.LastCreatedAt.Format(time.RFC3339)), Int32(cursor.LastID)))
+			orderBy = []OrderByClause{Recipe.CreatedAt.ASC(), Recipe.ID.ASC()}
 		} else {
-			comparison = ROW(Recipes.CreatedAt, Recipes.ID).LT(ROW(String(cursor.LastCreatedAt.Format(time.RFC3339)), Int(cursor.LastID)))
-			orderBy = []OrderByClause{Recipes.CreatedAt.DESC(), Recipes.ID.DESC()}
+			comparison = ROW(Recipe.CreatedAt, Recipe.ID).LT(ROW(String(cursor.LastCreatedAt.Format(time.RFC3339)), Int32(cursor.LastID)))
+			orderBy = []OrderByClause{Recipe.CreatedAt.DESC(), Recipe.ID.DESC()}
 		}
 	}
 
 	return SELECT(
-		Recipes.ID,
-		Recipes.Name,
-		Recipes.Servings,
-		Recipes.Minutes,
-		Recipes.Description,
-		Recipes.CreatedBy,
-		Recipes.CreatedAt,
-	).FROM(Recipes).
-		WHERE(Recipes.CreatedBy.EQ(Int(userID)).AND(comparison)).
+		Recipe.ID,
+		Recipe.Name,
+		Recipe.Servings,
+		Recipe.Minutes,
+		Recipe.Description,
+		Recipe.CreatedBy,
+		Recipe.CreatedAt,
+	).FROM(Recipe).
+		WHERE(Recipe.CreatedBy.EQ(Int32(userID)).AND(comparison)).
 		ORDER_BY(orderBy...).
 		LIMIT(limit)
 }
 
 // SelectTagsForRecipes returns a query to fetch all tags for given recipe IDs
-func SelectTagsForRecipes(recipeIDs []int64) SelectStatement {
-	return SELECT(RecipeTags.RecipeID, Tags.AllColumns).FROM(
-		Tags.INNER_JOIN(RecipeTags, Tags.ID.EQ(RecipeTags.TagID)),
-	).WHERE(RecipeTags.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
-		ORDER_BY(Tags.Name.ASC())
+func SelectTagsForRecipes(recipeIDs []int32) SelectStatement {
+	return SELECT(RecipeTag.RecipeID, Tag.AllColumns).FROM(
+		Tag.INNER_JOIN(RecipeTag, Tag.ID.EQ(RecipeTag.TagID)),
+	).WHERE(RecipeTag.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
+		ORDER_BY(Tag.Name.ASC())
 }
 
 // SelectImagesForRecipes returns a query to fetch all images for given recipe IDs
-func SelectImagesForRecipes(recipeIDs []int64) SelectStatement {
-	return SELECT(RecipeImages.AllColumns).FROM(RecipeImages).
-		WHERE(RecipeImages.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
-		ORDER_BY(RecipeImages.SortOrder.ASC())
+func SelectImagesForRecipes(recipeIDs []int32) SelectStatement {
+	return SELECT(RecipeImage.AllColumns).FROM(RecipeImage).
+		WHERE(RecipeImage.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
+		ORDER_BY(RecipeImage.SortOrder.ASC())
 }
 
 // InsertRecipe returns an insert statement for a new recipe
-func InsertRecipe(name, description string, servings, minutes, createdBy int64) InsertStatement {
-	return Recipes.INSERT(Recipes.Name, Recipes.Servings, Recipes.Minutes, Recipes.Description, Recipes.CreatedBy).
+func InsertRecipe(name, description string, servings, minutes, createdBy int32) InsertStatement {
+	return Recipe.INSERT(Recipe.Name, Recipe.Servings, Recipe.Minutes, Recipe.Description, Recipe.CreatedBy).
 		VALUES(name, servings, minutes, description, createdBy).
-		RETURNING(Recipes.AllColumns)
+		RETURNING(Recipe.AllColumns)
 }
 
 // DeleteRecipe returns a delete statement for a recipe
-func DeleteRecipe(id int64) DeleteStatement {
-	return Recipes.DELETE().WHERE(Recipes.ID.EQ(Int(id)))
+func DeleteRecipe(id int32) DeleteStatement {
+	return Recipe.DELETE().WHERE(Recipe.ID.EQ(Int32(id)))
 }
 
 // SelectStepsForRecipes returns a query to fetch all steps for given recipe IDs
-func SelectStepsForRecipes(recipeIDs []int64) SelectStatement {
-	return SELECT(RecipeSteps.AllColumns).FROM(RecipeSteps).
-		WHERE(RecipeSteps.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
-		ORDER_BY(RecipeSteps.SortOrder.ASC())
+func SelectStepsForRecipes(recipeIDs []int32) SelectStatement {
+	return SELECT(RecipeStep.AllColumns).FROM(RecipeStep).
+		WHERE(RecipeStep.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
+		ORDER_BY(RecipeStep.SortOrder.ASC())
 }
 
 // SelectIngredientsForRecipes returns a query to fetch all ingredients for given recipe IDs
-func SelectIngredientsForRecipes(recipeIDs []int64) SelectStatement {
+func SelectIngredientsForRecipes(recipeIDs []int32) SelectStatement {
 	return SELECT(
-		RecipeIngredients.AllColumns,
-		Ingredients.AllColumns,
-		Units.AllColumns,
-		RecipeSteps.ID.AS("step_id"),
-	).FROM(RecipeIngredients.
-		INNER_JOIN(RecipeSteps, RecipeIngredients.StepID.EQ(RecipeSteps.ID)).
-		INNER_JOIN(Ingredients, RecipeIngredients.IngredientID.EQ(Ingredients.ID)).
-		INNER_JOIN(Units, RecipeIngredients.UnitID.EQ(Units.ID)),
-	).WHERE(RecipeSteps.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
-		ORDER_BY(RecipeIngredients.SortOrder.ASC())
+		RecipeIngredient.AllColumns,
+		Ingredient.AllColumns,
+		Unit.AllColumns,
+		RecipeStep.ID.AS("step_id"),
+	).FROM(RecipeIngredient.
+		INNER_JOIN(RecipeStep, RecipeIngredient.StepID.EQ(RecipeStep.ID)).
+		INNER_JOIN(Ingredient, RecipeIngredient.IngredientID.EQ(Ingredient.ID)).
+		INNER_JOIN(Unit, RecipeIngredient.UnitID.EQ(Unit.ID)),
+	).WHERE(RecipeStep.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
+		ORDER_BY(RecipeIngredient.SortOrder.ASC())
 }
 
 // SelectNutrientsForRecipes returns a query to fetch nutrients for recipe ingredients
-func SelectNutrientsForRecipes(recipeIDs []int64) SelectStatement {
+func SelectNutrientsForRecipes(recipeIDs []int32) SelectStatement {
 	return SELECT(
-		IngredientNutrients.AllColumns,
-		Nutrients.AllColumns,
+		IngredientNutrient.AllColumns,
+		Nutrient.AllColumns,
 	).FROM(
-		IngredientNutrients.
-			INNER_JOIN(Nutrients, IngredientNutrients.NutrientID.EQ(Nutrients.ID)).
-			INNER_JOIN(RecipeIngredients, IngredientNutrients.IngredientID.EQ(RecipeIngredients.IngredientID)).
-			INNER_JOIN(RecipeSteps, RecipeIngredients.StepID.EQ(RecipeSteps.ID)),
-	).WHERE(RecipeSteps.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
-		ORDER_BY(IngredientNutrients.IngredientID.ASC(), Nutrients.Name.ASC())
+		IngredientNutrient.
+			INNER_JOIN(Nutrient, IngredientNutrient.NutrientID.EQ(Nutrient.ID)).
+			INNER_JOIN(RecipeIngredient, IngredientNutrient.IngredientID.EQ(RecipeIngredient.IngredientID)).
+			INNER_JOIN(RecipeStep, RecipeIngredient.StepID.EQ(RecipeStep.ID)),
+	).WHERE(RecipeStep.RecipeID.IN(IntSliceToExpressions(recipeIDs)...)).
+		ORDER_BY(IngredientNutrient.IngredientID.ASC(), Nutrient.Name.ASC())
 }
 
 // SelectTags returns a paginated query for tags
-func SelectTags(lastID int64, lastName string, limit int64) SelectStatement {
+func SelectTags(lastID int32, lastName string, limit int64) SelectStatement {
 	return SELECT(
-		Tags.ID,
-		Tags.Name,
-	).FROM(Tags).
-		WHERE(ROW(Tags.Name, Tags.ID).GT(ROW(String(lastName), Int(lastID)))).
-		ORDER_BY(Tags.Name.ASC(), Tags.ID.ASC()).
+		Tag.ID,
+		Tag.Name,
+	).FROM(Tag).
+		WHERE(ROW(Tag.Name, Tag.ID).GT(ROW(String(lastName), Int32(lastID)))).
+		ORDER_BY(Tag.Name.ASC(), Tag.ID.ASC()).
 		LIMIT(limit)
 }
 
 // SelectMealPlan returns a query for meal plan entries with recipes
-func SelectMealPlan(userID int64, from, until string, lastDate string, lastID, limit int64) SelectStatement {
+func SelectMealPlan(userID int32, from, until string, lastDate string, lastID int32, limit int64) SelectStatement {
 	return SELECT(
 		MealPlan.ID,
 		MealPlan.Date,
 		MealPlan.UserID,
 		MealPlan.RecipeID,
 		MealPlan.SortOrder,
-		Recipes.ID,
-		Recipes.Name,
-		Recipes.Servings,
-		Recipes.Minutes,
-		Recipes.Description,
-		Recipes.CreatedBy,
-		Recipes.CreatedAt,
+		Recipe.ID,
+		Recipe.Name,
+		Recipe.Servings,
+		Recipe.Minutes,
+		Recipe.Description,
+		Recipe.CreatedBy,
+		Recipe.CreatedAt,
 	).FROM(
-		MealPlan.INNER_JOIN(Recipes, Recipes.ID.EQ(MealPlan.RecipeID)),
+		MealPlan.INNER_JOIN(Recipe, Recipe.ID.EQ(MealPlan.RecipeID)),
 	).WHERE(
-		MealPlan.UserID.EQ(Int(userID)).
+		MealPlan.UserID.EQ(Int32(userID)).
 			AND(MealPlan.Date.GT_EQ(String(from))).
 			AND(MealPlan.Date.LT_EQ(String(until))).
-			AND(ROW(MealPlan.Date, MealPlan.ID).GT(ROW(String(lastDate), Int(lastID)))),
+			AND(ROW(MealPlan.Date, MealPlan.ID).GT(ROW(String(lastDate), Int32(lastID)))),
 	).ORDER_BY(
 		MealPlan.Date.ASC(),
 		MealPlan.ID.ASC(),
@@ -170,78 +170,78 @@ func SelectMealPlan(userID int64, from, until string, lastDate string, lastID, l
 }
 
 // InsertRecipeStep returns an insert statement for a recipe step
-func InsertRecipeStep(recipeID int64, instructions string, sortOrder int64) InsertStatement {
-	return RecipeSteps.INSERT(RecipeSteps.RecipeID, RecipeSteps.Instructions, RecipeSteps.SortOrder).
+func InsertRecipeStep(recipeID int32, instructions string, sortOrder int32) InsertStatement {
+	return RecipeStep.INSERT(RecipeStep.RecipeID, RecipeStep.Instructions, RecipeStep.SortOrder).
 		VALUES(recipeID, instructions, sortOrder).
-		RETURNING(RecipeSteps.AllColumns)
+		RETURNING(RecipeStep.AllColumns)
 }
 
 // InsertStepIngredient returns an insert statement for a step ingredient
-func InsertStepIngredient(stepID, ingredientID, unitID int64, amount float64, sortOrder int64) InsertStatement {
-	return RecipeIngredients.INSERT(
-		RecipeIngredients.StepID,
-		RecipeIngredients.IngredientID,
-		RecipeIngredients.UnitID,
-		RecipeIngredients.Amount,
-		RecipeIngredients.SortOrder,
+func InsertStepIngredient(stepID, ingredientID, unitID int32, amount float64, sortOrder int64) InsertStatement {
+	return RecipeIngredient.INSERT(
+		RecipeIngredient.StepID,
+		RecipeIngredient.IngredientID,
+		RecipeIngredient.UnitID,
+		RecipeIngredient.Amount,
+		RecipeIngredient.SortOrder,
 	).VALUES(stepID, ingredientID, unitID, amount, sortOrder)
 }
 
 // InsertRecipeImage returns an insert statement for a recipe image
-func InsertRecipeImage(recipeID int64, path string, sortOrder int64) InsertStatement {
-	return RecipeImages.INSERT(RecipeImages.RecipeID, RecipeImages.Path, RecipeImages.SortOrder).
+func InsertRecipeImage(recipeID int32, path string, sortOrder int32) InsertStatement {
+	return RecipeImage.INSERT(RecipeImage.RecipeID, RecipeImage.Path, RecipeImage.SortOrder).
 		VALUES(recipeID, path, sortOrder)
 }
 
 // InsertRecipeTag returns an insert statement for a recipe tag
-func InsertRecipeTag(recipeID, tagID int64) InsertStatement {
-	return RecipeTags.INSERT(RecipeTags.RecipeID, RecipeTags.TagID).
+func InsertRecipeTag(recipeID, tagID int32) InsertStatement {
+	return RecipeTag.INSERT(RecipeTag.RecipeID, RecipeTag.TagID).
 		VALUES(recipeID, tagID)
 }
 
 // InsertMealPlan returns an insert statement for a meal plan entry
-func InsertMealPlan(date string, userID, recipeID, sortOrder int64) InsertStatement {
+func InsertMealPlan(date string, userID, recipeID, sortOrder int32) InsertStatement {
 	return MealPlan.INSERT(MealPlan.Date, MealPlan.UserID, MealPlan.RecipeID, MealPlan.SortOrder).
 		VALUES(date, userID, recipeID, sortOrder)
 }
 
 // UpdateRecipe returns an update statement for a recipe
-func UpdateRecipe(id int64, name, description string, servings, minutes int64) UpdateStatement {
-	return Recipes.UPDATE(Recipes.Name, Recipes.Servings, Recipes.Minutes, Recipes.Description).
+func UpdateRecipe(id int32, name, description string, servings, minutes int32) UpdateStatement {
+	return Recipe.UPDATE(Recipe.Name, Recipe.Servings, Recipe.Minutes, Recipe.Description).
 		SET(name, servings, minutes, description).
-		WHERE(Recipes.ID.EQ(Int(id)))
+		WHERE(Recipe.ID.EQ(Int32(id)))
 }
 
 // DeleteRecipeSteps returns a delete statement for recipe steps
-func DeleteRecipeSteps(recipeID int64) DeleteStatement {
-	return RecipeSteps.DELETE().WHERE(RecipeSteps.RecipeID.EQ(Int(recipeID)))
+func DeleteRecipeSteps(recipeID int32) DeleteStatement {
+	return RecipeStep.DELETE().WHERE(RecipeStep.RecipeID.EQ(Int32(recipeID)))
 }
 
 // DeleteRecipeImages returns a delete statement for recipe images
-func DeleteRecipeImages(recipeID int64) DeleteStatement {
-	return RecipeImages.DELETE().WHERE(RecipeImages.RecipeID.EQ(Int(recipeID)))
+func DeleteRecipeImages(recipeID int32) DeleteStatement {
+	return RecipeImage.DELETE().WHERE(RecipeImage.RecipeID.EQ(Int32(recipeID)))
 }
 
 // DeleteRecipeTags returns a delete statement for recipe tags
-func DeleteRecipeTags(recipeID int64) DeleteStatement {
-	return RecipeTags.DELETE().WHERE(RecipeTags.RecipeID.EQ(Int(recipeID)))
+func DeleteRecipeTags(recipeID int32) DeleteStatement {
+	return RecipeTag.DELETE().WHERE(RecipeTag.RecipeID.EQ(Int32(recipeID)))
 }
 
 // DeleteRecipeIngredients returns a delete statement for recipe ingredients
-func DeleteRecipeIngredients(recipeID int64) DeleteStatement {
-	return RecipeIngredients.DELETE().
-		WHERE(RecipeIngredients.StepID.IN(
-			SELECT(RecipeSteps.ID).
-				FROM(RecipeSteps).
-				WHERE(RecipeSteps.RecipeID.EQ(Int(recipeID))),
+func DeleteRecipeIngredients(recipeID int32) DeleteStatement {
+	return RecipeIngredient.DELETE().
+		WHERE(RecipeIngredient.StepID.IN(
+			SELECT(RecipeStep.ID).
+				FROM(RecipeStep).
+				WHERE(RecipeStep.RecipeID.EQ(Int32(recipeID))),
 		))
 }
 
 // DeleteMealPlan returns a delete statement for a meal plan entry
-func DeleteMealPlan(userID, recipeID int64, date string) DeleteStatement {
+func DeleteMealPlan(userID, recipeID int32, date string) DeleteStatement {
 	return MealPlan.DELETE().WHERE(
-		MealPlan.UserID.EQ(Int(userID)).
-			AND(MealPlan.RecipeID.EQ(Int(recipeID))).
+		MealPlan.UserID.EQ(Int32(userID)).
+			AND(MealPlan.RecipeID.EQ(Int32(recipeID))).
 			AND(MealPlan.Date.EQ(String(date))),
 	)
 }
@@ -249,17 +249,17 @@ func DeleteMealPlan(userID, recipeID int64, date string) DeleteStatement {
 // Helper types and functions
 
 type RecipeCursor struct {
-	LastID        int64
+	LastID        int32
 	LastName      string
 	LastCreatedAt time.Time
-	LastServings  int64
+	LastServings  int32
 }
 
-// IntSliceToExpressions converts a slice of int64 to go-jet expressions
-func IntSliceToExpressions(ids []int64) []Expression {
+// IntSliceToExpressions converts a slice of int32 to go-jet expressions
+func IntSliceToExpressions(ids []int32) []Expression {
 	exprs := make([]Expression, len(ids))
 	for i, id := range ids {
-		exprs[i] = Int(id)
+		exprs[i] = Int32(id)
 	}
 	return exprs
 }

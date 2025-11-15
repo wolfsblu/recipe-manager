@@ -9,8 +9,8 @@ type RecipeDetails struct {
 	Name        string
 	Description string
 	CreatedBy   *User
-	Servings    int64
-	Minutes     int64
+	Servings    int32
+	Minutes     int32
 }
 
 type StepIngredient struct {
@@ -20,13 +20,13 @@ type StepIngredient struct {
 }
 
 type RecipeStep struct {
-	ID           int64
+	ID           int32
 	Instructions string
 	Ingredients  []StepIngredient
 }
 
 type Recipe struct {
-	ID        int64
+	ID        int32
 	CreatedAt time.Time
 	Tags      []Tag
 	Images    []RecipeImage
@@ -35,7 +35,7 @@ type Recipe struct {
 }
 
 type RecipeImage struct {
-	ID  int64
+	ID  int32
 	URL *url.URL
 }
 
@@ -45,41 +45,41 @@ type MealPlan struct {
 }
 
 type MealPlanRecipe struct {
-	ID     int64
+	ID     int32
 	Recipe Recipe
 }
 
 type MealPlanEntry struct {
-	UserID    int64
-	RecipeID  int64
+	UserID    int32
+	RecipeID  int32
 	Date      time.Time
-	SortOrder int64
+	SortOrder int32
 }
 
 type Ingredient struct {
-	ID        int64
+	ID        int32
 	Name      string
 	Nutrients []IngredientNutrient
 }
 
 type Nutrient struct {
-	ID   int64
+	ID   int32
 	Name string
 	Unit string
 }
 
 type IngredientNutrient struct {
 	Nutrient Nutrient
-	Amount   float64
+	Amount   float32
 }
 
 type Unit struct {
-	ID     int64
+	ID     int32
 	Name   string
 	Symbol *string
 }
 
 type Tag struct {
-	ID   int64
+	ID   int32
 	Name string
 }

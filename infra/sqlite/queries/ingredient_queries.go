@@ -6,7 +6,7 @@ import (
 )
 
 // SelectIngredientsPaginated returns a query for paginated ingredients with sorting and filtering
-func SelectIngredientsPaginated(lastID int64, lastName string, limit int64, sortField, sortOrder, search string) SelectStatement {
+func SelectIngredientsPaginated(lastID int32, lastName string, limit int64, sortField, sortOrder, search string) SelectStatement {
 	var comparison BoolExpression
 	var orderBy []OrderByClause
 	var whereClauses []BoolExpression
@@ -15,19 +15,19 @@ func SelectIngredientsPaginated(lastID int64, lastName string, limit int64, sort
 	switch sortField {
 	case "id":
 		if sortOrder == "asc" {
-			comparison = Ingredients.ID.GT(Int(lastID))
-			orderBy = []OrderByClause{Ingredients.ID.ASC()}
+			comparison = Ingredient.ID.GT(Int32(lastID))
+			orderBy = []OrderByClause{Ingredient.ID.ASC()}
 		} else {
-			comparison = Ingredients.ID.LT(Int(lastID))
-			orderBy = []OrderByClause{Ingredients.ID.DESC()}
+			comparison = Ingredient.ID.LT(Int32(lastID))
+			orderBy = []OrderByClause{Ingredient.ID.DESC()}
 		}
 	default: // name
 		if sortOrder == "asc" {
-			comparison = ROW(Ingredients.Name, Ingredients.ID).GT(ROW(String(lastName), Int(lastID)))
-			orderBy = []OrderByClause{Ingredients.Name.ASC(), Ingredients.ID.ASC()}
+			comparison = ROW(Ingredient.Name, Ingredient.ID).GT(ROW(String(lastName), Int32(lastID)))
+			orderBy = []OrderByClause{Ingredient.Name.ASC(), Ingredient.ID.ASC()}
 		} else {
-			comparison = ROW(Ingredients.Name, Ingredients.ID).LT(ROW(String(lastName), Int(lastID)))
-			orderBy = []OrderByClause{Ingredients.Name.DESC(), Ingredients.ID.DESC()}
+			comparison = ROW(Ingredient.Name, Ingredient.ID).LT(ROW(String(lastName), Int32(lastID)))
+			orderBy = []OrderByClause{Ingredient.Name.DESC(), Ingredient.ID.DESC()}
 		}
 	}
 
@@ -35,7 +35,7 @@ func SelectIngredientsPaginated(lastID int64, lastName string, limit int64, sort
 
 	// Add search filter if provided
 	if search != "" {
-		whereClauses = append(whereClauses, Ingredients.Name.LIKE(String("%"+search+"%")))
+		whereClauses = append(whereClauses, Ingredient.Name.LIKE(String("%"+search+"%")))
 	}
 
 	// Combine WHERE clauses with AND
@@ -45,88 +45,88 @@ func SelectIngredientsPaginated(lastID int64, lastName string, limit int64, sort
 	}
 
 	return SELECT(
-		Ingredients.ID,
-		Ingredients.Name,
-	).FROM(Ingredients).
+		Ingredient.ID,
+		Ingredient.Name,
+	).FROM(Ingredient).
 		WHERE(finalWhere).
 		ORDER_BY(orderBy...).
 		LIMIT(limit)
 }
 
 // SelectNutrientsForIngredients returns a query to fetch nutrients for given ingredient IDs
-func SelectNutrientsForIngredients(ingredientIDs []int64) SelectStatement {
+func SelectNutrientsForIngredients(ingredientIDs []int32) SelectStatement {
 	return SELECT(
-		IngredientNutrients.IngredientID,
-		Nutrients.ID,
-		Nutrients.Name,
-		Nutrients.Unit,
-		IngredientNutrients.Amount,
+		IngredientNutrient.IngredientID,
+		Nutrient.ID,
+		Nutrient.Name,
+		Nutrient.Unit,
+		IngredientNutrient.Amount,
 	).FROM(
-		IngredientNutrients.INNER_JOIN(Nutrients, IngredientNutrients.NutrientID.EQ(Nutrients.ID)),
-	).WHERE(IngredientNutrients.IngredientID.IN(IntSliceToExpressions(ingredientIDs)...))
+		IngredientNutrient.INNER_JOIN(Nutrient, IngredientNutrient.NutrientID.EQ(Nutrient.ID)),
+	).WHERE(IngredientNutrient.IngredientID.IN(IntSliceToExpressions(ingredientIDs)...))
 }
 
 // InsertIngredient returns an insert statement for a new ingredient
 func InsertIngredient(name string) InsertStatement {
-	return Ingredients.INSERT(Ingredients.Name).
+	return Ingredient.INSERT(Ingredient.Name).
 		VALUES(name).
-		RETURNING(Ingredients.AllColumns)
+		RETURNING(Ingredient.AllColumns)
 }
 
 // InsertIngredientNutrient returns an insert statement for an ingredient nutrient
-func InsertIngredientNutrient(ingredientID, nutrientID int64, amount float64) InsertStatement {
-	return IngredientNutrients.INSERT(
-		IngredientNutrients.IngredientID,
-		IngredientNutrients.NutrientID,
-		IngredientNutrients.Amount,
+func InsertIngredientNutrient(ingredientID, nutrientID int32, amount float64) InsertStatement {
+	return IngredientNutrient.INSERT(
+		IngredientNutrient.IngredientID,
+		IngredientNutrient.NutrientID,
+		IngredientNutrient.Amount,
 	).VALUES(ingredientID, nutrientID, amount)
 }
 
 // UpdateIngredient returns an update statement for an ingredient
-func UpdateIngredient(id int64, name string) UpdateStatement {
-	return Ingredients.UPDATE(Ingredients.Name).
+func UpdateIngredient(id int32, name string) UpdateStatement {
+	return Ingredient.UPDATE(Ingredient.Name).
 		SET(name).
-		WHERE(Ingredients.ID.EQ(Int(id)))
+		WHERE(Ingredient.ID.EQ(Int32(id)))
 }
 
 // DeleteIngredient returns a delete statement for an ingredient
-func DeleteIngredient(id int64) DeleteStatement {
-	return Ingredients.DELETE().WHERE(Ingredients.ID.EQ(Int(id)))
+func DeleteIngredient(id int32) DeleteStatement {
+	return Ingredient.DELETE().WHERE(Ingredient.ID.EQ(Int32(id)))
 }
 
 // DeleteIngredientNutrients returns a delete statement for ingredient nutrients
-func DeleteIngredientNutrients(ingredientID int64) DeleteStatement {
-	return IngredientNutrients.DELETE().
-		WHERE(IngredientNutrients.IngredientID.EQ(Int(ingredientID)))
+func DeleteIngredientNutrients(ingredientID int32) DeleteStatement {
+	return IngredientNutrient.DELETE().
+		WHERE(IngredientNutrient.IngredientID.EQ(Int32(ingredientID)))
 }
 
 // SelectUnits returns a paginated query for units
-func SelectUnits(lastID int64, lastName string, limit int64) SelectStatement {
+func SelectUnits(lastID int32, lastName string, limit int32) SelectStatement {
 	return SELECT(
-		Units.ID,
-		Units.Name,
-		Units.Symbol,
-	).FROM(Units).
-		WHERE(ROW(Units.Name, Units.ID).GT(ROW(String(lastName), Int(lastID)))).
-		ORDER_BY(Units.Name.ASC(), Units.ID.ASC()).
+		Unit.ID,
+		Unit.Name,
+		Unit.Symbol,
+	).FROM(Unit).
+		WHERE(ROW(Unit.Name, Unit.ID).GT(ROW(String(lastName), Int32(lastID)))).
+		ORDER_BY(Unit.Name.ASC(), Unit.ID.ASC()).
 		LIMIT(limit)
 }
 
 // InsertUnit returns an insert statement for a new unit
 func InsertUnit(name string, symbol *string) InsertStatement {
-	return Units.INSERT(Units.Name, Units.Symbol).
+	return Unit.INSERT(Unit.Name, Unit.Symbol).
 		VALUES(name, symbol).
-		RETURNING(Units.AllColumns)
+		RETURNING(Unit.AllColumns)
 }
 
 // UpdateUnit returns an update statement for a unit
-func UpdateUnit(id int64, name string, symbol *string) UpdateStatement {
-	return Units.UPDATE(Units.Name, Units.Symbol).
+func UpdateUnit(id int32, name string, symbol *string) UpdateStatement {
+	return Unit.UPDATE(Unit.Name, Unit.Symbol).
 		SET(name, symbol).
-		WHERE(Units.ID.EQ(Int(id)))
+		WHERE(Unit.ID.EQ(Int32(id)))
 }
 
 // DeleteUnit returns a delete statement for a unit
-func DeleteUnit(id int64) DeleteStatement {
-	return Units.DELETE().WHERE(Units.ID.EQ(Int(id)))
+func DeleteUnit(id int32) DeleteStatement {
+	return Unit.DELETE().WHERE(Unit.ID.EQ(Int32(id)))
 }

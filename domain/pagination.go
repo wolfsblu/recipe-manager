@@ -16,7 +16,7 @@ const (
 // Page contains pagination parameters
 type Page struct {
 	Cursor string
-	Limit  int
+	Limit  int64
 }
 
 // Result wraps paginated data with metadata
@@ -28,26 +28,26 @@ type Result[T any] struct {
 
 // Cursor represents the data encoded in a pagination cursor
 type Cursor struct {
-	LastID   int64     `json:"id"`
+	LastID   int32     `json:"id"`
 	LastName string    `json:"name"`
 	LastDate time.Time `json:"date"`
 }
 
 type NameCursor struct {
-	LastID   int64  `json:"id"`
+	LastID   int32  `json:"id"`
 	LastName string `json:"name"`
 }
 
 type DateCursor struct {
-	LastID   int64     `json:"id"`
+	LastID   int32     `json:"id"`
 	LastDate time.Time `json:"date"`
 }
 
 type RecipeCursor struct {
-	LastID        int64     `json:"id"`
+	LastID        int32     `json:"id"`
 	LastName      string    `json:"name,omitempty"`
 	LastCreatedAt time.Time `json:"created_at,omitempty"`
-	LastServings  int64     `json:"servings,omitempty"`
+	LastServings  int32     `json:"servings,omitempty"`
 }
 
 type SortField string
@@ -73,29 +73,29 @@ type RecipeSort struct {
 
 func NewDescendingDateCursor() *DateCursor {
 	return &DateCursor{
-		LastID:   math.MaxInt64,
+		LastID:   math.MaxInt32,
 		LastDate: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
 	}
 }
 
 func NewDescendingRecipeCursorByCreatedAt() *RecipeCursor {
 	return &RecipeCursor{
-		LastID:        math.MaxInt64,
+		LastID:        math.MaxInt32,
 		LastCreatedAt: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
 	}
 }
 
 func NewDescendingRecipeCursorByName() *RecipeCursor {
 	return &RecipeCursor{
-		LastID:   math.MaxInt64,
+		LastID:   math.MaxInt32,
 		LastName: string(rune(0x10FFFF)), // Max unicode character
 	}
 }
 
 func NewDescendingRecipeCursorByServings() *RecipeCursor {
 	return &RecipeCursor{
-		LastID:       math.MaxInt64,
-		LastServings: math.MaxInt64,
+		LastID:       math.MaxInt32,
+		LastServings: math.MaxInt32,
 	}
 }
 
@@ -162,20 +162,20 @@ func DecodeCursor[T any](cursor string) (T, error) {
 }
 
 // NormalizeLimit ensures the limit is within acceptable bounds
-func NormalizeLimit(limit int) int {
+func NormalizeLimit(limit int) int64 {
 	if limit <= 0 {
 		return DefaultPageSize
 	}
 	if limit > MaxPageSize {
 		return MaxPageSize
 	}
-	return limit
+	return int64(limit)
 }
 
 // NewPagedResult creates a paginated result from a slice of items
 // It expects items to contain limit+1 items if there are more pages
-func NewPagedResult[T any, C any](items []T, limit int, getCursor func(T) C) Result[T] {
-	hasMore := len(items) > limit
+func NewPagedResult[T any, C any](items []T, limit int64, getCursor func(T) C) Result[T] {
+	hasMore := int64(len(items)) > limit
 	data := items
 	if hasMore {
 		data = items[:limit]
