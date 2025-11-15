@@ -53,8 +53,14 @@ func InsertShoppingList(userID int64, name string) InsertStatement {
 
 // InsertShoppingListItem returns an insert statement for a new shopping list item
 func InsertShoppingListItem(listID int64, ingredient string, quantity, unit *string, done bool, sortOrder int64) InsertStatement {
-	return ShoppingListItem.INSERT(ShoppingListItem.AllColumns).
-		VALUES(listID, ingredient, quantity, unit, done, sortOrder).
+	return ShoppingListItem.INSERT(
+		ShoppingListItem.ShoppingListID,
+		ShoppingListItem.Ingredient,
+		ShoppingListItem.Quantity,
+		ShoppingListItem.Unit,
+		ShoppingListItem.Done,
+		ShoppingListItem.SortOrder,
+	).VALUES(listID, ingredient, quantity, unit, done, sortOrder).
 		RETURNING(ShoppingListItem.AllColumns)
 }
 
