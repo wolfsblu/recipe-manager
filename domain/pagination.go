@@ -28,26 +28,26 @@ type Result[T any] struct {
 
 // Cursor represents the data encoded in a pagination cursor
 type Cursor struct {
-	LastID   int32     `json:"id"`
+	LastID   int64     `json:"id"`
 	LastName string    `json:"name"`
 	LastDate time.Time `json:"date"`
 }
 
 type NameCursor struct {
-	LastID   int32  `json:"id"`
+	LastID   int64  `json:"id"`
 	LastName string `json:"name"`
 }
 
 type DateCursor struct {
-	LastID   int32     `json:"id"`
+	LastID   int64     `json:"id"`
 	LastDate time.Time `json:"date"`
 }
 
 type RecipeCursor struct {
-	LastID        int32     `json:"id"`
+	LastID        int64     `json:"id"`
 	LastName      string    `json:"name,omitempty"`
 	LastCreatedAt time.Time `json:"created_at,omitempty"`
-	LastServings  int32     `json:"servings,omitempty"`
+	LastServings  int64     `json:"servings,omitempty"`
 }
 
 type SortField string
@@ -73,29 +73,29 @@ type RecipeSort struct {
 
 func NewDescendingDateCursor() *DateCursor {
 	return &DateCursor{
-		LastID:   math.MaxInt32,
+		LastID:   math.MaxInt64,
 		LastDate: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
 	}
 }
 
 func NewDescendingRecipeCursorByCreatedAt() *RecipeCursor {
 	return &RecipeCursor{
-		LastID:        math.MaxInt32,
+		LastID:        math.MaxInt64,
 		LastCreatedAt: time.Date(9999, 12, 31, 23, 59, 59, 0, time.UTC),
 	}
 }
 
 func NewDescendingRecipeCursorByName() *RecipeCursor {
 	return &RecipeCursor{
-		LastID:   math.MaxInt32,
+		LastID:   math.MaxInt64,
 		LastName: string(rune(0x10FFFF)), // Max unicode character
 	}
 }
 
 func NewDescendingRecipeCursorByServings() *RecipeCursor {
 	return &RecipeCursor{
-		LastID:       math.MaxInt32,
-		LastServings: math.MaxInt32,
+		LastID:       math.MaxInt64,
+		LastServings: math.MaxInt64,
 	}
 }
 

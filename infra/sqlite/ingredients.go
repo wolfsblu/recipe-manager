@@ -19,7 +19,7 @@ func (s *Store) GetIngredients(ctx context.Context, filters domain.IngredientFil
 	err = queries.SelectIngredientsPaginated(
 		cursor.LastID,
 		cursor.LastName,
-		int64(filters.Page.Limit+1),
+		filters.Page.Limit+1,
 		filters.SortBy,
 		filters.SortOrder,
 		filters.Search,

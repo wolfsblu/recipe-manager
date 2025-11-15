@@ -13,19 +13,19 @@ type UserDetails struct {
 }
 
 type Permission struct {
-	ID   int32
+	ID   int64
 	Name string
 	Slug permissions.Slug
 }
 
 type Role struct {
-	ID          int32
+	ID          int64
 	Name        string
 	Permissions []Permission
 }
 
 type User struct {
-	ID        int32
+	ID        int64
 	Confirmed bool
 	Role      Role
 	UserDetails

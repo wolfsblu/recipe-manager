@@ -8,7 +8,7 @@ import (
 )
 
 // SelectUserByID returns a query to fetch a user with their role
-func SelectUserByID(id int32) SelectStatement {
+func SelectUserByID(id int64) SelectStatement {
 	return SELECT(
 		User.ID,
 		User.Email,
@@ -20,7 +20,7 @@ func SelectUserByID(id int32) SelectStatement {
 		Role.Name.AS("role.name"),
 	).FROM(
 		User.INNER_JOIN(Role, User.RoleID.EQ(Role.ID)),
-	).WHERE(User.ID.EQ(Int32(id))).
+	).WHERE(User.ID.EQ(Int(id))).
 		LIMIT(1)
 }
 
@@ -32,14 +32,14 @@ func SelectUserByEmail(email string) SelectStatement {
 }
 
 // SelectPermissionsByRole returns a query to fetch all permissions for a role
-func SelectPermissionsByRole(roleID int32) SelectStatement {
+func SelectPermissionsByRole(roleID int64) SelectStatement {
 	return SELECT(
 		Permission.ID,
 		Permission.Slug,
 		Permission.Name,
 	).FROM(
 		Permission.INNER_JOIN(RolePermission, Permission.ID.EQ(RolePermission.PermissionID)),
-	).WHERE(RolePermission.RoleID.EQ(Int32(roleID)))
+	).WHERE(RolePermission.RoleID.EQ(Int(roleID)))
 }
 
 // SelectPasswordResetByToken returns a query to fetch a password reset with user
@@ -62,13 +62,13 @@ func SelectPasswordResetByToken(token string) SelectStatement {
 }
 
 // SelectPasswordResetByUser returns a query to fetch a password reset by user ID
-func SelectPasswordResetByUser(userID int32) SelectStatement {
+func SelectPasswordResetByUser(userID int64) SelectStatement {
 	return SELECT(
 		PasswordReset.UserID,
 		PasswordReset.Token,
 		PasswordReset.CreatedAt,
 	).FROM(PasswordReset).
-		WHERE(PasswordReset.UserID.EQ(Int32(userID))).
+		WHERE(PasswordReset.UserID.EQ(Int(userID))).
 		LIMIT(1)
 }
 
@@ -92,7 +92,7 @@ func SelectRegistrationByToken(token string) SelectStatement {
 }
 
 // InsertUser returns an insert statement for a new user
-func InsertUser(email, passwordHash string, roleID int32, locale string) InsertStatement {
+func InsertUser(email, passwordHash string, roleID int64, locale string) InsertStatement {
 	stmt := User.INSERT(User.Email, User.PasswordHash, User.RoleID, User.Locale).
 		VALUES(email, passwordHash, roleID, locale).
 		RETURNING(User.AllColumns)
@@ -101,41 +101,41 @@ func InsertUser(email, passwordHash string, roleID int32, locale string) InsertS
 }
 
 // InsertUserRegistration returns an insert statement for a user registration
-func InsertUserRegistration(userID int32, token string) InsertStatement {
+func InsertUserRegistration(userID int64, token string) InsertStatement {
 	return UserRegistration.INSERT(UserRegistration.UserID, UserRegistration.Token).
 		VALUES(userID, token).
 		RETURNING(UserRegistration.AllColumns)
 }
 
 // InsertPasswordReset returns an insert statement for a password reset
-func InsertPasswordReset(userID int32, token string) InsertStatement {
+func InsertPasswordReset(userID int64, token string) InsertStatement {
 	return PasswordReset.INSERT(PasswordReset.UserID, PasswordReset.Token).
 		VALUES(userID, token).
 		RETURNING(PasswordReset.AllColumns)
 }
 
 // UpdateUser returns an update statement for user details
-func UpdateUser(userID int32, email string, isConfirmed bool) UpdateStatement {
+func UpdateUser(userID int64, email string, isConfirmed bool) UpdateStatement {
 	return User.UPDATE(User.Email, User.IsConfirmed).
 		SET(email, isConfirmed).
-		WHERE(User.ID.EQ(Int32(userID)))
+		WHERE(User.ID.EQ(Int(userID)))
 }
 
 // UpdatePassword returns an update statement for user password
-func UpdatePassword(userID int32, passwordHash string) UpdateStatement {
+func UpdatePassword(userID int64, passwordHash string) UpdateStatement {
 	return User.UPDATE(User.PasswordHash).
 		SET(passwordHash).
-		WHERE(User.ID.EQ(Int32(userID)))
+		WHERE(User.ID.EQ(Int(userID)))
 }
 
 // DeletePasswordReset returns a delete statement for password reset by user
-func DeletePasswordReset(userID int32) DeleteStatement {
-	return PasswordReset.DELETE().WHERE(PasswordReset.UserID.EQ(Int32(userID)))
+func DeletePasswordReset(userID int64) DeleteStatement {
+	return PasswordReset.DELETE().WHERE(PasswordReset.UserID.EQ(Int(userID)))
 }
 
 // DeleteRegistration returns a delete statement for user registration
-func DeleteRegistration(userID int32) DeleteStatement {
-	return UserRegistration.DELETE().WHERE(UserRegistration.UserID.EQ(Int32(userID)))
+func DeleteRegistration(userID int64) DeleteStatement {
+	return UserRegistration.DELETE().WHERE(UserRegistration.UserID.EQ(Int(userID)))
 }
 
 // DeletePasswordResetsBefore returns a delete statement for old password resets

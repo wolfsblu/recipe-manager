@@ -35,6 +35,8 @@ func main() {
 								defaultTableModelField := template.DefaultTableModelField(column)
 								if column.DataType.Name == "INTEGER" {
 									defaultTableModelField.Type = template.NewType(int64(0))
+								} else if column.DataType.Name == "REAL" {
+									defaultTableModelField.Type = template.NewType(float64(0))
 								}
 								return defaultTableModelField
 							})

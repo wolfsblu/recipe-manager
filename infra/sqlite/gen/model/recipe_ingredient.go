@@ -12,6 +12,6 @@ type RecipeIngredient struct {
 	StepID       int64
 	IngredientID int64
 	UnitID       int64
-	Amount       float32
+	Amount       float64
 	SortOrder    int64
 }
