@@ -8,9 +8,9 @@
 package model
 
 type MealPlan struct {
-	ID        int32 `sql:"primary_key"`
+	ID        int64 `sql:"primary_key"`
 	Date      string
-	UserID    int32
-	RecipeID  int32
-	SortOrder int32
+	UserID    int64
+	RecipeID  int64
+	SortOrder int64
 }

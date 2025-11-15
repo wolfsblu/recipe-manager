@@ -8,6 +8,6 @@
 package model
 
 type RolePermission struct {
-	RoleID       int32
-	PermissionID int32
+	RoleID       int64
+	PermissionID int64
 }

@@ -12,11 +12,11 @@ import (
 )
 
 type Recipe struct {
-	ID          int32 `sql:"primary_key"`
+	ID          int64 `sql:"primary_key"`
 	Name        string
-	Servings    int32
-	Minutes     int32
+	Servings    int64
+	Minutes     int64
 	Description string
-	CreatedBy   int32
+	CreatedBy   int64
 	CreatedAt   time.Time
 }

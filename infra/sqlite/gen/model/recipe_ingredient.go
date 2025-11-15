@@ -8,10 +8,10 @@
 package model
 
 type RecipeIngredient struct {
-	ID           int32 `sql:"primary_key"`
-	StepID       int32
-	IngredientID int32
-	UnitID       int32
+	ID           int64 `sql:"primary_key"`
+	StepID       int64
+	IngredientID int64
+	UnitID       int64
 	Amount       float32
-	SortOrder    int32
+	SortOrder    int64
 }

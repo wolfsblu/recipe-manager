@@ -8,7 +8,7 @@
 package model
 
 type Unit struct {
-	ID     int32 `sql:"primary_key"`
+	ID     int64 `sql:"primary_key"`
 	Symbol *string
 	Name   string
 }

@@ -8,7 +8,7 @@
 package model
 
 type IngredientNutrient struct {
-	IngredientID int32 `sql:"primary_key"`
-	NutrientID   int32 `sql:"primary_key"`
+	IngredientID int64 `sql:"primary_key"`
+	NutrientID   int64 `sql:"primary_key"`
 	Amount       float32
 }

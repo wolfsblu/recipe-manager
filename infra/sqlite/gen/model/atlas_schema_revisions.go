@@ -14,11 +14,11 @@ import (
 type AtlasSchemaRevisions struct {
 	Version         string `sql:"primary_key"`
 	Description     string
-	Type            int32
-	Applied         int32
-	Total           int32
+	Type            int64
+	Applied         int64
+	Total           int64
 	ExecutedAt      time.Time
-	ExecutionTime   int32
+	ExecutionTime   int64
 	Error           *string
 	ErrorStmt       *string
 	Hash            string

@@ -12,9 +12,9 @@ import (
 )
 
 type RecipeImage struct {
-	ID        int32 `sql:"primary_key"`
-	RecipeID  int32
+	ID        int64 `sql:"primary_key"`
+	RecipeID  int64
 	Path      string
-	SortOrder int32
+	SortOrder int64
 	CreatedAt time.Time
 }

@@ -12,7 +12,7 @@ import (
 )
 
 type UserRegistration struct {
-	UserID    int32 `sql:"primary_key"`
+	UserID    int64 `sql:"primary_key"`
 	Token     string
 	CreatedAt time.Time
 }

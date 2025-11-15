@@ -8,7 +8,7 @@
 package model
 
 type ShoppingList struct {
-	ID     int32 `sql:"primary_key"`
-	UserID int32
+	ID     int64 `sql:"primary_key"`
+	UserID int64
 	Name   string
 }

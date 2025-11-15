@@ -12,11 +12,11 @@ import (
 )
 
 type User struct {
-	ID           int32 `sql:"primary_key"`
+	ID           int64 `sql:"primary_key"`
 	Email        string
 	PasswordHash string
 	IsConfirmed  bool
-	RoleID       int32
+	RoleID       int64
 	Locale       string
 	CreatedAt    time.Time
 }

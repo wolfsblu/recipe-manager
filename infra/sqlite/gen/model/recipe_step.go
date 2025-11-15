@@ -8,8 +8,8 @@
 package model
 
 type RecipeStep struct {
-	ID           int32 `sql:"primary_key"`
-	RecipeID     int32
+	ID           int64 `sql:"primary_key"`
+	RecipeID     int64
 	Instructions string
-	SortOrder    int32
+	SortOrder    int64
 }

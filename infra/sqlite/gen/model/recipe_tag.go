@@ -8,6 +8,6 @@
 package model
 
 type RecipeTag struct {
-	RecipeID int32 `sql:"primary_key"`
-	TagID    int32 `sql:"primary_key"`
+	RecipeID int64 `sql:"primary_key"`
+	TagID    int64 `sql:"primary_key"`
 }

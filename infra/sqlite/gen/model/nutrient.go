@@ -8,7 +8,7 @@
 package model
 
 type Nutrient struct {
-	ID   int32 `sql:"primary_key"`
+	ID   int64 `sql:"primary_key"`
 	Name string
 	Unit string
 }
