@@ -52,7 +52,7 @@ func (s *UserService) RegisterUser(ctx context.Context, userDetails UserDetails)
 		return ErrUserExists
 	}
 
-	_, registration, err := s.store.RegisterUser(ctx, userDetails)
+	registration, err := s.store.RegisterUser(ctx, userDetails)
 	if err != nil {
 		return err
 	}

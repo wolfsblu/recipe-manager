@@ -34,7 +34,7 @@ type UserStore interface {
 	GetRegistrationByToken(ctx context.Context, token string) (UserRegistration, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
-	RegisterUser(ctx context.Context, userDetails UserDetails) (User, UserRegistration, error)
+	RegisterUser(ctx context.Context, userDetails UserDetails) (UserRegistration, error)
 	UpdatePasswordByToken(ctx context.Context, token, hashedPassword string) error
 }
 

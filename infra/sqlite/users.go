@@ -149,7 +149,7 @@ func (s *Store) ConfirmRegistration(ctx context.Context, user *domain.User) erro
 	})
 }
 
-func (s *Store) RegisterUser(ctx context.Context, userDetails domain.UserDetails) (domain.User, domain.UserRegistration, error) {
+func (s *Store) RegisterUser(ctx context.Context, userDetails domain.UserDetails) (domain.UserRegistration, error) {
 	var user domain.User
 	var registration domain.UserRegistration
 
@@ -168,10 +168,12 @@ func (s *Store) RegisterUser(ctx context.Context, userDetails domain.UserDetails
 		if err != nil {
 			return err
 		}
+
 		registration = s.mapper.ToUserRegistration(dbRegistration)
+		registration.User = &user
 
 		return nil
 	})
 
-	return user, registration, err
+	return registration, err
 }
