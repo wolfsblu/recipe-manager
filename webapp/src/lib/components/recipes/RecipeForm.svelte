@@ -7,9 +7,10 @@
     import { Textarea } from "$lib/components/ui/textarea/index.js";
     import { Separator } from "$lib/components/ui/separator/index.js";
     import * as Form from '$lib/components/ui/form/index.js';
-    import { TagsInput } from '$lib/components/ui/tags-input';
+    import AsyncTagsInput from '$lib/components/ui/tags-input/async-tags-input.svelte';
     import ImageUpload from "$lib/components/recipes/ImageUpload.svelte";
-    import Combobox from "$lib/components/recipes/Combobox.svelte";
+    import AsyncCombobox from "$lib/components/recipes/AsyncCombobox.svelte";
+    import { getIngredients, getUnits, getTags } from "$lib/api/recipes/recipes.svelte";
 
     import ClockIcon from '@lucide/svelte/icons/clock';
     import UsersIcon from '@lucide/svelte/icons/users';
@@ -28,23 +29,33 @@
     // Props
     interface Props {
         form: SuperForm<typeof formSchema>;
-        ingredients: Array<{ id: number; name: string }>;
-        units: Array<{ id: number; name: string }>;
-        tags: Array<{ id: number; name: string }>;
         isEditing?: boolean;
         submitText?: string;
         onCancel?: () => void;
     }
 
-    let { 
-        form, 
-        ingredients, 
-        units, 
-        tags, 
-        isEditing = false, 
+    let {
+        form,
+        isEditing = false,
         submitText = isEditing ? "Update Recipe" : "Create Recipe",
         onCancel
     }: Props = $props();
+
+    // Fetch functions for async components
+    const fetchIngredients = async (search: string) => {
+        const response = await getIngredients({ search, limit: 50 });
+        return response.data.map(ing => ({ value: ing.id, label: ing.name }));
+    };
+
+    const fetchUnits = async (search: string) => {
+        const response = await getUnits({ search, limit: 50 });
+        return response.data.map(unit => ({ value: unit.id, label: unit.name }));
+    };
+
+    const fetchTags = async (search: string) => {
+        const response = await getTags({ search, limit: 50 });
+        return response.data.map(tag => ({ value: tag.id, label: tag.name }));
+    };
 
     const { form: formData, enhance } = form;
 
@@ -163,20 +174,17 @@
                     </div>
 
                     <!-- Tags -->
-                    <Form.Field {form} name="tags">
-                        <Form.Control>
-                            {#snippet children({ props })}
-                                <Form.Label>{m.recipes_form_tags()}</Form.Label>
-                                <TagsInput
-                                    {...props}
-                                    bind:value={$formData.tags}
-                                    placeholder={m.recipes_form_tagsPlaceholder()}
-                                    suggestions={tags?.map(tag => ({ id: tag.id, label: tag.name })) || []}
-                                />
-                            {/snippet}
-                        </Form.Control>
-                        <Form.FieldErrors />
-                    </Form.Field>
+                    <div class="space-y-2">
+                        <label for="recipe-tags" class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                            {m.recipes_form_tags()}
+                        </label>
+                        <AsyncTagsInput
+                            id="recipe-tags"
+                            bind:value={$formData.tags}
+                            placeholder={m.recipes_form_tagsPlaceholder()}
+                            fetchSuggestions={fetchTags}
+                        />
+                    </div>
                 </div>
 
                 <!-- Right Column -->
@@ -303,18 +311,18 @@
                                                         <Form.FieldErrors />
                                                     </Form.ElementField>
 
-                                                    <Combobox
+                                                    <AsyncCombobox
                                                         {form}
                                                         name="steps[{stepIndex}].ingredients[{ingredientIndex}].unitId"
-                                                        options={units?.map(unit => ({ value: unit.id, label: unit.name })) || []}
+                                                        fetchOptions={fetchUnits}
                                                         bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].unitId}
                                                     />
                                                 </div>
 
-                                                <Combobox
+                                                <AsyncCombobox
                                                     {form}
                                                     name="steps[{stepIndex}].ingredients[{ingredientIndex}].ingredientId"
-                                                    options={ingredients?.map(ingredient => ({ value: ingredient.id, label: ingredient.name })) || []}
+                                                    fetchOptions={fetchIngredients}
                                                     bind:value={$formData.steps[stepIndex].ingredients[ingredientIndex].ingredientId}
                                                 />
 

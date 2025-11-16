@@ -12,7 +12,7 @@
     import * as m from "$lib/paraglide/messages.js";
 
     let { data }: { data: PageData } = $props();
-    const { recipe, ingredients, units, tags } = data;
+    const { recipe } = data;
 
     const form = superForm(data.form, {
         SPA: true,
@@ -52,9 +52,6 @@
 
     <RecipeForm
         {form}
-        {ingredients}
-        {units}
-        {tags}
         isEditing={true}
         submitText={m.recipes_edit_submitButton()}
         onCancel={handleCancel}

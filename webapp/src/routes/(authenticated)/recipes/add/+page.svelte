@@ -11,7 +11,6 @@
     import * as m from "$lib/paraglide/messages.js";
 
     let { data }: { data: PageData } = $props();
-    const { ingredients, units, tags } = data;
 
     const form = superForm(data.form, {
         SPA: true,
@@ -45,9 +44,6 @@
 
     <RecipeForm
         {form}
-        {ingredients}
-        {units}
-        {tags}
         isEditing={false}
         submitText={m.recipes_add_submitButton()}
     />

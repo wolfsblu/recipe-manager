@@ -1,5 +1,5 @@
 import type { PageLoad } from './$types';
-import { getRecipe, getIngredients, getUnits, getTags } from "$lib/api/recipes/recipes.svelte.js";
+import { getRecipe } from "$lib/api/recipes/recipes.svelte.js";
 import { superValidate } from "sveltekit-superforms";
 import { zod4 } from "sveltekit-superforms/adapters";
 import { formSchema } from "../../add/schema";
@@ -9,16 +9,7 @@ export const prerender = false
 export const load: PageLoad = async ({ params }) => {
     const recipeId = Number(params.id)
 
-    const [recipe, ingredientsResponse, unitsResponse, tagsResponse] = await Promise.all([
-        getRecipe(recipeId),
-        getIngredients({ limit: 100 }),
-        getUnits({ limit: 100 }),
-        getTags({ limit: 100 })
-    ])
-
-    const ingredients = ingredientsResponse.data
-    const units = unitsResponse.data
-    const tags = tagsResponse.data
+    const recipe = await getRecipe(recipeId)
 
     const breadcrumbs = [
         { link: "/", name: "Home" },
@@ -47,9 +38,6 @@ export const load: PageLoad = async ({ params }) => {
     return {
         breadcrumbs,
         recipe,
-        ingredients,
-        units,
-        tags,
         form,
     };
 };
