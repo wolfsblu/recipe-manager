@@ -65,12 +65,12 @@ func (s *RecipeService) GetIngredients(ctx context.Context, filters IngredientFi
 	return s.store.GetIngredients(ctx, filters)
 }
 
-func (s *RecipeService) GetUnits(ctx context.Context, page Page) (Result[Unit], error) {
-	return s.store.GetUnits(ctx, page)
+func (s *RecipeService) GetUnits(ctx context.Context, filters UnitFilters) (Result[Unit], error) {
+	return s.store.GetUnits(ctx, filters)
 }
 
-func (s *RecipeService) GetTags(ctx context.Context, page Page) (Result[Tag], error) {
-	return s.store.GetTags(ctx, page)
+func (s *RecipeService) GetTags(ctx context.Context, filters TagFilters) (Result[Tag], error) {
+	return s.store.GetTags(ctx, filters)
 }
 
 func (s *RecipeService) UpdateRecipe(ctx context.Context, recipe Recipe) (Recipe, error) {

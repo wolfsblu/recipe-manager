@@ -101,13 +101,23 @@ func DeleteIngredientNutrients(ingredientID int64) DeleteStatement {
 }
 
 // SelectUnits returns a paginated query for units
-func SelectUnits(lastID int64, lastName string, limit int64) SelectStatement {
+func SelectUnits(lastID int64, lastName string, search string, limit int64) SelectStatement {
+	var whereClauses []BoolExpression
+
+	// Add pagination cursor
+	whereClauses = append(whereClauses, ROW(Unit.Name, Unit.ID).GT(ROW(String(lastName), Int(lastID))))
+
+	// Add search filter if provided
+	if search != "" {
+		whereClauses = append(whereClauses, Unit.Name.LIKE(String("%"+search+"%")))
+	}
+
 	return SELECT(
 		Unit.ID,
 		Unit.Name,
 		Unit.Symbol,
 	).FROM(Unit).
-		WHERE(ROW(Unit.Name, Unit.ID).GT(ROW(String(lastName), Int(lastID)))).
+		WHERE(AND(whereClauses...)).
 		ORDER_BY(Unit.Name.ASC(), Unit.ID.ASC()).
 		LIMIT(limit)
 }

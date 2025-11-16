@@ -419,6 +419,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/CursorParam'
         - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SearchParam'
       responses:
         '200':
           description: Successful operation
@@ -487,6 +488,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/CursorParam'
         - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SearchParam'
       responses:
         '200':
           description: Successful operation
@@ -676,6 +678,13 @@ components:
         minimum: 1
         maximum: 100
         default: 30
+    SearchParam:
+      name: search
+      in: query
+      description: Search query to filter results by name
+      required: false
+      schema:
+        type: string
     RecipeSortFieldParam:
       name: sort_field
       in: query

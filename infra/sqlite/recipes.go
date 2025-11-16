@@ -241,14 +241,14 @@ func (s *Store) buildMealPlans(grouped map[string]*domain.MealPlan, populatedMap
 	return mealPlans
 }
 
-func (s *Store) GetTags(ctx context.Context, req domain.Page) (domain.Result[domain.Tag], error) {
-	cursor, err := domain.DecodeCursor[*domain.NameCursor](req.Cursor)
+func (s *Store) GetTags(ctx context.Context, filters domain.TagFilters) (domain.Result[domain.Tag], error) {
+	cursor, err := domain.DecodeCursor[*domain.NameCursor](filters.Page.Cursor)
 	if err != nil {
 		cursor = &domain.NameCursor{}
 	}
 
 	var result []model.Tag
-	err = queries.SelectTags(cursor.LastID, cursor.LastName, req.Limit+1).QueryContext(ctx, s.DB(), &result)
+	err = queries.SelectTags(cursor.LastID, cursor.LastName, filters.Search, filters.Page.Limit+1).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.Tag]{}, err
 	}
@@ -258,7 +258,7 @@ func (s *Store) GetTags(ctx context.Context, req domain.Page) (domain.Result[dom
 		tags = append(tags, s.mapper.ToTagFromModel(tag))
 	}
 
-	return domain.NewPagedResult(tags, req.Limit, func(t domain.Tag) domain.NameCursor {
+	return domain.NewPagedResult(tags, filters.Page.Limit, func(t domain.Tag) domain.NameCursor {
 		return domain.NameCursor{
 			LastID:   t.ID,
 			LastName: t.Name,

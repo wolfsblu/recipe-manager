@@ -8,14 +8,14 @@ import (
 	"github.com/wolfsblu/recipe-manager/infra/sqlite/queries"
 )
 
-func (s *Store) GetUnits(ctx context.Context, req domain.Page) (domain.Result[domain.Unit], error) {
-	cursor, err := domain.DecodeCursor[*domain.NameCursor](req.Cursor)
+func (s *Store) GetUnits(ctx context.Context, filters domain.UnitFilters) (domain.Result[domain.Unit], error) {
+	cursor, err := domain.DecodeCursor[*domain.NameCursor](filters.Page.Cursor)
 	if err != nil {
 		cursor = &domain.NameCursor{}
 	}
 
 	var result []model.Unit
-	err = queries.SelectUnits(cursor.LastID, cursor.LastName, int64(req.Limit+1)).QueryContext(ctx, s.DB(), &result)
+	err = queries.SelectUnits(cursor.LastID, cursor.LastName, filters.Search, int64(filters.Page.Limit+1)).QueryContext(ctx, s.DB(), &result)
 	if err != nil {
 		return domain.Result[domain.Unit]{}, err
 	}
@@ -25,7 +25,7 @@ func (s *Store) GetUnits(ctx context.Context, req domain.Page) (domain.Result[do
 		units = append(units, s.mapper.ToUnit(unit))
 	}
 
-	return domain.NewPagedResult(units, req.Limit, func(u domain.Unit) domain.NameCursor {
+	return domain.NewPagedResult(units, filters.Page.Limit, func(u domain.Unit) domain.NameCursor {
 		return domain.NameCursor{
 			LastID:   u.ID,
 			LastName: u.Name,

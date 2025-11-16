@@ -230,7 +230,12 @@ func (h *RecipeHandler) GetUnits(ctx context.Context, params api.GetUnitsParams)
 		return nil, err
 	}
 
-	result, err := h.Recipes.GetUnits(ctx, paginationReq)
+	filters := domain.UnitFilters{
+		Page:   paginationReq,
+		Search: params.Search.Value,
+	}
+
+	result, err := h.Recipes.GetUnits(ctx, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +258,12 @@ func (h *RecipeHandler) GetTags(ctx context.Context, params api.GetTagsParams) (
 		return nil, err
 	}
 
-	result, err := h.Recipes.GetTags(ctx, paginationReq)
+	filters := domain.TagFilters{
+		Page:   paginationReq,
+		Search: params.Search.Value,
+	}
+
+	result, err := h.Recipes.GetTags(ctx, filters)
 	if err != nil {
 		return nil, err
 	}

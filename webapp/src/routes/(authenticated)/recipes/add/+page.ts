@@ -11,17 +11,17 @@ export const load: PageLoad = async () => {
         { link: "/recipes/add", name: "New Recipe" },
     ]
 
-    const [ingredients, units, tags] = await Promise.all([
-        getIngredients(),
-        getUnits(),
-        getTags()
+    const [ingredientsResponse, unitsResponse, tagsResponse] = await Promise.all([
+        getIngredients({ limit: 100 }),
+        getUnits({ limit: 100 }),
+        getTags({ limit: 100 })
     ])
 
     return {
         breadcrumbs,
-        ingredients,
-        units,
-        tags,
+        ingredients: ingredientsResponse.data,
+        units: unitsResponse.data,
+        tags: tagsResponse.data,
         form: await superValidate(zod4(formSchema)),
     };
 };

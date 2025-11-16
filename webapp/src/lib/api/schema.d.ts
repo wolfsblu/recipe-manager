@@ -818,6 +818,8 @@ export interface components {
         CursorParam: string;
         /** @description Maximum number of items to return (default 30, max 100) */
         LimitParam: number;
+        /** @description Search query to filter results by name */
+        SearchParam: string;
         /** @description Field to sort recipes by */
         RecipeSortFieldParam: "name" | "created_at" | "servings";
         /** @description Sort order direction */
@@ -1216,6 +1218,12 @@ export interface operations {
                 cursor?: components["parameters"]["CursorParam"];
                 /** @description Maximum number of items to return (default 30, max 100) */
                 limit?: components["parameters"]["LimitParam"];
+                /** @description Field to sort by */
+                sortBy?: "name" | "id";
+                /** @description Sort order (ascending or descending) */
+                sortOrder?: "asc" | "desc";
+                /** @description Search ingredients by name */
+                search?: string;
             };
             header?: never;
             path?: never;
@@ -1288,6 +1296,8 @@ export interface operations {
                 cursor?: components["parameters"]["CursorParam"];
                 /** @description Maximum number of items to return (default 30, max 100) */
                 limit?: components["parameters"]["LimitParam"];
+                /** @description Search query to filter results by name */
+                search?: components["parameters"]["SearchParam"];
             };
             header?: never;
             path?: never;
@@ -1360,6 +1370,8 @@ export interface operations {
                 cursor?: components["parameters"]["CursorParam"];
                 /** @description Maximum number of items to return (default 30, max 100) */
                 limit?: components["parameters"]["LimitParam"];
+                /** @description Search query to filter results by name */
+                search?: components["parameters"]["SearchParam"];
             };
             header?: never;
             path?: never;

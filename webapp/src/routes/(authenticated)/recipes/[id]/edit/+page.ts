@@ -9,12 +9,16 @@ export const prerender = false
 export const load: PageLoad = async ({ params }) => {
     const recipeId = Number(params.id)
 
-    const [recipe, ingredients, units, tags] = await Promise.all([
+    const [recipe, ingredientsResponse, unitsResponse, tagsResponse] = await Promise.all([
         getRecipe(recipeId),
-        getIngredients(),
-        getUnits(),
-        getTags()
+        getIngredients({ limit: 100 }),
+        getUnits({ limit: 100 }),
+        getTags({ limit: 100 })
     ])
+
+    const ingredients = ingredientsResponse.data
+    const units = unitsResponse.data
+    const tags = tagsResponse.data
 
     const breadcrumbs = [
         { link: "/", name: "Home" },

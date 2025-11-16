@@ -83,12 +83,13 @@ export const deleteRecipe = async (id: number) => {
     return response.data
 }
 
-export const getIngredients = async (params?: { cursor?: string | null; limit?: number }) => {
+export const getIngredients = async (params?: { cursor?: string | null; limit?: number; search?: string }) => {
     const response = await client.GET("/ingredients", {
         params: {
             query: {
                 cursor: params?.cursor ?? undefined,
-                limit: params?.limit ?? undefined
+                limit: params?.limit ?? undefined,
+                search: params?.search ?? undefined
             }
         }
     })
@@ -98,12 +99,13 @@ export const getIngredients = async (params?: { cursor?: string | null; limit?: 
     return response.data
 }
 
-export const getUnits = async (params?: { cursor?: string | null; limit?: number }) => {
+export const getUnits = async (params?: { cursor?: string | null; limit?: number; search?: string }) => {
     const response = await client.GET("/units", {
         params: {
             query: {
                 cursor: params?.cursor ?? undefined,
-                limit: params?.limit ?? undefined
+                limit: params?.limit ?? undefined,
+                search: params?.search ?? undefined
             }
         }
     })
@@ -113,12 +115,13 @@ export const getUnits = async (params?: { cursor?: string | null; limit?: number
     return response.data
 }
 
-export const getTags = async (params?: { cursor?: string | null; limit?: number }) => {
+export const getTags = async (params?: { cursor?: string | null; limit?: number; search?: string }) => {
     const response = await client.GET("/tags", {
         params: {
             query: {
                 cursor: params?.cursor ?? undefined,
-                limit: params?.limit ?? undefined
+                limit: params?.limit ?? undefined,
+                search: params?.search ?? undefined
             }
         }
     })

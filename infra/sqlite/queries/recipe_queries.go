@@ -131,12 +131,22 @@ func SelectNutrientsForRecipes(recipeIDs []int64) SelectStatement {
 }
 
 // SelectTags returns a paginated query for tags
-func SelectTags(lastID int64, lastName string, limit int64) SelectStatement {
+func SelectTags(lastID int64, lastName string, search string, limit int64) SelectStatement {
+	var whereClauses []BoolExpression
+
+	// Add pagination cursor
+	whereClauses = append(whereClauses, ROW(Tag.Name, Tag.ID).GT(ROW(String(lastName), Int(lastID))))
+
+	// Add search filter if provided
+	if search != "" {
+		whereClauses = append(whereClauses, Tag.Name.LIKE(String("%"+search+"%")))
+	}
+
 	return SELECT(
 		Tag.ID,
 		Tag.Name,
 	).FROM(Tag).
-		WHERE(ROW(Tag.Name, Tag.ID).GT(ROW(String(lastName), Int(lastID)))).
+		WHERE(AND(whereClauses...)).
 		ORDER_BY(Tag.Name.ASC(), Tag.ID.ASC()).
 		LIMIT(limit)
 }
