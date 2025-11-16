@@ -5,6 +5,11 @@
 	import { useDebounce } from 'runed';
 
 	type Suggestion = { id: number; label: string };
+	type FetchResult = {
+		suggestions: Suggestion[];
+		nextCursor?: string | null;
+		hasMore: boolean;
+	};
 
 	// Define defaultValidate before using it
 	const defaultValidate = (val: Suggestion, tags: number[]) => {
@@ -30,7 +35,7 @@
 		class?: string;
 		disabled?: boolean;
 		validate?: (val: Suggestion, tags: number[]) => number | undefined;
-		fetchSuggestions: (searchQuery: string) => Promise<Suggestion[]>;
+		fetchSuggestions: (searchQuery: string, cursor?: string | null) => Promise<FetchResult>;
 		minSearchLength?: number;
 		debounceMs?: number;
 		id?: string;
@@ -46,26 +51,37 @@
 	let containerElement: HTMLDivElement;
 	let loading = $state(false);
 	let suggestions = $state<Suggestion[]>([]);
+	let nextCursor = $state<string | null | undefined>(undefined);
+	let hasMore = $state(false);
 
-	// Debounced search function
-	const debouncedSearch = useDebounce(async (query: string) => {
+	// Search function
+	async function performSearch(query: string) {
 		if (query.length < minSearchLength) {
 			suggestions = [];
+			nextCursor = undefined;
+			hasMore = false;
 			return;
 		}
 
 		loading = true;
 		try {
-			const results = await fetchSuggestions(query);
+			const result = await fetchSuggestions(query);
 			// Filter out already selected tags
-			suggestions = results.filter(s => !value.includes(s.id));
+			suggestions = result.suggestions.filter(s => !value.includes(s.id));
+			nextCursor = result.nextCursor;
+			hasMore = result.hasMore;
 		} catch (error) {
 			console.error('Failed to fetch suggestions:', error);
 			suggestions = [];
+			nextCursor = undefined;
+			hasMore = false;
 		} finally {
 			loading = false;
 		}
-	}, debounceMs);
+	}
+
+	// Debounced search function
+	const debouncedSearch = useDebounce(performSearch, debounceMs);
 
 	$effect(() => {
 		// whenever input value changes reset invalid and update dropdown

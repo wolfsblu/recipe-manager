@@ -12,6 +12,11 @@
     import { useDebounce } from 'runed';
 
     type Option = { value: number; label: string };
+    type FetchResult = {
+        options: Option[];
+        nextCursor?: string | null;
+        hasMore: boolean;
+    };
 
     let {
         empty = 'No results found.',
@@ -30,7 +35,7 @@
         placeholder?: string;
         search?: string;
         value?: number;
-        fetchOptions: (searchQuery: string) => Promise<Option[]>;
+        fetchOptions: (searchQuery: string, cursor?: string | null) => Promise<FetchResult>;
         minSearchLength?: number;
         debounceMs?: number;
     } = $props();
@@ -40,6 +45,8 @@
     let loading = $state(false);
     let options = $state<Option[]>([]);
     let selectedOption = $state<Option | undefined>(undefined);
+    let nextCursor = $state<string | null | undefined>(undefined);
+    let hasMore = $state(false);
 
     const itemHeight = 34;
     const maxHeight = 300;
@@ -52,18 +59,38 @@
     async function performSearch(query: string) {
         loading = true;
         try {
-            const results = await fetchOptions(query);
+            const result = await fetchOptions(query);
             // Only update if dropdown is still open
             if (open) {
-                options = results;
+                options = result.options;
+                nextCursor = result.nextCursor;
+                hasMore = result.hasMore;
             }
         } catch (error) {
             console.error('Failed to fetch options:', error);
             if (open) {
                 options = [];
+                nextCursor = undefined;
+                hasMore = false;
             }
         } finally {
             loading = false;
+        }
+    }
+
+    // Load more results for infinite scroll
+    async function loadMore() {
+        if (!hasMore || !nextCursor) return;
+
+        try {
+            const result = await fetchOptions(searchQuery, nextCursor);
+            if (open) {
+                options = [...options, ...result.options];
+                nextCursor = result.nextCursor;
+                hasMore = result.hasMore;
+            }
+        } catch (error) {
+            console.error('Failed to load more options:', error);
         }
     }
 
@@ -121,8 +148,8 @@
         // If not found, we need to fetch all to find it
         // Or you could add a getById API endpoint
         try {
-            const allOptions = await fetchOptions('');
-            const option = allOptions.find(opt => opt.value === val);
+            const result = await fetchOptions('');
+            const option = result.options.find(opt => opt.value === val);
             if (option) {
                 selectedOption = option;
             }
@@ -193,6 +220,19 @@
                             height={dynamicHeight}
                             itemCount={options.length}
                             itemSize={itemHeight}
+                            onAfterScroll={(e) => {
+                                console.log(e)
+                                const target = e.event.target;
+                                if (target == null) return
+                                const scrollTop = target.scrollTop;
+                                const scrollHeight = target.scrollHeight;
+                                const clientHeight = target.clientHeight;
+
+                                // Load more when scrolled to within 100px of bottom
+                                if (scrollHeight - scrollTop - clientHeight < 100) {
+                                    loadMore();
+                                }
+                            }}
                         >
                             {#snippet item({ index, style })}
                                 {@const option = options?.[index]}

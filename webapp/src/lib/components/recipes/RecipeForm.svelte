@@ -42,19 +42,31 @@
     }: Props = $props();
 
     // Fetch functions for async components
-    const fetchIngredients = async (search: string) => {
-        const response = await getIngredients({ search, limit: 50 });
-        return response.data.map(ing => ({ value: ing.id, label: ing.name }));
+    const fetchIngredients = async (search: string, cursor?: string | null) => {
+        const response = await getIngredients({ search, limit: 50, cursor: cursor ?? undefined });
+        return {
+            options: response.data.map(ing => ({ value: ing.id, label: ing.name })),
+            nextCursor: response.nextCursor,
+            hasMore: response.hasMore
+        };
     };
 
-    const fetchUnits = async (search: string) => {
-        const response = await getUnits({ search, limit: 50 });
-        return response.data.map(unit => ({ value: unit.id, label: unit.name }));
+    const fetchUnits = async (search: string, cursor?: string | null) => {
+        const response = await getUnits({ search, limit: 50, cursor: cursor ?? undefined });
+        return {
+            options: response.data.map(unit => ({ value: unit.id, label: unit.name })),
+            nextCursor: response.nextCursor,
+            hasMore: response.hasMore
+        };
     };
 
-    const fetchTags = async (search: string) => {
-        const response = await getTags({ search, limit: 50 });
-        return response.data.map(tag => ({ value: tag.id, label: tag.name }));
+    const fetchTags = async (search: string, cursor?: string | null) => {
+        const response = await getTags({ search, limit: 50, cursor: cursor ?? undefined });
+        return {
+            suggestions: response.data.map(tag => ({ id: tag.id, label: tag.name })),
+            nextCursor: response.nextCursor,
+            hasMore: response.hasMore
+        };
     };
 
     const { form: formData, enhance } = form;
